@@ -1,4 +1,4 @@
-@extends('layouts')
+@extends('layouts.app')
 
 @section('title', 'Trang chủ')
 
@@ -30,6 +30,33 @@
                         </a>
                     </p>
                 </div>
+
+                <!-- Giới thiệu nền tảng học tập -->
+                <div class="mt-4 p-3 bg-white rounded border shadow-sm">
+                    <h4 class="text-success">🎓 Nền tảng học tập trực tuyến miễn phí</h4>
+                    <p class="text-justify">
+                        Website này là một <strong>nền tảng học tập trực tuyến</strong> được đầu tư biên soạn công phu, kỹ lưỡng.
+                        Nội dung bao gồm đầy đủ các môn học quan trọng trong kỳ thi tốt nghiệp như <strong>Toán 12, Vật lí 12, Hóa học 12</strong>,
+                        đến cả các môn học cấp 1, cấp 2 – tất cả đều được xây dựng bài bản và đồ sộ.
+                    </p>
+                    <p class="text-justify">
+                        Mình hy vọng đây sẽ là nơi giúp các bạn học sinh học tập hiệu quả hơn, tự tin hơn trên hành trình ôn thi và tích lũy kiến thức.
+                    </p>
+                </div>
+
+                <!-- Kêu gọi ủng hộ -->
+                <div class="mt-4 p-3 bg-light rounded border">
+                    <h4 class="text-danger">❤️ Ủng hộ tác giả</h4>
+                    <p class="text-justify">
+                        Nếu bạn thấy website hữu ích và muốn góp phần giúp mình duy trì và phát triển nội dung, có thể ủng hộ qua:
+                    </p>
+                    <ul>
+                        <li><strong>Ngân hàng NCB</strong> – Trương Thành Công</li>
+                        <li><strong>Số tài khoản:</strong> <span class="text-primary">100007635197</span></li>
+                    </ul>
+                    <p class="mb-0">Mình rất cảm ơn sự quan tâm và ủng hộ của các bạn 💖</p>
+                </div>
+
 
                 <h4 class="mt-5">🌱 Những cái cây mình trồng</h4>
                 <div class="d-flex flex-wrap gap-3 justify-content-center">

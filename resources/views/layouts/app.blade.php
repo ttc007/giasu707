@@ -56,19 +56,22 @@
                         <a class="nav-link" href="{{ url('/') }}">Trang chủ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/ly12') }}">Lý 12</a>
+                        <a class="nav-link" href="{{ url('/vat-li-12') }}">Vật lí 12</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/khoahoc') }}">Khóa học</a>
+                        <a class="nav-link" href="{{ url('/toan-12') }}">Toán 12</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/thaoluan') }}">Thảo luận</a>
+                        <a class="nav-link" href="{{ url('/hoa-12') }}">Hóa 12</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/baiviet') }}">Bài viết</a>
+                        <a class="nav-link" href="{{ url('/thi-thu') }}">Thi thử</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/gioithieu') }}">Giới thiệu</a>
+                        <a class="nav-link" href="{{ url('/dang-ki') }}">Đăng kí học</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url('/bai-viet') }}">Bài viết</a>
                     </li>
                 </ul>
             </div>
