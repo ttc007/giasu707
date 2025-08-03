@@ -16,12 +16,12 @@
             background: #f9f9f9;
         }
         header, footer {
-            background: #a7c5eb;
+            background: #7cb342;
             color: white;
             padding: 1rem;
         }
         nav {
-            background: ##a7c5eb;
+            background: #6eb816;
         }
         nav a {
             color: white !important;
@@ -33,6 +33,15 @@
             margin-top: 2rem;
             text-align: center;
         }
+
+        a {
+            color: #58a407;
+            text-decoration:none;
+        }
+
+        h2, h4, h1 {
+            color: #699238!important;
+        }
     </style>
 </head>
 <body>
@@ -42,7 +51,7 @@
                 <img src="{{ asset('images/banner.png') }}" alt="Banner giáo dục" class="img-fluid w-100  shadow">
             </div>
         </div>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-info">
+        <nav class="navbar navbar-expand-lg navbar-dark">
             <a class="navbar-brand px-2" href="{{ url('/') }}" >Gia sư 707</a>
             <!-- Nút toggle khi thu gọn -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,5 +94,17 @@
             © {{ date('Y') }} Gia sư 707 - Made with ❤️ ở quê
         </footer>
     </div>
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        startup: {
+          typeset: true
+        }
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
 </body>
 </html>

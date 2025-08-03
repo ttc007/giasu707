@@ -9,15 +9,16 @@
         <thead>
             <tr>
                 <th>Tên chương</th>
-                <th>Thuộc môn</th>
+                <th>Nội dung tổng hợp</th>
                 <th>Hành động</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($chapters as $chapter)
                 <tr>
-                    <td>{{ $chapter->title }}</td>
-                    <td>{{ $chapter->subject->name }}</td>
+                    <td><b>{{ $chapter->title }}</b><br>
+                    {{ $chapter->subject->name }}</td>
+                    <td>{!!$chapter->summary!!}</td>
                     <td>
                         <a href="{{ route('chapters.edit', $chapter) }}" class="btn btn-sm btn-primary">Sửa</a>
                         <form action="{{ route('chapters.destroy', $chapter) }}" method="POST" style="display:inline-block">

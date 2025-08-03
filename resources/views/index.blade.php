@@ -11,7 +11,7 @@
                 <div class="text-center mb-4">
                     <img src="{{ asset('images/avata.jpg') }}" class="rounded-circle shadow" width="150" alt="Ảnh đại diện">
                 </div>
-                <h2 class="text-primary text-center">Xin chào, mình là Trương Thành Công</h2>
+                <h2 class="text-center">Xin chào, mình là Trương Thành Công</h2>
                 <p class="mt-3 text-justify">
                     Mình từng là một lập trình viên. Nhưng đến một ngày mình chán cái cảnh làm 8 tiếng mỗi ngày bán mình cho tư bản...
                     Mình đã quyết định nghỉ làm để về quê. Trồng cây và dạy học online.
@@ -19,16 +19,22 @@
 
                 <!-- Giới thiệu Gia sư 707 -->
                 <div class="mt-5 p-3 bg-light rounded border">
-                    <h4 class="text-info">📚 Gia sư 707 là gì?</h4>
+                    <h4 class="">📚 Gia sư 707 là gì?</h4>
                     <p class="text-justify">
                         <strong>Gia sư 707</strong> là một nhóm học tập nhỏ mà mình lập ra để giúp các bạn học sinh có thể hỏi bài mọi lúc mọi nơi.
-                        Các bạn có thể gửi câu hỏi qua <strong>Zalo: 0909707000</strong>, mình sẽ trả lời nhanh và dễ hiểu nhất có thể.
+                        Các bạn có thể gửi câu hỏi qua <strong>Zalo: 0909707000</strong>, mình sẽ trả lời nhanh và dễ hiểu nhất có thể.<br>
+                        Hoặc follow mình trên <strong>Facebook</strong> để tiện nhắn tin nhé.
                     </p>
                     <p>
-                        👉 <a href="https://zalo.me/0909707000" target="_blank" class="btn btn-outline-primary btn-sm">
+                        👉 <a href="https://zalo.me/0909707000" target="_blank" class="btn btn-outline-success btn-sm">
                             Nhắn tin Zalo ngay
+                        </a> <br><br>
+                        👉 <a href="https://www.facebook.com/truong.thanh.cong.201321" target="_blank" class="btn btn-outline-primary btn-sm">
+                            Follow Facebook
                         </a>
                     </p>
+
+
                 </div>
 
                 <!-- Giới thiệu nền tảng học tập -->
@@ -43,7 +49,18 @@
                         Mình hy vọng đây sẽ là nơi giúp các bạn học sinh học tập hiệu quả hơn, tự tin hơn trên hành trình ôn thi và tích lũy kiến thức.
                     </p>
                 </div>
-
+                <div class="mt-4 p-3 bg-white rounded border shadow-sm">
+                <h4 class="mt-4">🧑‍💻 Dịch vụ thiết kế website</h4>
+                    <p class="text-justify">
+                        Ngoài việc dạy học, mình còn nhận thiết kế website cho cá nhân, cửa hàng, trung tâm, trường học... Bạn có thể <a href="/bang-gia-thiet-ke-website" class="fw-bold">tham khảo bảng giá tại đây</a>.  
+                        Đảm bảo sản phẩm <strong>đẹp mắt, đầy đủ tính năng, chuẩn SEO</strong> mà giá cả thì <em>rất chi là "sinh viên" luôn</em> 😄.
+                    </p>
+                    <p>
+                        👉 <a href="/bang-gia-thiet-ke-website" class="btn btn-outline-primary btn-sm">
+                            Tham khảo bảng giá
+                        </a>
+                    </p>
+                </div>
                 <!-- Kêu gọi ủng hộ -->
                 <div class="mt-4 p-3 bg-light rounded border">
                     <h4 class="text-danger">❤️ Ủng hộ tác giả</h4>

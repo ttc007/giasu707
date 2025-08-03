@@ -1,0 +1,5 @@
+Cách gõ latex:
+Gõ Ni với Z và A: \( {}^{106}_{28}\mathrm{Ni} \)
+Gõ Q tỏa = Q thu: 
+Q = mc delta t : \( Q_1 = m_1 c \Delta t_1 \)
+Phân số: \( \frac{}\{} \)

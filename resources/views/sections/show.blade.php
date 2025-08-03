@@ -14,7 +14,7 @@
         'lesson_slug' => $section->lesson->slug
     ]) }}">{{ $section->lesson->title }}</a></h5>
 
-    <h3>{{ $section->title }}</h3>
+    <h1 class="text-center pt-4">{{ $section->title }}</h1>
 
     <hr>
     <div>
@@ -31,28 +31,28 @@
 
     <hr class="mt-5">
     <div class="d-flex justify-content-between mt-4">
-        @if ($section->prev_id)
+        @if ($section->prevSection())
             <a href="{{ route('show.section', [
                 'subject_slug' => $subject->slug,
                 'chapter_slug' => $chapter->slug,
-                'section_slug' => $section->slug
-            ]) }}" class="btn btn-outline-primary">
-                ⬅️ Quay lại phần trước
+                'section_slug' => $section->prevSection()->slug
+            ]) }}" class="btn btn-outline-success">
+                Phần trước:{{$section->prevSection()->title}}
             </a>
         @else
-            <button class="btn btn-outline-secondary" disabled>⬅️ Quay lại phần trước</button>
+            <button class="btn btn-outline-success" disabled>Phần trước</button>
         @endif
 
-        @if ($section->next_id)
+        @if ($section->nextSection())
             <a href="{{ route('show.section', [
                 'subject_slug' => $subject->slug,
                 'chapter_slug' => $chapter->slug,
-                'section_slug' => $section->slug
-            ]) }}" class="btn btn-outline-primary">
-                Học bài sau ➡️
+                'section_slug' => $section->nextSection()->slug
+            ]) }}" class="btn btn-outline-success">
+                Phần sau:{{$section->nextSection()->title}}
             </a>
         @else
-            <button class="btn btn-outline-secondary" disabled>Học bài sau ➡️</button>
+            <button class="btn btn-outline-success" disabled>Phần sau</button>
         @endif
     </div>
 </div>
@@ -87,13 +87,19 @@
     }
 
     function checkAnswer() {
-        const userAnswer = document.getElementById('user-answer').value.trim();
+        const userAnswerInput = document.getElementById('user-answer');
+        const userAnswer = userAnswerInput.value.trim();
         const resultArea = document.getElementById('result-area');
+        const checkButton = event.target; // chính là nút vừa được bấm
 
         if (userAnswer === '') {
             resultArea.innerHTML = `<span class="text-danger">Vui lòng nhập câu trả lời.</span>`;
             return;
         }
+
+        // Disable input và nút sau khi đã chấm điểm
+        userAnswerInput.disabled = true;
+        checkButton.disabled = true;
 
         if (userAnswer.toLowerCase() === currentAnswer.toLowerCase()) {
             resultArea.innerHTML = `<span class="text-success">✅ Đúng rồi! Giỏi lắm!</span><br>${currentSolution}`;
@@ -105,7 +111,7 @@
             `;
         }
 
-        resultArea.innerHTML += `<button class="btn btn-outline-secondary mt-2" onclick="loadQuestion()">Câu tiếp theo ➡️</button>`;
+        resultArea.innerHTML += `<button class="btn btn-primary mt-2" onclick="loadQuestion()">Câu tiếp theo ➡️</button>`;
     }
 
     loadQuestion(); // Load câu đầu tiên khi trang vừa mở

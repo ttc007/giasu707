@@ -51,6 +51,7 @@
             <div class="col-md-4">
                 <label class="form-label">Loại</label>
                 <select name="type" class="form-select">
+                    <option value="">-- Tất cả --</option>
                     <option value="multiple_choice" {{ request('type') == 'multiple_choice' ? 'selected' : ''}}>Trắc nghiệm</option>
                     <option value="true_false" {{ request('type') == 'true_false' ? 'selected' : ''}}>Đúng / Sai</option>
                     <option value="fill_blank" {{ request('type') == 'fill_blank' ? 'selected' : ''}}>Điền kết quả</option>

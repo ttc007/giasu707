@@ -5,11 +5,12 @@
 @section('content')
 <div class="container">
     <div class="text-center">
+        <h2>Ôn tập chương</h2>    
+        
         <p><a href="{{ route('show.chapter', [
             'subject_slug' => $subject->slug,
             'chapter_slug' => $chapter->slug,
             ]) }}" class=""><strong>{{ $chapter->title }} - {{ $chapter->subject->name }}</strong></a></p>
-        <h2>Ôn tập chương</h2>    
     </div>
     
     <hr>
@@ -66,13 +67,19 @@
     }
 
     function checkAnswer() {
-        const userAnswer = document.getElementById('user-answer').value.trim();
+        const userAnswerInput = document.getElementById('user-answer');
+        const userAnswer = userAnswerInput.value.trim();
         const resultArea = document.getElementById('result-area');
+        const checkButton = event.target; // chính là nút vừa được bấm
 
         if (userAnswer === '') {
             resultArea.innerHTML = `<span class="text-danger">Vui lòng nhập câu trả lời.</span>`;
             return;
         }
+
+        // Disable input và nút sau khi đã chấm điểm
+        userAnswerInput.disabled = true;
+        checkButton.disabled = true;
 
         if (userAnswer.toLowerCase() === currentAnswer.toLowerCase()) {
             resultArea.innerHTML = `<span class="text-success">✅ Đúng rồi! Giỏi lắm!</span><br>${currentSolution}`;
@@ -84,7 +91,7 @@
             `;
         }
 
-        resultArea.innerHTML += `<button class="btn btn-outline-secondary mt-3" onclick="loadQuestion()">Câu tiếp theo ➡️</button>`;
+        resultArea.innerHTML += `<button class="btn btn-primary mt-2" onclick="loadQuestion()">Câu tiếp theo ➡️</button>`;
     }
 
     loadQuestion();

@@ -8,7 +8,7 @@
         'subject_slug' => $subject->slug,
         'chapter_slug' => $chapter->slug,
     ]) }}" class=""><strong>{{ $lesson->chapter->title }} - {{ $lesson->chapter->subject->name }}</strong></a></p>
-    <h2 class="my-3 text-info">{{ $lesson->title }}</h2>
+    <h2 class="my-3">{{ $lesson->title }}</h2>
 
     <hr>
     @if ($lesson->sections->count())
@@ -43,28 +43,28 @@
 
         <hr class="mt-5">
         <div class="d-flex justify-content-between mt-4">
-            @if ($lesson->prev_id)
+            @if ($lesson->prevLesson())
                 <a href="{{ route('show.lesson', [
                     'subject_slug' => $subject->slug,
                     'chapter_slug' => $chapter->slug,
-                    'lesson_slug' => $lesson->prevLesson->slug
-                ]) }}" class="btn btn-outline-primary">
-                    ⬅️ Bài trước
+                    'lesson_slug' => $lesson->prevLesson()->slug
+                ]) }}" class="btn btn-outline-success">
+                    {{$lesson->prevLesson()->title}}
                 </a>
             @else
-                <button class="btn btn-outline-secondary" disabled>⬅️ Bài trước</button>
+                <button class="btn btn-outline-success" disabled>Bài trước</button>
             @endif
 
-            @if ($lesson->next_id)
+            @if ($lesson->nextLesson())
                 <a href="{{ route('show.lesson', [
                     'subject_slug' => $subject->slug,
                     'chapter_slug' => $chapter->slug,
-                    'lesson_slug' => $lesson->nextLesson->slug
-                ]) }}" class="btn btn-outline-primary">
-                    Bài sau ➡️
+                    'lesson_slug' => $lesson->nextLesson()->slug
+                ]) }}" class="btn btn-outline-success">
+                    {{$lesson->nextLesson()->title}} 
                 </a>
             @else
-                <button class="btn btn-outline-secondary" disabled>Bài sau ➡️</button>
+                <button class="btn btn-outline-success" disabled>Bài sau </button>
             @endif
         </div>
     </div>
@@ -99,13 +99,19 @@
         }
 
         function checkAnswer() {
-            const userAnswer = document.getElementById('user-answer').value.trim();
+            const userAnswerInput = document.getElementById('user-answer');
+            const userAnswer = userAnswerInput.value.trim();
             const resultArea = document.getElementById('result-area');
+            const checkButton = event.target; // chính là nút vừa được bấm
 
             if (userAnswer === '') {
                 resultArea.innerHTML = `<span class="text-danger">Vui lòng nhập câu trả lời.</span>`;
                 return;
             }
+
+            // Disable input và nút sau khi đã chấm điểm
+            userAnswerInput.disabled = true;
+            checkButton.disabled = true;
 
             if (userAnswer.toLowerCase() === currentAnswer.toLowerCase()) {
                 resultArea.innerHTML = `<span class="text-success">✅ Đúng rồi! Giỏi lắm!</span><br>${currentSolution}`;
@@ -117,7 +123,7 @@
                 `;
             }
 
-            resultArea.innerHTML += `<button class="btn btn-outline-secondary mt-2" onclick="loadQuestion()">Câu tiếp theo ➡️</button>`;
+            resultArea.innerHTML += `<button class="btn btn-primary mt-2" onclick="loadQuestion()">Câu tiếp theo ➡️</button>`;
         }
 
         loadQuestion();

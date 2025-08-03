@@ -8,7 +8,7 @@
     <h4 class="text-center">{{ $chapter->title }}</h4>
 
     <h5>Danh sách bài học:</h5>
-
+    <div class="card p-3 rounded border">
     @foreach ($chapter->lessons as $lesson)
         <div class="mb-3">
             <strong>
@@ -38,12 +38,12 @@
             @endif
         </div>
     @endforeach
-
+    </div>
     <hr>
     <a href="{{ route('review.chapter', [
         'subject_slug' => $subject->slug,
         'chapter_slug' => $chapter->slug
-    ]) }}" class="btn btn-outline-primary">
+    ]) }}" class="btn btn-outline-success">
         🔁 Ôn tập chương
     </a>
 </div>

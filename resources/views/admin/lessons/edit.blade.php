@@ -39,7 +39,7 @@
 
             <div class="mb-3">
                 <label>Summary:</label>
-                <textarea name="summary" id="editor" class="form-control" rows="6">{{ old('content', $chapter->summary ?? '') }}</textarea>
+                <textarea name="summary" id="editor" class="form-control" rows="6">{{ old('content', $lesson->summary ?? '') }}</textarea>
             </div>
 
             <button class="btn btn-primary">Update</button>

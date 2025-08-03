@@ -12,10 +12,46 @@ use Str;
 
 class SectionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $sections = Section::with('lesson')->latest()->paginate(10);
-        return view('admin.sections.index', compact('sections'));
+        $query = Section::query();
+
+        if ($search = $request->input('search')) {
+            $query->where('content', 'like', '%' . $search . '%');
+        }
+
+        // Lấy danh sách chapter nếu đã chọn subject
+        $chapters = collect();
+        if ($subject_id = $request->input('subject_id')) {
+            $query->whereHas('lesson.chapter.subject', function ($q) use ($subject_id) {
+                $q->where('id', $subject_id);
+            });
+            $chapters = Chapter::where('subject_id', $subject_id)->get();
+        }
+
+        // Lấy danh sách lesson nếu đã chọn chapter
+        $lessons = collect();
+        if ($chapter_id = $request->input('chapter_id')) {
+            $query->whereHas('lesson.chapter', function ($q) use ($chapter_id) {
+                $q->where('id', $chapter_id);
+            });
+            $lessons = Lesson::where('chapter_id', $chapter_id)->get();
+        }
+
+        if ($lesson_id = $request->input('lesson_id')) {
+            $query->whereHas('lesson', function ($q) use ($lesson_id) {
+                $q->where('id', $lesson_id);
+            });
+        }
+
+        $sections = $query->orderBy('id', 'desc')->paginate(10);
+
+        return view('admin.sections.index', [
+            'sections' => $sections,
+            'subjects' => Subject::all(),
+            'chapters' => $chapters,
+            'lessons' => $lessons,
+        ]);
     }
 
     public function create()

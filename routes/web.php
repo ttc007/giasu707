@@ -16,15 +16,14 @@ use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\HomeController;
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Models\Chapter;
 use App\Models\Lesson;
 use App\Models\Section;
 
-Route::get('/', function () {
-    return view('index');
-});
+Route::get('/', [HomeController::class, 'index']);
 
 Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/', [AdminSubjectController::class, 'index'])->name('admin.index');
@@ -66,6 +65,8 @@ Route::prefix('api')->group(function () {
 
 Route::post('/upload', [UploadController::class, 'uploadImage'])->name('ckeditor.upload');
 
+
+Route::get('/bang-gia-thiet-ke-website', [HomeController::class, 'priceTableWeb']);
 // Trang môn học
 Route::get('/{subject_slug}', [SubjectController::class, 'showSubject'])->name('show.subject');
 

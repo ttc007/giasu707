@@ -11,17 +11,16 @@
             <thead>
                 <tr>
                     <th>Tiêu đề</th>
-                    <th>Chương</th>
-                    <th>Môn học</th>
+                    <th>Tổng hợp</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($lessons as $lesson)
                     <tr>
-                        <td>{{ $lesson->title }}</td>
-                        <td>{{ $lesson->chapter->title ?? '' }}</td>
-                        <td>{{ $lesson->chapter->subject->name ?? '' }}</td>
+                        <td><b>{{ $lesson->title }}</b> <br>{{ $lesson->chapter->title ?? '' }} <br>
+                        {{ $lesson->chapter->subject->name ?? '' }}</td>
+                        <td>{!! $lesson->summary !!}</td>
                         <td>
                             <a href="{{ route('lessons.edit', $lesson) }}" class="btn btn-sm btn-primary">Sửa</a>
                             <form action="{{ route('lessons.destroy', $lesson) }}" method="POST" class="d-inline"
