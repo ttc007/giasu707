@@ -4,7 +4,9 @@
 
 @section('content')
 <div class="container">
-    <h3 class="text-center"><a href="{{route(show.subject), ['subject_slug' => $subject->slug]}}">{{ $chapter->subject->name }}</a></h3>
+    <h3 class="text-center"><a href="{{ route('show.subject', [
+                    'subject_slug' => $subject->slug
+                ]) }}">{{ $chapter->subject->name }}</a></h3>
     <h4 class="text-center">{{ $chapter->title }}</h4>
 
     <h5>Danh sách bài học:</h5>
@@ -18,6 +20,7 @@
                     'lesson_slug' => $lesson->slug
                 ]) }}">
                     {{ $loop->iteration }}. {{ $lesson->title }}
+                    ({{$lesson->getQuestionsCountAttribute()}} câu hỏi)
                 </a>
             </strong>
 
@@ -30,7 +33,8 @@
                                 'chapter_slug' => $chapter->slug,
                                 'section_slug' => $section->slug
                             ]) }}">
-                                {{ $section->title ?? 'Phần ' . $loop->iteration }}
+                                {{ $section->title ?? 'Phần ' . $loop->iteration }} 
+                                ({{ $section->questions_count }} câu hỏi)
                             </a>
                         </li>
                     @endforeach

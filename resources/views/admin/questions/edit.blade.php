@@ -58,9 +58,9 @@
         <div class="mb-3">
             <label>Loại câu hỏi</label>
             <select name="type" class="form-control" required>
-                <option value="multiple_choice" {{ $question->type == 'trac_nghiem' ? 'selected' : '' }}>Trắc nghiệm</option>
-                <option value="true_false" {{ $question->type == 'dung_sai' ? 'selected' : '' }}>Đúng / Sai</option>
-                <option value="fill_blank" {{ $question->type == 'dien_ket_qua' ? 'selected' : '' }}>Điền kết quả</option>
+                <option value="multiple_choice" {{ $question->type == 'multiple_choice' ? 'selected' : '' }}>Trắc nghiệm</option>
+                <option value="true_false" {{ $question->type == 'true_false' ? 'selected' : '' }}>Đúng / Sai</option>
+                <option value="fill_blank" {{ $question->type == 'fill_blank' ? 'selected' : '' }}>Điền kết quả</option>
             </select>
         </div>
 

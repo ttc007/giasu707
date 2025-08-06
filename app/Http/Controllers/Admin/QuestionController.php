@@ -83,7 +83,8 @@ class QuestionController extends Controller
             'answer'     => 'nullable',
         ]);
 
-        Question::create($request->all());
+        $question = Question::create($request->all());
+        $question->exams()->sync($request->input('exam_ids', []));
 
         return redirect()->route('questions.index')->with('success', 'Thêm câu hỏi thành công');
     }

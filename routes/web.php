@@ -55,12 +55,9 @@ Route::prefix('api')->group(function () {
     });
 
     // routes/api.php
-    Route::get('/section/{section}/random-question', [ApiQuestionController::class, 'getRandom']);
+    Route::get('/{type}/{id}/random-question', [ApiQuestionController::class, 'getRandom']);
     // routes/api.php
-    Route::get('/section/{section}/ordered-question/{number}', [ApiQuestionController::class, 'getOrderedQuestion']);
-
-    Route::get('/lesson/{lesson}/random-question', [ApiQuestionController::class, 'getRandomByLesson']);
-    Route::get('/chapter/{chapter}/random-question', [ApiQuestionController::class, 'randomFromChapter']);
+    Route::get('/{type}/{id}/ordered-question/{number}', [ApiQuestionController::class, 'getOrderedQuestion']);
 
     // routes/web.php
     Route::get('/subject/{id}/exams', [ApiQuestionController::class, 'getExamsBySubject']);
@@ -70,6 +67,9 @@ Route::post('/upload', [UploadController::class, 'uploadImage'])->name('ckeditor
 
 
 Route::get('/bang-gia-thiet-ke-website', [HomeController::class, 'priceTableWeb']);
+Route::get('/thi-thu', [App\Http\Controllers\HomeController::class, 'thiThu'])->name('thi-thu');
+Route::post('/thi-thu/bat-dau', [HomeController::class, 'startThiThu'])->name('thi-thu.start');
+
 // Trang môn học
 Route::get('/{subject_slug}', [SubjectController::class, 'showSubject'])->name('show.subject');
 

@@ -35,8 +35,24 @@
     </div>
 
     <hr>
-    <h4>Bài tập ôn tập</h4>
+    <h4>Bài tập ôn tập ({{ $lesson->getQuestionsCountAttribute() }} tổng câu hỏi)</h4>
     <i class='text-danger'>*Lưu ý: làm hết câu này rồi đến câu khác. Xin đừng nôn nóng.</i>
+        <div class="mb-3">
+            <label for="mode" class="form-label">Chọn chế độ hiển thị câu hỏi:</label>
+            <select id="mode" class="form-select w-auto d-inline-block" onchange="onModeChange()">
+                <option value="random" selected>Ngẫu nhiên</option>
+                <option value="ordered">Theo thứ tự</option>
+            </select>
+
+            <div class="d-inline-block ms-3" id="question-number-wrapper" style="display: none!important;">
+                <label for="question-number">Số câu:</label>
+                <input type="number" id="question-number" class="form-control d-inline-block" 
+                    min="1" max="{{ $lesson->getQuestionsCountAttribute() }}" style="width: 70px;" value="1" 
+                    onchange="loadQuestion()">
+                / {{ $lesson->getQuestionsCountAttribute() }}
+            </div>
+        </div>
+
         <div id="exercise-area">
             <p><em>Đang tải câu hỏi...</em></p>
         </div>
@@ -69,63 +85,91 @@
         </div>
     </div>
 
-    <script>
-        const lessonId = {{ $lesson->id }};
-        let currentAnswer = '';
-        let currentSolution = '';
+<script>
+    const lesson = {{ $lesson->id }};
+    let currentAnswer = '';
+    let currentSolution = '';
+    let currentQuestionId = '';
+    let mode = 'random';
 
-        function loadQuestion() {
-            fetch(`/api/lesson/${lessonId}/random-question`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        document.getElementById('exercise-area').innerHTML = `<p>${data.error}</p>`;
-                        return;
-                    }
-
-                    currentAnswer = data.answer;
-                    currentSolution = data.solution ?? '';
-
-                    document.getElementById('exercise-area').innerHTML = `
-                        <div class="card p-3">
-                            <div><strong>Câu hỏi:</strong></div>
-                            <div class="mb-2">${data.content}</div>
-                            <input type="text" id="user-answer" class="form-control" placeholder="Nhập câu trả lời...">
-                            <button class="btn btn-primary mt-2" onclick="checkAnswer()">Chấm điểm</button>
-                            <div id="result-area" class="mt-3"></div>
-                        </div>
-                    `;
-                });
+    function onModeChange() {
+        mode = document.getElementById('mode').value;
+        const wrapper = document.getElementById('question-number-wrapper');
+        if (mode === 'ordered') {
+            wrapper.style.display = 'inline-block';
+        } else {
+            wrapper.style.setProperty('display', 'none', 'important');
         }
 
-        function checkAnswer() {
-            const userAnswerInput = document.getElementById('user-answer');
-            const userAnswer = userAnswerInput.value.trim();
-            const resultArea = document.getElementById('result-area');
-            const checkButton = event.target; // chính là nút vừa được bấm
+        loadQuestion(); // Load lại câu theo chế độ mới
+    }
 
-            if (userAnswer === '') {
-                resultArea.innerHTML = `<span class="text-danger">Vui lòng nhập câu trả lời.</span>`;
+    function loadQuestion() {
+
+        let url = `/api/lesson/${lesson}/random-question`;
+        if (currentQuestionId) url =  `/api/lesson/${lesson}/random-question?exclude_id=${currentQuestionId}`;
+
+        if (mode === 'ordered') {
+            const questionNumber = document.getElementById('question-number').value;
+            if (questionNumber === '' || questionNumber < 1) {
+                document.getElementById('exercise-area').innerHTML = `<p class="text-danger">Vui lòng nhập số câu hợp lệ.</p>`;
                 return;
             }
-
-            // Disable input và nút sau khi đã chấm điểm
-            userAnswerInput.disabled = true;
-            checkButton.disabled = true;
-
-            if (userAnswer.toLowerCase() === currentAnswer.toLowerCase()) {
-                resultArea.innerHTML = `<span class="text-success">✅ Đúng rồi! Giỏi lắm!</span><br>${currentSolution}`;
-            } else {
-                resultArea.innerHTML = `
-                    <span class="text-danger">❌ Sai rồi!</span><br>
-                    <strong>Đáp án đúng:</strong> ${currentAnswer}<br>
-                    ${currentSolution}
-                `;
-            }
-
-            resultArea.innerHTML += `<button class="btn btn-primary mt-2" onclick="loadQuestion()">Câu tiếp theo ➡️</button>`;
+            url = `/api/lesson/${lesson}/ordered-question/${questionNumber}`;
         }
 
-        loadQuestion();
-    </script>
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('exercise-area').innerHTML = `<p class="text-danger">${data.error}</p>`;
+                    return;
+                }
+
+                currentAnswer = data.answer;
+                currentSolution = data.solution ?? '';
+                currentQuestionId = data.id;
+
+                document.getElementById('exercise-area').innerHTML = `
+                    <div class="card p-3">
+                        <div><strong>Câu hỏi:</strong></div>
+                        <div class="mb-2">${data.content}</div>
+                        <input type="text" id="user-answer" class="form-control" placeholder="Nhập câu trả lời..." autofocus>
+                        <button class="btn btn-primary mt-2" onclick="checkAnswer()">Chấm điểm</button>
+                        <div id="result-area" class="mt-3"></div>
+                    </div>
+                `;
+            });
+    }
+
+    function checkAnswer() {
+        const userAnswerInput = document.getElementById('user-answer');
+        const userAnswer = userAnswerInput.value.trim();
+        const resultArea = document.getElementById('result-area');
+        const checkButton = event.target;
+
+        if (userAnswer === '') {
+            resultArea.innerHTML = `<span class="text-danger">Vui lòng nhập câu trả lời.</span>`;
+            return;
+        }
+
+        userAnswerInput.disabled = true;
+        checkButton.disabled = true;
+
+        if (userAnswer.toLowerCase() === currentAnswer.toLowerCase()) {
+            resultArea.innerHTML = `<span class="text-success">✅ Đúng rồi! Giỏi lắm!</span><br>${currentSolution}`;
+        } else {
+            resultArea.innerHTML = `
+                <span class="text-danger">❌ Sai rồi!</span><br>
+                <strong>Đáp án đúng:</strong> ${currentAnswer}<br>
+                ${currentSolution}
+            `;
+        }
+
+        resultArea.innerHTML += `<button class="btn btn-primary mt-2" onclick="loadQuestion()">Câu tiếp theo ➡️</button>`;
+    }
+
+    // Auto load khi trang vừa mở
+    document.addEventListener('DOMContentLoaded', loadQuestion);
+</script>
 @endsection

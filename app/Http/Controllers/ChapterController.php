@@ -14,9 +14,13 @@ class ChapterController extends Controller
         $subject = Subject::where('slug', $subject_slug)->firstOrFail();
 
         $chapter = Chapter::where('slug', $chapter_slug)
-            ->where('subject_id', $subject->id)
-            ->with(['lessons.sections']) // nếu bạn muốn load nội dung
-            ->firstOrFail();
+        ->where('subject_id', $subject->id)
+        ->with([
+            'lessons.sections' => function ($query) {
+                $query->withCount('questions');
+            }
+        ])
+        ->firstOrFail();
 
         return view('chapters.show', compact('subject', 'chapter'));
     }

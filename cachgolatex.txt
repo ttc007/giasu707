@@ -16,3 +16,5 @@ RootPassword: kEdYS8qm
 Main IP: 157.66.24.104
 Disk Limit: 21 GB
 Memory: 1024 MB
+
+git clone https://github.com/ttc007/giasu707.git

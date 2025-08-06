@@ -23,6 +23,7 @@ class SectionController extends Controller
                 $query->where('chapter_id', $chapter->id);
             })
             ->with('lesson')
+            ->withCount('questions')
             ->firstOrFail();
 
         return view('sections.show', compact('subject', 'chapter', 'section'));

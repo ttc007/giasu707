@@ -39,4 +39,13 @@ class Lesson extends Model
                      ->orderBy('id', 'desc')
                      ->first();
     }
+
+    public function getQuestionsCountAttribute()
+    {
+        // Chắc chắn đã eager load 'sections.questions' để tránh N+1
+        return $this->sections->sum(function ($section) {
+            return $section->questions_count ?? $section->questions->count();
+        });
+    }
+
 }

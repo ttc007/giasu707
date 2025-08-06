@@ -23,4 +23,15 @@ class Chapter extends Model
     {
         return $this->hasMany(Lesson::class);
     }
+
+    public function getQuestionsCountAttribute()
+    {
+        // Đảm bảo đã eager load 'lessons.sections.questions' để tránh N+1
+        return $this->lessons->sum(function ($lesson) {
+            return $lesson->sections->sum(function ($section) {
+                return $section->questions_count ?? $section->questions->count();
+            });
+        });
+    }
+
 }

@@ -32,8 +32,13 @@
             <option value="ordered">Theo thứ tự</option>
         </select>
 
-        <input type="number" id="question-number" class="form-control d-inline-block w-auto ms-3"
-               placeholder="Số câu muốn làm" min="1" style="display: none;" onkeydown="if(event.key === 'Enter') loadQuestion()">
+        <div class="d-inline-block ms-3" id="question-number-wrapper" style="display: none!important;">
+            <label for="question-number">Số câu:</label>
+            <input type="number" id="question-number" class="form-control d-inline-block" 
+                min="1" max='{{ $section->questions_count }}' style="width: 70px;" value="1" 
+                onchange="loadQuestion()">
+            / {{ $section->questions_count }}
+        </div>
     </div>
 
     <div id="exercise-area">
@@ -72,28 +77,30 @@
     const sectionId = {{ $section->id }};
     let currentAnswer = '';
     let currentSolution = '';
+    let currentQuestionId = '';
     let mode = 'random';
 
     function onModeChange() {
         mode = document.getElementById('mode').value;
-        const inputBox = document.getElementById('question-number');
-
+        const wrapper = document.getElementById('question-number-wrapper');
         if (mode === 'ordered') {
-            inputBox.style.display = 'inline-block';
+            wrapper.style.display = 'inline-block';
         } else {
-            inputBox.style.display = 'none';
+            wrapper.style.setProperty('display', 'none', 'important');
         }
 
-        loadQuestion(); // Load lại theo chế độ mới
+        loadQuestion(); // Load lại câu theo chế độ mới
     }
 
     function loadQuestion() {
+
         let url = `/api/section/${sectionId}/random-question`;
+        if (currentQuestionId) url =  `/api/section/${sectionId}/random-question?exclude_id=${currentQuestionId}`;
 
         if (mode === 'ordered') {
             const questionNumber = document.getElementById('question-number').value;
             if (questionNumber === '' || questionNumber < 1) {
-                document.getElementById('exercise-area').innerHTML = `<p class="text-danger">Vui lòng nhập số câu muốn làm.</p>`;
+                document.getElementById('exercise-area').innerHTML = `<p class="text-danger">Vui lòng nhập số câu hợp lệ.</p>`;
                 return;
             }
             url = `/api/section/${sectionId}/ordered-question/${questionNumber}`;
@@ -109,12 +116,13 @@
 
                 currentAnswer = data.answer;
                 currentSolution = data.solution ?? '';
+                currentQuestionId = data.id;
 
                 document.getElementById('exercise-area').innerHTML = `
                     <div class="card p-3">
                         <div><strong>Câu hỏi:</strong></div>
                         <div class="mb-2">${data.content}</div>
-                        <input type="text" id="user-answer" class="form-control" placeholder="Nhập câu trả lời...">
+                        <input type="text" id="user-answer" class="form-control" placeholder="Nhập câu trả lời..." autofocus>
                         <button class="btn btn-primary mt-2" onclick="checkAnswer()">Chấm điểm</button>
                         <div id="result-area" class="mt-3"></div>
                     </div>
@@ -149,8 +157,8 @@
         resultArea.innerHTML += `<button class="btn btn-primary mt-2" onclick="loadQuestion()">Câu tiếp theo ➡️</button>`;
     }
 
-    // Load câu đầu tiên khi trang vừa mở
-    loadQuestion();
+    // Auto load khi trang vừa mở
+    document.addEventListener('DOMContentLoaded', loadQuestion);
 </script>
 
 @endsection
