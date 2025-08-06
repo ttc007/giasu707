@@ -29,6 +29,21 @@ class QuestionController extends Controller
         ]);
     }
 
+    public function getOrderedQuestion(Section $section, $number)
+    {
+        $question = $section->questions()->orderBy('id')->skip($number - 1)->first();
+
+        if (!$question) {
+            return response()->json(['error' => 'Không tìm thấy câu hỏi số ' . $number]);
+        }
+
+        return response()->json([
+            'content' => $question->content,
+            'answer' => $question->answer,
+            'solution' => $question->solution,
+        ]);
+    }
+
     public function getRandomByLesson($lessonId)
     {
         $lesson = Lesson::with('sections.questions')->find($lessonId);

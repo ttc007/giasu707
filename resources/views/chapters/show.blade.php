@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h3 class="text-center">{{ $chapter->subject->name }}</h3>
+    <h3 class="text-center"><a href="{{route(show.subject), ['subject_slug' => $subject->slug]}}">{{ $chapter->subject->name }}</a></h3>
     <h4 class="text-center">{{ $chapter->title }}</h4>
 
     <h5>Danh sách bài học:</h5>

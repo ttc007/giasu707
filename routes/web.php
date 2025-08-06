@@ -56,6 +56,9 @@ Route::prefix('api')->group(function () {
 
     // routes/api.php
     Route::get('/section/{section}/random-question', [ApiQuestionController::class, 'getRandom']);
+    // routes/api.php
+    Route::get('/section/{section}/ordered-question/{number}', [ApiQuestionController::class, 'getOrderedQuestion']);
+
     Route::get('/lesson/{lesson}/random-question', [ApiQuestionController::class, 'getRandomByLesson']);
     Route::get('/chapter/{chapter}/random-question', [ApiQuestionController::class, 'randomFromChapter']);
 

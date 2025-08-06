@@ -25,6 +25,17 @@
     <h4>Bài tập ôn tập</h4>
     <i class='text-danger'>*Lưu ý: làm hết câu này rồi đến câu khác. Xin đừng nôn nóng.</i>
     
+    <div class="mb-3">
+        <label for="mode" class="form-label">Chọn chế độ hiển thị câu hỏi:</label>
+        <select id="mode" class="form-select w-auto d-inline-block" onchange="onModeChange()">
+            <option value="random" selected>Ngẫu nhiên</option>
+            <option value="ordered">Theo thứ tự</option>
+        </select>
+
+        <input type="number" id="question-number" class="form-control d-inline-block w-auto ms-3"
+               placeholder="Số câu muốn làm" min="1" style="display: none;" onkeydown="if(event.key === 'Enter') loadQuestion()">
+    </div>
+
     <div id="exercise-area">
         <p><em>Đang tải câu hỏi...</em></p>
     </div>
@@ -61,13 +72,38 @@
     const sectionId = {{ $section->id }};
     let currentAnswer = '';
     let currentSolution = '';
+    let mode = 'random';
+
+    function onModeChange() {
+        mode = document.getElementById('mode').value;
+        const inputBox = document.getElementById('question-number');
+
+        if (mode === 'ordered') {
+            inputBox.style.display = 'inline-block';
+        } else {
+            inputBox.style.display = 'none';
+        }
+
+        loadQuestion(); // Load lại theo chế độ mới
+    }
 
     function loadQuestion() {
-        fetch(`/api/section/${sectionId}/random-question`)
+        let url = `/api/section/${sectionId}/random-question`;
+
+        if (mode === 'ordered') {
+            const questionNumber = document.getElementById('question-number').value;
+            if (questionNumber === '' || questionNumber < 1) {
+                document.getElementById('exercise-area').innerHTML = `<p class="text-danger">Vui lòng nhập số câu muốn làm.</p>`;
+                return;
+            }
+            url = `/api/section/${sectionId}/ordered-question/${questionNumber}`;
+        }
+
+        fetch(url)
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    document.getElementById('exercise-area').innerHTML = `<p>${data.error}</p>`;
+                    document.getElementById('exercise-area').innerHTML = `<p class="text-danger">${data.error}</p>`;
                     return;
                 }
 
@@ -90,14 +126,13 @@
         const userAnswerInput = document.getElementById('user-answer');
         const userAnswer = userAnswerInput.value.trim();
         const resultArea = document.getElementById('result-area');
-        const checkButton = event.target; // chính là nút vừa được bấm
+        const checkButton = event.target;
 
         if (userAnswer === '') {
             resultArea.innerHTML = `<span class="text-danger">Vui lòng nhập câu trả lời.</span>`;
             return;
         }
 
-        // Disable input và nút sau khi đã chấm điểm
         userAnswerInput.disabled = true;
         checkButton.disabled = true;
 
@@ -114,7 +149,8 @@
         resultArea.innerHTML += `<button class="btn btn-primary mt-2" onclick="loadQuestion()">Câu tiếp theo ➡️</button>`;
     }
 
-    loadQuestion(); // Load câu đầu tiên khi trang vừa mở
+    // Load câu đầu tiên khi trang vừa mở
+    loadQuestion();
 </script>
 
 @endsection
