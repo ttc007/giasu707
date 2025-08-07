@@ -18,3 +18,11 @@ Disk Limit: 21 GB
 Memory: 1024 MB
 
 git clone https://github.com/ttc007/giasu707.git
+cd /var/www/giasu/giasu707
+
+php artisan tinker
+$user = new App\Models\User;
+$user->name = 'Admin';
+$user->email = 'admin@example.com';
+$user->password = bcrypt('admin123'); // Đặt lại mật khẩu ở đây
+$user->save();

@@ -7,6 +7,9 @@ use App\Http\Controllers\Admin\SectionController as AdminSectionController;
 use App\Http\Controllers\Admin\LessonController as AdminLessonController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\ExamController as AdminExamController;
+use App\Http\Controllers\Admin\PostController as AdminPostController;
+use App\Http\Controllers\Admin\CollectionController as AdminCollectionController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 
 use App\Http\Controllers\Api\QuestionController as ApiQuestionController;
 use App\Http\Controllers\Api\ExamQuestionController;
@@ -17,11 +20,13 @@ use App\Http\Controllers\SectionController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\HomePostController;
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Models\Chapter;
 use App\Models\Lesson;
 use App\Models\Section;
+use App\Models\Collection;
 
 Route::get('/', [HomeController::class, 'index']);
 
@@ -33,6 +38,10 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::resource('sections', AdminSectionController::class);
     Route::resource('questions', AdminQuestionController::class);
     Route::resource('exams', AdminExamController::class);
+
+    Route::resource('posts', AdminPostController::class);
+    Route::resource('collections', AdminCollectionController::class);
+    Route::resource('categories', AdminCategoryController::class);
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -54,6 +63,10 @@ Route::prefix('api')->group(function () {
         return Section::where('lesson_id', $lesson_id)->get(['id', 'title']);
     });
 
+    Route::get('collections-by-category/{category_id}', function ($category_id) {
+        return Collection::where('category_id', $category_id)->get(['id', 'title']);
+    });
+
     // routes/api.php
     Route::get('/{type}/{id}/random-question', [ApiQuestionController::class, 'getRandom']);
     // routes/api.php
@@ -69,6 +82,13 @@ Route::post('/upload', [UploadController::class, 'uploadImage'])->name('ckeditor
 Route::get('/bang-gia-thiet-ke-website', [HomeController::class, 'priceTableWeb']);
 Route::get('/thi-thu', [App\Http\Controllers\HomeController::class, 'thiThu'])->name('thi-thu');
 Route::post('/thi-thu/bat-dau', [HomeController::class, 'startThiThu'])->name('thi-thu.start');
+
+
+Route::get('/bai-viet', [HomePostController::class, 'index'])->name('home.posts');
+Route::get('/danh-muc/{slug}', [HomePostController::class, 'category'])->name('home.category');
+Route::get('/tuyen-tap/{slug}', [HomePostController::class, 'collection'])->name('home.collection');
+Route::get('/post/{slug}', [HomePostController::class, 'show'])->name('home.post.show');
+
 
 // Trang môn học
 Route::get('/{subject_slug}', [SubjectController::class, 'showSubject'])->name('show.subject');

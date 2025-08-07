@@ -22,9 +22,21 @@
             <a href="{{ route('lessons.index') }}">Bài</a> |
             <a href="{{ route('sections.index') }}">Phần</a> |
             <a href="{{ route('questions.index') }}">Câu hỏi</a> |
-            <a href="{{ route('exams.index') }}">Đề thi thử</a> 
+            <a href="{{ route('exams.index') }}">Đề thi thử</a> |
+            <a href="{{ route('categories.index') }}">Danh mục bài viết</a> |
+            <a href="{{ route('collections.index') }}">Tuyển tập bài viết</a> |
+            <a href="{{ route('posts.index') }}">Bài viết</a> 
         </nav>
 
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         @yield('content')
     </div>
     
@@ -51,7 +63,7 @@
                     })
                     .catch(error => {
                         console.error('Error fetching chapters:', error);
-                        chapterSelect.innerHTML = `<option value="">-- Error loading --</option>`;
+                        chapterSelect.innerHTML = `<option value="">-- Select Chapter --</option>`;
                     });
             });
 

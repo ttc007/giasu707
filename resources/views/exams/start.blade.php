@@ -3,42 +3,6 @@
 @section('title', 'Bắt đầu thi thử | Giasu707')
 
 @section('content')
-<style>
-    #timer {
-        position: fixed;
-        top: 320px;
-        right: 230px;
-        background-color: white;
-        padding: 10px 15px;
-        border: 2px solid red;
-        border-radius: 5px;
-        z-index: 1000;
-        font-size: 24px;
-        font-weight: bold;
-        color: red;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .result {
-        background-color: #f9f9f9; /* nền xám nhạt */
-        border: 1px solid #ddd;    /* viền xám mờ */
-        padding: 10px;
-        margin-top: 10px;
-        border-radius: 5px;
-        font-size: 14px;
-    }
-
-    /* Mobile: màn hình nhỏ hơn hoặc bằng 768px */
-    @media (max-width: 768px) {
-        #timer {
-            top: 10px;
-            right: 10px;
-            font-size: 18px;
-            padding: 8px 12px;
-        }
-    }
-</style>
-
 <div class="container">
     <div class="text-center">
         <h2 class="mb-3">Thi thử</h2>
@@ -151,15 +115,8 @@ function submitExam() {
         const correctAnswer = block.dataset.answer.trim();
         const solution = block.dataset.solution;
         const type = block.dataset.type;
-        const inputs = block.querySelectorAll('input');
-        let userAnswer = '';
-
-        inputs.forEach(input => {
-            if ((input.type === 'radio' && input.checked) || input.type === 'text') {
-                userAnswer = input.value.trim();
-            }
-
-        });
+        const input = block.querySelector('input');
+        let userAnswer = input.value;
 
         const resultDiv = block.querySelector('.result');
         resultDiv.style.display = 'block';
@@ -223,7 +180,7 @@ function submitExam() {
         submitBtn.classList.add('btn-disabled'); // tuỳ bạn định nghĩa class CSS cho hiệu ứng
     }
 
-    alert(`Bạn làm được: ${total} điểm`);
+    alert(`Bạn làm được: ${total.toFixed(2)} điểm`);
     document.getElementById('final-score').innerHTML = `🎯 Tổng điểm của bạn: <strong>${total.toFixed(2)}</strong>`;
 }
 </script>

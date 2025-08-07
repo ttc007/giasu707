@@ -42,6 +42,40 @@
         h2, h4, h1 {
             color: #699238!important;
         }
+
+        #timer {
+            position: fixed;
+            top: 320px;
+            right: 230px;
+            background-color: white;
+            padding: 10px 15px;
+            border: 2px solid red;
+            border-radius: 5px;
+            z-index: 1000;
+            font-size: 24px;
+            font-weight: bold;
+            color: red;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .result {
+            background-color: #f9f9f9; /* nền xám nhạt */
+            border: 1px solid #ddd;    /* viền xám mờ */
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        /* Mobile: màn hình nhỏ hơn hoặc bằng 768px */
+        @media (max-width: 768px) {
+            #timer {
+                top: 10px;
+                right: 10px;
+                font-size: 18px;
+                padding: 8px 12px;
+            }
+        }
     </style>
 </head>
 <body>
