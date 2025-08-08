@@ -9,6 +9,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/icon.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <style>
         body {
@@ -133,11 +134,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url('/thi-thu') }}">Thi thử</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/dang-ky') }}">Đăng kí học</a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url('/bai-viet') }}">Bài viết</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url('/trang-ca-nhan') }}">Trang cá nhân</a>
                     </li>
                 </ul>
             </div>
@@ -163,5 +165,30 @@
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const CLIENT_KEY = 'client_id';
+
+            if (!localStorage.getItem(CLIENT_KEY)) {
+                fetch("/api/register-client", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.client_id) {
+                        localStorage.setItem(CLIENT_KEY, data.client_id);
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi khi tạo client:", error);
+                });
+            }
+        });
+    </script>
 </body>
 </html>

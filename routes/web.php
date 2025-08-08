@@ -78,6 +78,11 @@ Route::prefix('api')->group(function () {
 
     // routes/web.php
     Route::get('/subject/{id}/exams', [ApiQuestionController::class, 'getExamsBySubject']);
+
+    // routes/api.php
+    Route::post('/register-client', [RegistrationController::class, 'store']);
+    Route::get('/registration/{client_id}', [RegistrationController::class, 'apiShow']);
+
 });
 
 Route::post('/upload', [UploadController::class, 'uploadImage'])->name('ckeditor.upload');
@@ -93,8 +98,9 @@ Route::get('/danh-muc/{slug}', [HomePostController::class, 'category'])->name('h
 Route::get('/tuyen-tap/{slug}', [HomePostController::class, 'collection'])->name('home.collection');
 Route::get('/tuyen-tap/{slug}/{post_slug}', [HomePostController::class, 'show'])->name('home.post.show');
 
-Route::get('/dang-ky', [RegistrationController::class, 'create'])->name('registration.create');
-Route::post('/dang-ky', [RegistrationController::class, 'store'])->name('registration.store');
+Route::get('/trang-ca-nhan', [RegistrationController::class, 'index'])->name('registration.index');
+Route::get('/cap-nhat-trang-ca-nhan', [RegistrationController::class, 'create'])->name('registration.create');
+Route::post('/dang-ky', [RegistrationController::class, 'update'])->name('registration.store');
 
 // Trang môn học
 Route::get('/{subject_slug}', [SubjectController::class, 'showSubject'])->name('show.subject');

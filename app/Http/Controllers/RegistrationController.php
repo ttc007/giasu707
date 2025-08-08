@@ -7,12 +7,29 @@ use Illuminate\Http\Request;
 
 class RegistrationController extends Controller
 {
+    public function index()
+    {
+        return view('registrations.index');
+    }
+
+    public function apiShow($client_id)
+    {
+        $registration = Registration::where('client_id', $client_id)->first();
+
+        if (!$registration) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+
+        return response()->json($registration);
+    }
+
+
     public function create()
     {
         return view('registrations.create');
     }
 
-    public function store(Request $request)
+    public function update(Request $request)
     {
         $request->validate([
             'name'    => 'required|string|max:255',
@@ -22,8 +39,26 @@ class RegistrationController extends Controller
             'note'    => 'nullable|string',
         ]);
 
-        Registration::create($request->only(['name', 'phone', 'email', 'subject', 'note']));
+        $registration = Registration::where('client_id', $request->client_id)->firstOrFail();
 
-        return redirect()->back()->with('success', 'Đăng ký thành công!');
+        $registration->update($request->only(['name', 'phone', 'email', 'subject', 'note']));
+
+        return redirect()->route('registration.index')->with('success', 'Cập nhật thành công!');
+    }
+
+
+    public function store(Request $request)
+    {
+        $registration = Registration::create([
+            'name' => 'Chưa cập nhật', // để trống, sẽ cập nhật sau
+            'email' => 'Chưa cập nhật',
+            'phone' => 'Chưa cập nhật',
+            'subject' => 'Chưa cập nhật',
+            'client_id' => uniqid('client_', true), // gen ID tạm
+        ]);
+
+        return response()->json([
+            'client_id' => $registration->client_id,
+        ]);
     }
 }
