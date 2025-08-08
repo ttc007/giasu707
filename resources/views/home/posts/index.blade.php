@@ -24,7 +24,7 @@
 
     </div>
 
-    <div>
+    <div class="card p-3">
         <h4 class="mb-5 mt-4 text-center">Danh sách tuyển tập</h2>
         <div class="row">
             @foreach ($collections as $collection)
@@ -39,11 +39,7 @@
                         </a>
 
                         <div class="card-body">
-                            <h4 class="card-title">{{ $collection->title }}</h4>
-                            <p class="text-muted">
-                                Danh mục: {{ $collection->category->name ?? 'Không có' }}
-                            </p>
-                            <a href="{{ route('home.collection', $collection->slug) }}" class="btn btn-sm btn-primary">Xem chi tiết</a>
+                            <h4 class="card-title text-center"><a href="{{ route('home.collection', $collection->slug) }}">{{ $collection->title }}</a></h4>
                         </div>
                     </div>
                 </div>

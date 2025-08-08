@@ -22,4 +22,11 @@ class Collection extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function favoriteCount(): int
+    {
+        return \DB::table('favorites')
+            ->where('collection_id', $this->id)
+            ->count();
+    }
 }

@@ -4,9 +4,10 @@
 
 @section('content')
     <div class="text-center">
-        <h1>{{ $post->collection->title ?? 'Không có' }}</h1>
+        <h1><a href="{{ route('home.collection', $post->collection->slug) }}">{{ $post->collection->title ?? 'Không có' }}</a></h1>
         <h4>{{ $post->title }}</h4>
         <p class="text-muted"><strong>Danh mục:</strong> <a href="{{ route('home.category', $post->category->slug) }}">{{ $post->category->name ?? 'Không có' }}</a></p>
+        
     </div>
     
     <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#chapterModal">

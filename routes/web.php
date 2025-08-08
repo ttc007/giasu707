@@ -83,6 +83,13 @@ Route::prefix('api')->group(function () {
     Route::post('/register-client', [RegistrationController::class, 'store']);
     Route::get('/registration/{client_id}', [RegistrationController::class, 'apiShow']);
 
+    Route::get('/collection/{slug}/is-favorite', [RegistrationController::class, 'isFavorite']);
+    // Like collection
+    Route::post('/collection/{slug}/like', [RegistrationController::class, 'like']);
+
+    // Unlike collection
+    Route::delete('/collection/{slug}/unlike', [RegistrationController::class, 'unlike']);
+
 });
 
 Route::post('/upload', [UploadController::class, 'uploadImage'])->name('ckeditor.upload');

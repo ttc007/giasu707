@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Registration;
 use Illuminate\Http\Request;
+use App\Models\Collection;
 
 class RegistrationController extends Controller
 {
@@ -14,7 +15,12 @@ class RegistrationController extends Controller
 
     public function apiShow($client_id)
     {
-        $registration = Registration::where('client_id', $client_id)->first();
+        $registration = Registration::where('client_id', $client_id)
+                            ->with([
+                                'favoriteCollections:id,title,slug,image,category_id',
+                                'favoriteCollections.category:id,slug'
+                            ])
+                            ->first();
 
         if (!$registration) {
             return response()->json(['error' => 'Not found'], 404);
@@ -22,7 +28,6 @@ class RegistrationController extends Controller
 
         return response()->json($registration);
     }
-
 
     public function create()
     {
@@ -46,7 +51,6 @@ class RegistrationController extends Controller
         return redirect()->route('registration.index')->with('success', 'Cập nhật thành công!');
     }
 
-
     public function store(Request $request)
     {
         $registration = Registration::create([
@@ -60,5 +64,55 @@ class RegistrationController extends Controller
         return response()->json([
             'client_id' => $registration->client_id,
         ]);
+    }
+
+    public function isFavorite(Request $request, $slug)
+    {
+        $client_id = $request->query('client_id');
+        
+        $registration = Registration::where('client_id', $client_id)->first();
+        $collection = Collection::where('slug', $slug)->first();
+
+        if (!$registration || !$collection) {
+            return response()->json(['liked' => false]);
+        }
+
+        $liked = $registration->favoriteCollections()->where('collection_id', $collection->id)->exists();
+
+        return response()->json(['liked' => $liked]);
+    }
+
+    public function like(Request $request, $slug)
+    {
+        $client_id = $request->input('client_id');
+        $registration = Registration::where('client_id', $client_id)->first();
+        $collection = Collection::where('slug', $slug)->first();
+
+        if (!$registration || !$collection) {
+            return response()->json(['success' => false, 'message' => 'Không tìm thấy dữ liệu'], 404);
+        }
+
+        // Gắn quan hệ yêu thích nếu chưa có
+        if (!$registration->favoriteCollections()->where('collection_id', $collection->id)->exists()) {
+            $registration->favoriteCollections()->attach($collection->id);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    public function unlike(Request $request, $slug)
+    {
+        $client_id = $request->input('client_id');
+        $registration = Registration::where('client_id', $client_id)->first();
+        $collection = Collection::where('slug', $slug)->first();
+
+        if (!$registration || !$collection) {
+            return response()->json(['success' => false, 'message' => 'Không tìm thấy dữ liệu'], 404);
+        }
+
+        // Xoá quan hệ yêu thích nếu có
+        $registration->favoriteCollections()->detach($collection->id);
+
+        return response()->json(['success' => true]);
     }
 }

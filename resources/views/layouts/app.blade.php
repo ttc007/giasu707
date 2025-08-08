@@ -136,10 +136,10 @@
                     </li>
                     
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/bai-viet') }}">Bài viết</a>
+                        <a class="nav-link" href="{{ url('/bai-viet') }}">Thư viện</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/trang-ca-nhan') }}">Trang cá nhân</a>
+                        <a class="nav-link" href="{{ url('/trang-ca-nhan') }}"><img src="{{ asset('images/avatar.png') }}" class="rounded-circle shadow" width="25" alt="Ảnh đại diện"></a>
                     </li>
                 </ul>
             </div>
