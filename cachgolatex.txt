@@ -18,6 +18,8 @@ Disk Limit: 21 GB
 Memory: 1024 MB
 
 git clone https://github.com/ttc007/giasu707.git
+
+ssh root@157.66.24.104
 cd /var/www/giasu/giasu707
 
 php artisan tinker
