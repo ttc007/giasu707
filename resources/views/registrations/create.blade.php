@@ -41,6 +41,7 @@
             </div>
             <input type="hidden" name="client_id" id="client_id">
             <button type="submit" class="btn btn-primary">Lưu cập nhật</button>
+            <a href="{{route('registration.index')}}" class='btn btn-secondary'>Quay lại</a>
         </form>
     </div>
     <script>
