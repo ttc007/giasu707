@@ -104,6 +104,6 @@
         </tbody>
     </table>
 
-    {{ $questions->links() }}
+    {{ $questions->links('vendor.pagination.bootstrap-5') }}
 </div>
 @endsection

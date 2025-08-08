@@ -76,6 +76,29 @@
                 padding: 8px 12px;
             }
         }
+
+        .square-box {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .centered-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+
     </style>
 </head>
 <body>
@@ -111,7 +134,7 @@
                         <a class="nav-link" href="{{ url('/thi-thu') }}">Thi thử</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/dang-ki') }}">Đăng kí học</a>
+                        <a class="nav-link" href="{{ url('/dang-ky') }}">Đăng kí học</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url('/bai-viet') }}">Bài viết</a>

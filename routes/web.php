@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ExamController as AdminExamController;
 use App\Http\Controllers\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Admin\CollectionController as AdminCollectionController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\StudentController;
 
 use App\Http\Controllers\Api\QuestionController as ApiQuestionController;
 use App\Http\Controllers\Api\ExamQuestionController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\LessonController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HomePostController;
+use App\Http\Controllers\RegistrationController;
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Models\Chapter;
@@ -42,6 +44,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::resource('posts', AdminPostController::class);
     Route::resource('collections', AdminCollectionController::class);
     Route::resource('categories', AdminCategoryController::class);
+
+    Route::get('students', [StudentController::class, 'index'])->name('admin.students.index');
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -87,8 +91,10 @@ Route::post('/thi-thu/bat-dau', [HomeController::class, 'startThiThu'])->name('t
 Route::get('/bai-viet', [HomePostController::class, 'index'])->name('home.posts');
 Route::get('/danh-muc/{slug}', [HomePostController::class, 'category'])->name('home.category');
 Route::get('/tuyen-tap/{slug}', [HomePostController::class, 'collection'])->name('home.collection');
-Route::get('/post/{slug}', [HomePostController::class, 'show'])->name('home.post.show');
+Route::get('/tuyen-tap/{slug}/{post_slug}', [HomePostController::class, 'show'])->name('home.post.show');
 
+Route::get('/dang-ky', [RegistrationController::class, 'create'])->name('registration.create');
+Route::post('/dang-ky', [RegistrationController::class, 'store'])->name('registration.store');
 
 // Trang môn học
 Route::get('/{subject_slug}', [SubjectController::class, 'showSubject'])->name('show.subject');

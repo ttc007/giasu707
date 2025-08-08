@@ -9,6 +9,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Tiêu đề</th>
                 <th>Danh mục</th>
                 <th>Tuyển tập</th>
@@ -19,6 +20,7 @@
         <tbody>
             @foreach($posts as $post)
             <tr>
+                <td>{{ $post->id }}</td>
                 <td>{{ $post->title }}</td>
                 <td>{{ $post->category->name ?? '-' }}</td>
                 <td>{{ $post->collection->title ?? '-' }}</td>

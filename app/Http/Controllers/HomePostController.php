@@ -33,9 +33,17 @@ class HomePostController extends Controller
         return view('home.posts.index', compact('categories', 'collections', 'category'));
     }
 
-    public function show($slug)
+    public function collection($slug)
     {
-        $post = Post::with('category', 'collection')->where('slug', $slug)->firstOrFail();
+        $collection = Collection::where('slug', $slug)->firstOrFail();
+        $posts = Post::where('collection_id', $collection->id)->paginate(100);
+
+        return view('home.posts.collection', compact('collection', 'posts'));
+    }
+
+    public function show($slug, $post_slug)
+    {
+        $post = Post::with('category', 'collection')->where('slug', $post_slug)->firstOrFail();
 
         return view('home.posts.show', compact('post'));
     }

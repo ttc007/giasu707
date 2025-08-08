@@ -28,20 +28,21 @@
         <h4 class="mb-5 mt-4 text-center">Danh sách tuyển tập</h2>
         <div class="row">
             @foreach ($collections as $collection)
-                <div class="col-md-4 mb-4">
+                <div class="col-md-3 mb-4">
                     <div class="card h-100">
                         <a href="{{ route('home.collection', $collection->slug) }}">
                         @if ($collection->image)
-                            <img src="{{ asset($collection->image) }}" class="card-img-top" alt="{{ $collection->title }}">
+                            <div class="square-box">
+                                <img src="{{ asset($collection->image) }}" class="centered-img" alt="{{ $collection->title }}">
+                            </div>
                         @endif
                         </a>
 
                         <div class="card-body">
                             <h4 class="card-title">{{ $collection->title }}</h4>
-                            <h5 class="card-text">
+                            <p class="text-muted">
                                 Danh mục: {{ $collection->category->name ?? 'Không có' }}
-                            </h5>
-                            <p class="text-muted">{!! $collection->description !!}</p>
+                            </p>
                             <a href="{{ route('home.collection', $collection->slug) }}" class="btn btn-sm btn-primary">Xem chi tiết</a>
                         </div>
                     </div>
@@ -51,7 +52,7 @@
 
         {{-- PHÂN TRANG --}}
         <div class="d-flex justify-content-center">
-            {{ $collections->links() }}
+            {{ $collections->links('vendor.pagination.bootstrap-5') }}
         </div>
     </div>
 </div>

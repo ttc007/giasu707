@@ -23,4 +23,20 @@ class Post extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function next()
+    {
+        return Post::where('collection_id', $this->collection_id)
+                     ->where('id', '>', $this->id)
+                     ->orderBy('id', 'asc')
+                     ->first(); // không dùng findOrFail để tránh lỗi
+    }
+
+    public function prev()
+    {
+        return Post::where('collection_id', $this->collection_id)
+                     ->where('id', '<', $this->id)
+                     ->orderBy('id', 'desc')
+                     ->first();
+    }
 }
