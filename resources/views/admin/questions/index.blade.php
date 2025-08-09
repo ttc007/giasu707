@@ -90,7 +90,7 @@
                     <td>{{ $question->id }}</td>
                     <td>
                         <input type="number" name="orders[{{ $question->id }}]" value="{{ $question->order }}" 
-                               class="form-control" style="width:70px;">
+                               class="form-control" style="width:90px;">
                     </td>
                     <td>
                         <b>{{ $question->section->title ?? '-' }}</b><br>
@@ -98,7 +98,7 @@
                         {{ $question->section->lesson->chapter->title ?? 'N/A' }}<br>
                         {{ $question->section->lesson->title ?? 'N/A' }}
                     </td>
-                    <td>{{ ucfirst(str_replace('_', ' ', $question->type)) }} <br> {{ $question->level }}</td>
+                    <td><b>{{ ucfirst(str_replace('_', ' ', $question->type)) }}</b> <br> {{ $question->level }}</td>
                     <td>{!! $question->content !!}</td>
                     <td>{{ $question->answer }}</td>
                     <td>{!! $question->solution !!}</td>
