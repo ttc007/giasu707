@@ -3,10 +3,10 @@
 @section('title', isset($category) ? ($category->name . ' | Gia sư 707'): 'Bài viết | Gia sư 707')
 
 @section('content')
-<div class="container py-4">
+<div class="container py-4 section">
 
     {{-- DANH MỤC --}}
-    <div class="mb-4">
+    <div class="mb-1">
         <h1 class="text-center my-3">THƯ VIỆN BÀI VIẾT</h1>
 
         <a href="{{ route('home.posts') }}"
@@ -24,22 +24,25 @@
 
     </div>
 
-    <div class="card p-3">
-        <h4 class="mb-5 mt-4 text-center">Danh sách tuyển tập</h2>
-        <div class="row">
+    <div class="p-3">
+        <h3 class="mb-3 mt-1 text-center">Danh sách tuyển tập</h3>
+
+        <div class="row collection-container pt-3">
             @foreach ($collections as $collection)
                 <div class="col-md-3 mb-4">
                     <div class="card h-100">
                         <a href="{{ route('home.collection', $collection->slug) }}">
                         @if ($collection->image)
-                            <div class="square-box">
+                            <div class="square-box position-relative">
                                 <img src="{{ asset($collection->image) }}" class="centered-img" alt="{{ $collection->title }}">
+                                <span class="like-badge">❤️{{ $collection->favoriteCount() }}</span>
+
                             </div>
                         @endif
                         </a>
 
                         <div class="card-body">
-                            <h4 class="card-title text-center"><a href="{{ route('home.collection', $collection->slug) }}">{{ $collection->title }}</a></h4>
+                            <h5 class="card-title text-center"><a href="{{ route('home.collection', $collection->slug) }}">{{ $collection->title }}</a></h5>
                         </div>
                     </div>
                 </div>

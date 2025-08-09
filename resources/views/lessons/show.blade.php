@@ -141,6 +141,7 @@
                         </div>
                         <hr>
                         <div class="mb-2">${data.content}</div>
+                        <hr>
                         <input type="text" id="user-answer" class="form-control" placeholder="Nhập câu trả lời...">
                         <button class="btn btn-primary mt-2" onclick="checkAnswer()">Chấm điểm</button>
                         <div id="result-area" class="mt-3"></div>

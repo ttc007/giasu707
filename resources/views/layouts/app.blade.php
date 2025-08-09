@@ -200,6 +200,26 @@
         .card{
             background: #ffffffa3;
         }
+
+        .collection-container .card-body{
+            height:80px;
+        }
+
+        .square-box {
+            position: relative; /* để phần tử con định vị tuyệt đối dựa trên khung ảnh */
+        }
+
+        .like-badge {
+            position: absolute;
+            top: 8px;       /* cách mép trên 8px */
+            right: 8px;     /* hoặc đổi thành left: 8px nếu muốn bên trái */
+            background: rgb(51 164 185 / 60%); /* nền mờ để nổi bật */
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
     </style>
 </head>
 <body>

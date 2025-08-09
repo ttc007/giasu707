@@ -20,8 +20,9 @@
         <p><strong>Ghi chú:</strong><span id="note"></span></p>
         <a href="{{route('registration.create')}}" class="btn btn-primary">Cập nhật</a>
 
-        <h2 class="text-center mt-4 mb-2">Tuyển tập yêu thích</h2>
-        <div class="row" id="favorite-collections-container">
+        <hr>
+        <h2 class="text-center mt-2 mb-5">Tuyển tập yêu thích</h2>
+        <div class="row collection-container" id="favorite-collections-container">
             <!-- JS sẽ render vào đây -->
         </div>
 
@@ -70,9 +71,9 @@
                                     ${image}
                                 </a>
                                 <div class="card-body">
-                                    <h4 class="card-title text-center">
+                                    <h5 class="card-title text-center">
                                         <a href="${url}">${col.title}</a>
-                                    </h4>
+                                    </h5>
                                 </div>
                             </div>
                         </div>`;

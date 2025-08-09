@@ -3,7 +3,7 @@
 @section('title', $chapter->title . ' - ' . $subject->name . ' | Giasu707')
 
 @section('content')
-<div class="container">
+<div class="container section">
     <h3 class="text-center"><a href="{{ route('show.subject', [
                     'subject_slug' => $subject->slug
                 ]) }}">{{ $chapter->subject->name }}</a></h3>
@@ -47,7 +47,7 @@
     <a href="{{ route('review.chapter', [
         'subject_slug' => $subject->slug,
         'chapter_slug' => $chapter->slug
-    ]) }}" class="btn btn-outline-success">
+    ]) }}" class="btn btn-success">
         🔁 Ôn tập chương
     </a>
 </div>
