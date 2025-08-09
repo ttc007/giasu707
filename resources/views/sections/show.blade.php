@@ -52,7 +52,7 @@
                 'chapter_slug' => $chapter->slug,
                 'section_slug' => $section->prevSection()->slug
             ]) }}" class="btn btn-outline-success">
-                Phần trước:{{$section->prevSection()->title}}
+                Phần trước: {{$section->prevSection()->title}}
             </a>
         @else
             <button class="btn btn-outline-success" disabled>Phần trước</button>
@@ -64,7 +64,7 @@
                 'chapter_slug' => $chapter->slug,
                 'section_slug' => $section->nextSection()->slug
             ]) }}" class="btn btn-outline-success">
-                Phần sau:{{$section->nextSection()->title}}
+                Phần sau: {{$section->nextSection()->title}}
             </a>
         @else
             <button class="btn btn-outline-success" disabled>Phần sau</button>

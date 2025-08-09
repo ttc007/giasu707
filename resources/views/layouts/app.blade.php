@@ -115,8 +115,8 @@
 
         h1, h2, h3 {
             font-weight: bold;
-            color: #2c3e50;
         }
+        
         h1 {
             font-size: 2rem;
             border-bottom: 3px solid #27ae60;
