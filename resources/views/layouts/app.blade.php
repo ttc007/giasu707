@@ -147,7 +147,7 @@
         }
 
         .section {
-            background-color: white;
+            background-color: #ffffff00;
             padding: 20px;
             margin-bottom: 20px;
             border-radius: 8px;
