@@ -139,6 +139,7 @@
                                data.type === 'fill_blank' ? 'Điền khuyết' : 'Không xác định'}
                             - <em>Cấp độ: ${data.level}</em>
                         </div>
+                        <hr>
                         <div class="mb-2">${data.content}</div>
                         <input type="text" id="user-answer" class="form-control" placeholder="Nhập câu trả lời...">
                         <button class="btn btn-primary mt-2" onclick="checkAnswer()">Chấm điểm</button>
