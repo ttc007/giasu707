@@ -22,7 +22,7 @@
     </div>
 
     <hr>
-    <h4>Bài tập ôn tập</h4>
+    <h4>Bài tập ôn tập({{ $section->questions_count }} tổng câu hỏi)</h4>
     <i class='text-danger'>*Lưu ý: làm hết câu này rồi đến câu khác. Xin đừng nôn nóng.</i>
     
     <div class="mb-3">
