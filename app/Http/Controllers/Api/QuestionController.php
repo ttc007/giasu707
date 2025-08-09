@@ -66,7 +66,7 @@ class QuestionController extends Controller
             return response()->json(['error' => 'Loại không hợp lệ'], 400);
         }
 
-        $question = $query->orderBy('id')->skip($number - 1)->first();
+        $question = $query->orderBy('order')->skip($number - 1)->first();
 
         if (!$question) {
             return response()->json(['error' => 'Không tìm thấy câu hỏi số ' . $number]);
