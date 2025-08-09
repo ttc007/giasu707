@@ -40,11 +40,11 @@
         <div class="mb-3">
             <label for="mode" class="form-label">Chọn chế độ hiển thị câu hỏi:</label>
             <select id="mode" class="form-select w-auto d-inline-block" onchange="onModeChange()">
-                <option value="random" selected>Ngẫu nhiên</option>
-                <option value="ordered">Theo thứ tự</option>
+                <option value="ordered" selected>Theo thứ tự</option>
+                <option value="random" >Ngẫu nhiên</option>
             </select>
 
-            <div class="d-inline-block ms-3" id="question-number-wrapper" style="display: none!important;">
+            <div class="d-inline-block ms-3" id="question-number-wrapper" style="display: inline!important;">
                 <label for="question-number">Số câu:</label>
                 <input type="number" id="question-number" class="form-control d-inline-block" 
                     min="1" max="{{ $lesson->getQuestionsCountAttribute() }}" style="width: 70px;" value="1" 
@@ -90,7 +90,7 @@
     let currentAnswer = '';
     let currentSolution = '';
     let currentQuestionId = '';
-    let mode = 'random';
+    let mode = 'ordered';
 
     function onModeChange() {
         mode = document.getElementById('mode').value;

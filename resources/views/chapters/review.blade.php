@@ -7,10 +7,10 @@
     <div class="text-center">
         <h2>Ôn tập chương</h2>    
         
-        <p><a href="{{ route('show.chapter', [
+        <h2><a href="{{ route('show.chapter', [
             'subject_slug' => $subject->slug,
             'chapter_slug' => $chapter->slug,
-            ]) }}" class=""><strong>{{ $chapter->title }} - {{ $chapter->subject->name }}</strong></a></p>
+            ]) }}" class=""><strong>{{ $chapter->title }} - {{ $chapter->subject->name }}</strong></a></h2>
     </div>
     
     <hr>
