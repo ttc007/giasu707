@@ -5,6 +5,9 @@
     <h2>Danh sách câu hỏi</h2>
     <a href="{{ route('questions.create') }}" class="btn btn-primary mb-3">+ Thêm câu hỏi</a>
 
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
     <form method="GET" action="{{ route('questions.index') }}" class="mb-4">
         <div class="row g-2 align-items-end">
             <div class="col-md-4">
@@ -66,43 +69,50 @@
 
 
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Phần</th>
-                <th>Loại</th>
-                <th>Nội dung</th>
-                <th>Đáp án</th>
-                <th>Bài giải</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach($questions as $question)
-            <tr>
-                <td>{{ $question->id }}</td>
-                <td><b>{{ $question->section->title ?? '-' }}</b><br>
-                    {{ $question->section->lesson->chapter->subject->name ?? 'N/A' }} -
-                    {{ $question->section->lesson->chapter->title ?? 'N/A' }}<br>
-                    {{ $question->section->lesson->title ?? 'N/A' }}<br>
+    <form action="{{ route('questions.updateOrder') }}" method="POST">
+        @csrf
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Thứ tự</th>
+                    <th>Phần</th>
+                    <th>Loại</th>
+                    <th>Nội dung</th>
+                    <th>Đáp án</th>
+                    <th>Bài giải</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach($questions as $question)
+                <tr>
+                    <td>{{ $question->id }}</td>
+                    <td>
+                        <input type="number" name="orders[{{ $question->id }}]" value="{{ $question->order }}" 
+                               class="form-control" style="width:70px;">
+                    </td>
+                    <td>
+                        <b>{{ $question->section->title ?? '-' }}</b><br>
+                        {{ $question->section->lesson->chapter->subject->name ?? 'N/A' }} - 
+                        {{ $question->section->lesson->chapter->title ?? 'N/A' }}<br>
+                        {{ $question->section->lesson->title ?? 'N/A' }}
+                    </td>
+                    <td>{{ ucfirst(str_replace('_', ' ', $question->type)) }} <br> {{ $question->level }}</td>
+                    <td>{!! $question->content !!}</td>
+                    <td>{{ $question->answer }}</td>
+                    <td>{!! $question->solution !!}</td>
+                    <td>
+                        <a href="{{ route('questions.edit', $question) }}" class="btn btn-sm btn-primary">Sửa</a>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
 
-                </td>
-                <td>{{ ucfirst(str_replace('_', ' ', $question->type)) }}</td>
-                <td>{!! $question->content !!}</td>
-                <td>{{ $question->answer }}</td>
-                <td>{!! $question->solution !!}</td>
-                <td>
-                    <a href="{{ route('questions.edit', $question) }}" class="btn btn-sm btn-primary">Sửa</a>
-                    <form action="{{ route('questions.destroy', $question) }}" method="POST" style="display:inline;">
-                        @csrf @method('DELETE')
-                        <button class="btn btn-sm btn-danger" onclick="return confirm('Xóa?')">Xóa</button>
-                    </form>
-                </td>
-            </tr>
-        @endforeach
-        </tbody>
-    </table>
+        <button type="submit" class="btn btn-success">Lưu sắp xếp</button>
+    </form>
+
 
     {{ $questions->links('vendor.pagination.bootstrap-5') }}
 </div>

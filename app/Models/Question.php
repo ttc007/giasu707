@@ -13,6 +13,8 @@ class Question extends Model
         'solution',
         'answer',
         'type',
+        'level', 
+        'order'
     ];
 
     public function section()

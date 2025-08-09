@@ -41,6 +41,16 @@
         </div>
 
         <div class="mb-3">
+            <label>Cấp độ</label>
+            <select name="level" class="form-control" required>
+                <option value="Nhận biết">Nhận biết</option>
+                <option value="Thông hiểu">Thông hiểu</option>
+                <option value="Vận dụng">Vận dụng</option>
+                <option value="Vận dụng cao">Vận dụng cao</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
             <label>Nội dung câu hỏi</label>
             <textarea name="content" class="form-control editor" rows="5" id="ckeditor-content"></textarea>
         </div>

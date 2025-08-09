@@ -38,6 +38,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::resource('chapters', AdminChapterController::class);
     Route::resource('lessons', AdminLessonController::class);
     Route::resource('sections', AdminSectionController::class);
+
+    Route::post('update-order-questions', [AdminQuestionController::class, 'updateOrder'])->name('questions.updateOrder');
     Route::resource('questions', AdminQuestionController::class);
     Route::resource('exams', AdminExamController::class);
 
@@ -93,7 +95,6 @@ Route::prefix('api')->group(function () {
 });
 
 Route::post('/upload', [UploadController::class, 'uploadImage'])->name('ckeditor.upload');
-
 
 Route::get('/bang-gia-thiet-ke-website', [HomeController::class, 'priceTableWeb']);
 Route::get('/thi-thu', [App\Http\Controllers\HomeController::class, 'thiThu'])->name('thi-thu');

@@ -65,6 +65,16 @@
         </div>
 
         <div class="mb-3">
+            <label>Cấp độ</label>
+            <select name="level" class="form-control" required>
+                <option value="Nhận biết" {{ $question->level == 'Nhận biết' ? 'selected' : '' }}>Nhận biết</option>
+                <option value="Thông hiểu" {{ $question->level == 'Thông hiểu' ? 'selected' : '' }}>Thông hiểu</option>
+                <option value="Vận dụng" {{ $question->level == 'Vận dụng' ? 'selected' : '' }}>Vận dụng</option>
+                <option value="Vận dụng cao" {{ $question->level == 'Vận dụng cao' ? 'selected' : '' }}>Vận dụng cao</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
             <label>Nội dung câu hỏi</label>
             <textarea name="content" class="form-control" rows="5" id="ckeditor-content">{{ $question->content }}</textarea>
         </div>

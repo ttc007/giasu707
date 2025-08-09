@@ -125,4 +125,14 @@ class QuestionController extends Controller
     {
         //
     }
+
+    public function updateOrder(Request $request)
+    {
+        foreach ($request->orders as $id => $order) {
+            Question::where('id', $id)->update(['order' => $order]);
+        }
+
+        return redirect()->route('questions.index')->with('success', 'Cập nhật thứ tự thành công!');
+    }
+
 }
