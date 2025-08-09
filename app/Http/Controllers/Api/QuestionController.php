@@ -46,6 +46,8 @@ class QuestionController extends Controller
             'content' => $question->content,
             'solution' => $question->solution,
             'answer' => $question->answer,
+            'type'     => $question->type,   // thêm type
+            'level'    => $question->level,  // thêm level
         ]);
     }
 
@@ -77,6 +79,8 @@ class QuestionController extends Controller
             'content' => $question->content,
             'answer' => $question->answer,
             'solution' => $question->solution,
+            'type'     => $question->type,   // thêm type
+            'level'    => $question->level,  // thêm level
         ]);
     }
 

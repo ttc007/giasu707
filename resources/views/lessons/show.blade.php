@@ -132,9 +132,15 @@
 
                 document.getElementById('exercise-area').innerHTML = `
                     <div class="card p-3">
-                        <div><strong>Câu hỏi:</strong></div>
+                        <div>
+                            <strong>Câu hỏi:</strong> 
+                            ${data.type === 'multiple_choice' ? 'Trắc nghiệm' : 
+                               data.type === 'true_false' ? 'Đúng/Sai' : 
+                               data.type === 'fill_blank' ? 'Điền khuyết' : 'Không xác định'}
+                            - <em>Cấp độ: ${data.level}</em>
+                        </div>
                         <div class="mb-2">${data.content}</div>
-                        <input type="text" id="user-answer" class="form-control" placeholder="Nhập câu trả lời..." autofocus>
+                        <input type="text" id="user-answer" class="form-control" placeholder="Nhập câu trả lời...">
                         <button class="btn btn-primary mt-2" onclick="checkAnswer()">Chấm điểm</button>
                         <div id="result-area" class="mt-3"></div>
                     </div>
