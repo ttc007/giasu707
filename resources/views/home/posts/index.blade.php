@@ -7,7 +7,7 @@
 
     {{-- DANH MỤC --}}
     <div class="mb-4">
-        <h1 class="text-center my-3">Thư viện bài viết</h1>
+        <h1 class="text-center my-3">THƯ VIỆN BÀI VIẾT</h1>
 
         <a href="{{ route('home.posts') }}"
            class="btn btn-outline-primary btn-sm m-1

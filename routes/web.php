@@ -101,7 +101,7 @@ Route::get('/thi-thu', [App\Http\Controllers\HomeController::class, 'thiThu'])->
 Route::post('/thi-thu/bat-dau', [HomeController::class, 'startThiThu'])->name('thi-thu.start');
 
 
-Route::get('/bai-viet', [HomePostController::class, 'index'])->name('home.posts');
+Route::get('/thu-vien', [HomePostController::class, 'index'])->name('home.posts');
 Route::get('/danh-muc/{slug}', [HomePostController::class, 'category'])->name('home.category');
 Route::get('/tuyen-tap/{slug}', [HomePostController::class, 'collection'])->name('home.collection');
 Route::get('/tuyen-tap/{slug}/{post_slug}', [HomePostController::class, 'show'])->name('home.post.show');

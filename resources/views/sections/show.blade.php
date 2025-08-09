@@ -52,7 +52,7 @@
                 'chapter_slug' => $chapter->slug,
                 'section_slug' => $section->prevSection()->slug
             ]) }}" class="btn btn-outline-success">
-                Phần trước: {{$section->prevSection()->title}}
+                {{$section->prevSection()->title}}
             </a>
         @else
             <button class="btn btn-outline-success" disabled>Phần trước</button>
@@ -64,7 +64,7 @@
                 'chapter_slug' => $chapter->slug,
                 'section_slug' => $section->nextSection()->slug
             ]) }}" class="btn btn-outline-success">
-                Phần sau: {{$section->nextSection()->title}}
+                {{$section->nextSection()->title}}
             </a>
         @else
             <button class="btn btn-outline-success" disabled>Phần sau</button>
@@ -123,7 +123,7 @@
                             <strong>Câu hỏi:</strong> 
                             ${data.type === 'multiple_choice' ? 'Trắc nghiệm' : 
                                data.type === 'true_false' ? 'Đúng/Sai' : 
-                               data.type === 'fill_blank' ? 'Điền khuyết' : 'Không xác định'}
+                               data.type === 'fill_blank' ? 'Điền kết quả' : 'Không xác định'}
                             - <em>Cấp độ: ${data.level}</em>
                         </div>
                         <hr>
@@ -161,9 +161,22 @@
             `;
         }
 
-        resultArea.innerHTML += `<button class="btn btn-primary mt-2" onclick="loadQuestion()">Câu tiếp theo ➡️</button>`;
+        resultArea.innerHTML += `
+        <button class="btn btn-primary mt-2" onclick="nextQuestion()">Câu tiếp theo ➡️</button>
+        `;
     }
 
+    function nextQuestion() {
+        if (mode === 'ordered') {
+            const input = document.getElementById('question-number');
+            let questionNumber = parseInt(input.value, 10) || 1;
+            questionNumber++;
+            input.value = questionNumber;
+            loadQuestion(questionNumber);
+        } else {
+            loadQuestion(); // random mode
+        }
+    }
     // Auto load khi trang vừa mở
     document.addEventListener('DOMContentLoaded', loadQuestion);
 </script>

@@ -3,7 +3,7 @@
 @section('title', 'Ôn tập chương- ' . $chapter->title . ' | ' . $subject->name)
 
 @section('content')
-<div class="container">
+<div class="container section">
     <div class="text-center">
         <h2>Ôn tập chương</h2>    
         
@@ -14,7 +14,7 @@
     </div>
     
     <hr>
-    <div class="card p-3 mb-4">
+    <div class="p-3 mb-4">
         <h5 class="text-muted">Nội dung tổng hợp</h5>
         {!! $chapter->summary !!}
     </div>
@@ -83,7 +83,7 @@
                 document.getElementById('exercise-area').innerHTML = `<p class="text-danger">Vui lòng nhập số câu hợp lệ.</p>`;
                 return;
             }
-            url = `/api/chapterId/${chapterId}/ordered-question/${questionNumber}`;
+            url = `/api/chapter/${chapterId}/ordered-question/${questionNumber}`;
         }
 
         fetch(url)
@@ -141,9 +141,22 @@
             `;
         }
 
-        resultArea.innerHTML += `<button class="btn btn-primary mt-2" onclick="loadQuestion()">Câu tiếp theo ➡️</button>`;
+        resultArea.innerHTML += `
+            <button class="btn btn-primary mt-2" onclick="nextQuestion()">Câu tiếp theo ➡️</button>
+            `;
     }
 
+    function nextQuestion() {
+        if (mode === 'ordered') {
+            const input = document.getElementById('question-number');
+            let questionNumber = parseInt(input.value, 10) || 1;
+            questionNumber++;
+            input.value = questionNumber;
+            loadQuestion(questionNumber);
+        } else {
+            loadQuestion(); // random mode
+        }
+    }
     // Auto load khi trang vừa mở
     document.addEventListener('DOMContentLoaded', loadQuestion);
 </script>

@@ -58,7 +58,7 @@
 
                     container.innerHTML = ''; // Xóa nếu có cũ
                     collections.forEach(col => {
-                        const url = `/${col.category.slug}/${col.slug}`;
+                        const url = `/tuyen-tap/${col.slug}`;
                         const image = col.image ? `<div class="square-box">
                             <img src="/${col.image}" class="centered-img" alt="${col.title}">
                         </div>` : '';

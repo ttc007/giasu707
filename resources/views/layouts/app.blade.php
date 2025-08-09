@@ -185,6 +185,21 @@
             background-color: #f1f1f1;
         }
 
+        #exercise-area input.form-control {
+            max-width: 300px;   /* Giới hạn chiều rộng */
+            display: inline-block; 
+            margin-right: 10px; /* Khoảng cách với nút */
+        }
+
+        #exercise-area button.btn {
+            width: auto;        /* Chỉ vừa nội dung */
+            padding: 6px 12px;  /* Gọn gàng hơn */
+            max-width:300px;
+        }
+
+        .card{
+            background: #ffffffa3;
+        }
     </style>
 </head>
 <body>
@@ -221,7 +236,7 @@
                     </li>
                     
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/bai-viet') }}">Thư viện</a>
+                        <a class="nav-link" href="{{ url('/thu-vien') }}">Thư viện</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url('/trang-ca-nhan') }}"><img src="{{ asset('images/avatar.png') }}" class="rounded-circle shadow" width="25" alt="Ảnh đại diện"></a>

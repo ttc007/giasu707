@@ -55,10 +55,11 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const collectionSlug = '{{ $post->collection->slug ?? '' }}';
+        const collectionSlug = '{{ $collection->slug ?? '' }}';
         const clientId = localStorage.getItem('client_id');
         const container = document.getElementById('like-container');
         const likeCountSpan = document.getElementById('like-count');
+        console.log(collectionSlug, clientId)
 
         if (collectionSlug && clientId) {
             fetch(`/api/collection/${collectionSlug}/is-favorite?client_id=${clientId}`)

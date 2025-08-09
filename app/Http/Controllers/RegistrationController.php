@@ -18,7 +18,6 @@ class RegistrationController extends Controller
         $registration = Registration::where('client_id', $client_id)
                             ->with([
                                 'favoriteCollections:id,title,slug,image,category_id',
-                                'favoriteCollections.category:id,slug'
                             ])
                             ->first();
 

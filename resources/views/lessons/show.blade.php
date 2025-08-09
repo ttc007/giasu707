@@ -3,7 +3,7 @@
 @section('title', $lesson->title . ' - ' . $chapter->title)
 
 @section('content')
-<div class="container">
+<div class="container section">
     <p><a href="{{ route('show.chapter', [
         'subject_slug' => $subject->slug,
         'chapter_slug' => $chapter->slug,
@@ -29,7 +29,7 @@
     @endif
 
     <hr>
-    <div class="card p-3 mb-4">
+    <div class="p-3 mb-4">
         <h5 class="text-muted">Nội dung tổng hợp</h5>
         {!! $lesson->summary !!}
     </div>
@@ -173,9 +173,22 @@
             `;
         }
 
-        resultArea.innerHTML += `<button class="btn btn-primary mt-2" onclick="loadQuestion()">Câu tiếp theo ➡️</button>`;
+        resultArea.innerHTML += `
+            <button class="btn btn-primary mt-2" onclick="nextQuestion()">Câu tiếp theo ➡️</button>
+            `;
     }
 
+    function nextQuestion() {
+        if (mode === 'ordered') {
+            const input = document.getElementById('question-number');
+            let questionNumber = parseInt(input.value, 10) || 1;
+            questionNumber++;
+            input.value = questionNumber;
+            loadQuestion(questionNumber);
+        } else {
+            loadQuestion(); // random mode
+        }
+    }
     // Auto load khi trang vừa mở
     document.addEventListener('DOMContentLoaded', loadQuestion);
 </script>
