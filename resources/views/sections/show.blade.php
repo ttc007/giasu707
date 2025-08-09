@@ -3,7 +3,7 @@
 @section('title', $section->title . ' - ' . $subject->name . ' | Giasu707')
 
 @section('content')
-<div class="container">
+<div class="container section">
     <p><a href="{{ route('show.chapter', [
         'subject_slug' => $subject->slug,
         'chapter_slug' => $chapter->slug,
@@ -16,7 +16,6 @@
 
     <h1 class="text-center pt-4">{{ $section->title }}</h1>
 
-    <hr>
     <div>
         {!! $section->content !!}
     </div>
@@ -122,7 +121,7 @@
                     <div class="card p-3">
                         <div><strong>Câu hỏi:</strong></div>
                         <div class="mb-2">${data.content}</div>
-                        <input type="text" id="user-answer" class="form-control" placeholder="Nhập câu trả lời..." autofocus>
+                        <input type="text" id="user-answer" class="form-control" placeholder="Nhập câu trả lời...">
                         <button class="btn btn-primary mt-2" onclick="checkAnswer()">Chấm điểm</button>
                         <div id="result-area" class="mt-3"></div>
                     </div>

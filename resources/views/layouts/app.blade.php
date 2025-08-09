@@ -99,6 +99,91 @@
             overflow-y: auto;
         }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            line-height: 1.7;
+            background-color: #fafafa;
+        }
+
+        h1, h2, h3, h4 {
+            color: #298f45; /* Màu xanh đậm hơn một chút */
+        }
+
+        ol li::marker {
+            color: #27ae60; /* Xanh lá chuẩn cho đánh số */
+        }
+
+        h1, h2, h3 {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        h1 {
+            font-size: 2rem;
+            border-bottom: 3px solid #27ae60;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+
+        ol li::marker {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        strong {
+            color: #2ecc71; /* Xanh lá sáng và mềm hơn */
+            font-weight: 600;
+        }
+
+        h3 strong {
+            color: #298f45;
+        }
+
+        h4 strong {
+            color: #58a407;
+        }
+
+        header {
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+        }
+
+        .section {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 1rem;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #27ae60;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
 
     </style>
 </head>
