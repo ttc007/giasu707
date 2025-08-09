@@ -130,12 +130,12 @@
         }
 
         strong {
-            color: #2ecc71; /* Xanh lá sáng và mềm hơn */
+            color: #35a263; /* Xanh lá sáng và mềm hơn */
             font-weight: 600;
         }
 
         h3 strong {
-            color: #298f45;
+            color: #699238;
         }
 
         h4 strong {
