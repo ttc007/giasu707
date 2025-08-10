@@ -220,6 +220,9 @@
             font-size: 14px;
         }
 
+        figure.image img {
+            max-width: 100%;
+        }
     </style>
 </head>
 <body>
