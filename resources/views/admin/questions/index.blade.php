@@ -52,6 +52,18 @@
             </div>
 
             <div class="col-md-4">
+                <label class="form-label">Phần</label>
+                <select name="section_id" id="section_id" class="form-select">
+                    <option value="">-- Tất cả --</option>
+                    @foreach ($sections as $section)
+                        <option value="{{ $section->id }}" {{ request('section_id') == $section->id ? 'selected' : '' }}>
+                            {{ $section->title }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-4">
                 <label class="form-label">Loại</label>
                 <select name="type" class="form-select">
                     <option value="">-- Tất cả --</option>

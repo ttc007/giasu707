@@ -104,7 +104,7 @@
                             <strong>Câu hỏi:</strong> 
                             (${data.type === 'multiple_choice' ? 'Trắc nghiệm' : 
                                data.type === 'true_false' ? 'Đúng/Sai' : 
-                               data.type === 'fill_blank' ? 'Điền khuyết' : 'Không xác định'})
+                               data.type === 'fill_blank' ? 'Điền kết quả' : 'Không xác định'})
                             - <em>Cấp độ: ${data.level}</em>
                         </div>
                         <hr>

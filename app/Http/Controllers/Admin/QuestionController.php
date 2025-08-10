@@ -56,7 +56,7 @@ class QuestionController extends Controller
             $query->where('type', $type);
         }
 
-        $questions = $query->orderBy('id', 'desc')->paginate(20);
+        $questions = $query->orderBy('order', 'asc')->paginate(30);
 
         return view('admin.questions.index', [
             'questions' => $questions,
