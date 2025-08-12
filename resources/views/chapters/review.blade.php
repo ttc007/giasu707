@@ -115,6 +115,10 @@
                         <div id="result-area" class="mt-3"></div>
                     </div>
                 `;
+
+                if (window.MathJax) {
+                  MathJax.typeset();
+                }
             });
     }
 
@@ -145,6 +149,10 @@
         resultArea.innerHTML += `
             <button class="btn btn-primary mt-2" onclick="nextQuestion()">Câu tiếp theo ➡️</button>
             `;
+
+        if (window.MathJax) {
+          MathJax.typeset();
+        }
     }
 
     function nextQuestion() {
