@@ -55,7 +55,7 @@
                         </a>
 
                         <div class="card-body">
-                            <h5 class="card-title text-center"><a href="{{ route('home.post.show', ['slug' => $post->category->slug,'post_slug' => $post->slug]) }}">{{ $post->title }}</a></h5>
+                            <p class="card-title text-center"><a href="{{ route('home.post.show', ['slug' => $post->category->slug,'post_slug' => $post->slug]) }}">{{ $post->title }}</a></p>
                         </div>
                     </div>
                 </div>
