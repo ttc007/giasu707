@@ -85,19 +85,21 @@ Route::prefix('api')->group(function () {
     Route::post('/register-client', [RegistrationController::class, 'store']);
     Route::get('/registration/{client_id}', [RegistrationController::class, 'apiShow']);
 
-    Route::get('/collection/{slug}/is-favorite', [RegistrationController::class, 'isFavorite']);
+    Route::get('/{model}/{id}/is-favorite', [RegistrationController::class, 'isFavorite']);
     // Like collection
-    Route::post('/collection/{slug}/like', [RegistrationController::class, 'like']);
+    Route::post('/{model}/{id}/like', [RegistrationController::class, 'like']);
 
     // Unlike collection
-    Route::delete('/collection/{slug}/unlike', [RegistrationController::class, 'unlike']);
+    Route::delete('/{model}/{model_id}/unlike', [RegistrationController::class, 'unlike']);
 
+    // Like collection
+    Route::post('/{model}/view', [RegistrationController::class, 'view']);
 });
 
 Route::post('/upload', [UploadController::class, 'uploadImage'])->name('ckeditor.upload');
 
 Route::get('/bang-gia-thiet-ke-website', [HomeController::class, 'priceTableWeb']);
-Route::get('/thi-thu', [App\Http\Controllers\HomeController::class, 'thiThu'])->name('thi-thu');
+Route::get('/thi-thu', [HomeController::class, 'thiThu'])->name('thi-thu');
 Route::post('/thi-thu/bat-dau', [HomeController::class, 'startThiThu'])->name('thi-thu.start');
 
 

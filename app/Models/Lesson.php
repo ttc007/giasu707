@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\HasViewsCount;
+use App\Models\Traits\HasLikesCount;
 
 class Lesson extends Model
 {
@@ -14,6 +16,9 @@ class Lesson extends Model
         'order',
     ];
 
+    use HasLikesCount;
+    use HasViewsCount;
+    
     public function chapter()
     {
         return $this->belongsTo(Chapter::class);

@@ -28,6 +28,6 @@
         </tbody>
     </table>
 
-    {{ $students->links() }}
+    {{ $students->links('vendor.pagination.bootstrap-5') }}
 </div>
 @endsection

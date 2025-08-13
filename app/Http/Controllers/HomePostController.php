@@ -36,7 +36,7 @@ class HomePostController extends Controller
     public function collection($slug)
     {
         $collection = Collection::where('slug', $slug)->firstOrFail();
-        $posts = Post::where('collection_id', $collection->id)->paginate(100);
+        $posts = Post::where('collection_id', $collection->id)->paginate(12);
 
         return view('home.posts.collection', compact('collection', 'posts'));
     }

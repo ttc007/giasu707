@@ -14,7 +14,13 @@
         'lesson_slug' => $section->lesson->slug
     ]) }}">{{ $section->lesson->title }}</a></h5>
 
+
     <h1 class="text-center pt-4">{{ $section->title }}</h1>
+    <div class="text-center" style="font-size:25px; display: flex; justify-content: center; gap: 30px; align-items: center;">
+        <span id="view-count">👀 {{ $section->countView() }}</span>
+        <span id="like-count">❤️{{ $section->countLikes() }}</span>
+        <div id="like-container"></div>
+    </div>
 
     <div>
         {!! $section->content !!}
@@ -188,6 +194,75 @@
     }
     // Auto load khi trang vừa mở
     document.addEventListener('DOMContentLoaded', loadQuestion);
-</script>
 
+    document.addEventListener("DOMContentLoaded", function() {
+        let clientId = localStorage.getItem("client_id");
+        fetch(`/api/section/view`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({
+                client_id: clientId,
+                model_id: {{ $section->id }}
+            })
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const collectionId = '{{ $section->id ?? '' }}';
+        const clientId = localStorage.getItem('client_id');
+        const container = document.getElementById('like-container');
+        const likeCountSpan = document.getElementById('like-count');
+        const type = 'section';
+
+        if (collectionId && clientId) {
+            fetch(`/api/${type}/${collectionId}/is-favorite?client_id=${clientId}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateLikeButton(data.liked);
+                });
+
+            function updateLikeButton(isLiked) {
+                if (isLiked) {
+                    container.innerHTML = `<button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>`;
+                } else {
+                    container.innerHTML = `<button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>`;
+                }
+
+                // Gán lại sự kiện sau khi render
+                setTimeout(() => {
+                    document.getElementById('like-btn')?.addEventListener('click', function () {
+                        fetch(`/api/${type}/${collectionId}/like`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            },
+                            body: JSON.stringify({ client_id: clientId })
+                        }).then(() => {updateLikeButton(true); updateLikeCount(1)});
+                    });
+
+                    document.getElementById('unlike-btn')?.addEventListener('click', function () {
+                        fetch(`/api/${type}/${collectionId}/unlike`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            },
+                            body: JSON.stringify({ client_id: clientId })
+                        }).then(() => {updateLikeButton(false); updateLikeCount(-1)});
+                    });
+                }, 10);
+            }
+
+            function updateLikeCount(change) {
+                const text = likeCountSpan.textContent.trim(); // ❤️123
+                const number = parseInt(text.replace('❤️', '').trim());
+                likeCountSpan.textContent = `❤️${number + change}`;
+            }
+        }
+    });
+</script>
 @endsection

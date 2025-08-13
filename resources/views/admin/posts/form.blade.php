@@ -5,13 +5,13 @@
     <input type="text" name="title" class="form-control" value="{{ old('title', $post->title ?? '') }}" required>
 </div>
 
-<!-- <div class="mb-3">
+<div class="mb-3">
     <label for="image" class="form-label">Ảnh đại diện</label>
     @if(isset($post) && $post->image)
         <img src="{{ asset($post->image) }}" alt="Ảnh bài viết" style="max-width: 200px;">
     @endif
     <input type="file" name="image" class="form-control" accept="image/*">
-</div> -->
+</div>
 
 <div class="mb-3">
     <label>Danh mục</label>

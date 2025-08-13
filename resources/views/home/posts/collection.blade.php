@@ -17,8 +17,11 @@
                 <h5 class="text-center text-muted">Thể loại: <a href="{{ route('home.category', $collection->category->slug) }}">{{ $collection->category->name }}</a></h5>
 
                 <div class="pb-4">
+                    <div class="text-center" style="font-size:25px; display: flex; justify-content: center; gap: 30px; align-items: center;">
+                        <span id="view-count">👀 {{ $collection->countView() }}</span>
+                        <span id="like-count">❤️{{ $collection->countLikes() }}</span>
+                    </div>
                     <div class="text-center"  style="font-size:25px">
-                        <span id="like-count">❤️{{ $collection->favoriteCount() }}</span>
                         <div id="like-container" class="mt-3 text-center">
                             <!-- Nút sẽ được hiển thị ở đây -->
                         </div>   
@@ -34,17 +37,29 @@
     </div>
 
     <div class="card p-5">
-        <h2 class="mb-5 text-center">Danh sách chương</h2>
-        <div class="row">
-            <ul>
-                @foreach ($posts as $index => $post)
-                    <li><a href="{{route('home.post.show', [
-                        'slug' => $collection->slug,
-                        'post_slug' => $post->slug
-                    ])}}" class="text-primary">{{$post->title}}</a></li>
-                @endforeach
-            </ul>
-            
+        <h2 class="mb-5 text-center">Danh sách bài viết</h2>
+        <div class="row collection-container pt-3">
+            @foreach ($posts as $post)
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100">
+                        <a href="{{ route('home.post.show', ['slug' => $post->category->slug,'post_slug' => $post->slug]) }}">
+                        @if ($post->image)
+                            <div class="square-box position-relative">
+                                <img src="{{ asset($post->image) }}" class="centered-img" alt="{{ $post->title }}">
+                                <div class="like-badge">
+                                    <span>👀 {{ $post->countView() }}</span>
+                                    <span>❤️{{ $post->countLikes() }}</span>
+                                </div>
+                            </div>
+                        @endif
+                        </a>
+
+                        <div class="card-body">
+                            <h5 class="card-title text-center"><a href="{{ route('home.post.show', ['slug' => $post->category->slug,'post_slug' => $post->slug]) }}">{{ $post->title }}</a></h5>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
         </div>
 
         {{-- PHÂN TRANG --}}
@@ -55,14 +70,13 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const collectionSlug = '{{ $collection->slug ?? '' }}';
+        const collectionId = '{{ $collection->id ?? '' }}';
         const clientId = localStorage.getItem('client_id');
         const container = document.getElementById('like-container');
         const likeCountSpan = document.getElementById('like-count');
-        console.log(collectionSlug, clientId)
 
-        if (collectionSlug && clientId) {
-            fetch(`/api/collection/${collectionSlug}/is-favorite?client_id=${clientId}`)
+        if (collectionId && clientId) {
+            fetch(`/api/collection/${collectionId}/is-favorite?client_id=${clientId}`)
                 .then(response => response.json())
                 .then(data => {
                     updateLikeButton(data.liked);
@@ -78,7 +92,7 @@
                 // Gán lại sự kiện sau khi render
                 setTimeout(() => {
                     document.getElementById('like-btn')?.addEventListener('click', function () {
-                        fetch(`/api/collection/${collectionSlug}/like`, {
+                        fetch(`/api/collection/${collectionId}/like`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -89,7 +103,7 @@
                     });
 
                     document.getElementById('unlike-btn')?.addEventListener('click', function () {
-                        fetch(`/api/collection/${collectionSlug}/unlike`, {
+                        fetch(`/api/collection/${collectionId}/unlike`, {
                             method: 'DELETE',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -108,5 +122,20 @@
             }
         }
     });
+
+document.addEventListener("DOMContentLoaded", function() {
+    let clientId = localStorage.getItem("client_id");
+    fetch(`/api/collection/view`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({
+            client_id: clientId,
+            model_id: {{ $collection->id }}
+        })
+    });
+});
 </script>
 @endsection

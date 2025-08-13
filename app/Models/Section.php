@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\HasViewsCount;
+use App\Models\Traits\HasLikesCount;
 
 class Section extends Model
 {
@@ -15,6 +17,9 @@ class Section extends Model
         'slug'
     ];
 
+    use HasViewsCount;
+    use HasLikesCount;
+    
     public function lesson()
     {
         return $this->belongsTo(Lesson::class);

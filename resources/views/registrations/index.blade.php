@@ -1,89 +1,104 @@
 @extends('layouts.app')
 
-@section('title', 'Đăng kí học online | Giasu707')
+@section('title', 'Trang cá nhân | Giasu707')
 
 @section('content')
-    <div class="card p-5">
+    <div class="card p-4 p-md-5 profile-card">
         <div class="text-center">
-        <img src="{{ asset('images/avatar.png') }}" class="rounded-circle shadow" width="150" alt="Ảnh đại diện">
-        </div>
-        <h1 class="mb-5 mt-3 text-center">Thông Tin Cá Nhân</h1>
-
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-
-        <p><strong>Họ tên:</strong> <span id="name"></span></p>
-        <p><strong>Email:</strong> <span id="email"></span></p>
-        <p><strong>Số điện thoại:</strong> <span id="phone"></span></p>
-        <p><strong>Môn học:</strong> <span id="subject"></span></p>
-        <p><strong>Ghi chú:</strong><span id="note"></span></p>
-        <a href="{{route('registration.create')}}" class="btn btn-primary">Cập nhật</a>
-
-        <hr>
-        <h2 class="text-center mt-2 mb-5">Tuyển tập yêu thích</h2>
-        <div class="row collection-container" id="favorite-collections-container">
-            <!-- JS sẽ render vào đây -->
+            <img src="{{ asset('images/avatar.png') }}" class="rounded-circle shadow mb-3" width="150" alt="Ảnh đại diện">
+            <h1 class="mb-1">{{ $registration->name ?? 'Tên người dùng' }}</h1>
+            <p class="text-muted mb-3">{{ $registration->email ?? '' }}</p>
+            <a href="{{ route('registration.create') }}" class="btn btn-primary mb-4">Cập nhật thông tin</a>
         </div>
 
+        <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="recent-views-tab" data-bs-toggle="tab" href="#recent-views" role="tab">Xem gần đây</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="favorite-posts-tab" data-bs-toggle="tab" href="#favorite-posts" role="tab">Bài viết yêu thích</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="favorite-lessons-tab" data-bs-toggle="tab" href="#favorite-lessons" role="tab">Bài học yêu thích</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="favorite-collections-tab" data-bs-toggle="tab" href="#favorite-collections" role="tab">Tuyển tập yêu thích</a>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-4" id="profileTabsContent">
+            <div class="tab-pane fade show active" id="recent-views" role="tabpanel">
+                <div class="row" id="recent-views-container">
+                    <!-- JS render recent views -->
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="favorite-posts" role="tabpanel">
+                <div class="row" id="favorite-posts-container"></div>
+            </div>
+
+            <div class="tab-pane fade" id="favorite-lessons" role="tabpanel">
+                <div class="row" id="favorite-lessons-container"></div>
+            </div>
+
+            <div class="tab-pane fade" id="favorite-collections" role="tabpanel">
+                <div class="row" id="favorite-collections-container"></div>
+            </div>
+        </div>
     </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const clientId = localStorage.getItem('client_id');
-            const container = document.getElementById('favorite-collections-container');
-            if (!clientId) {
-                alert("Không tìm thấy client_id.");
-                return;
-            }
+            if (!clientId) return alert("Không tìm thấy client_id.");
 
             fetch(`/api/registration/${clientId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Không tìm thấy thông tin.");
-                    }
-                    return response.json();
-                })
+                .then(res => res.ok ? res.json() : Promise.reject("Không tìm thấy thông tin."))
                 .then(data => {
-                    document.getElementById("name").textContent = data.name;
-                    document.getElementById("email").textContent = data.email;
-                    document.getElementById("phone").textContent = data.phone;
-                    document.getElementById("subject").textContent = data.subject;
-                    document.getElementById("note").textContent = data.note;
+                    renderUserInfo(data);
+                    renderFavorites(data);
+                    renderRecentViews(data);
+                })
+                .catch(err => alert(err));
 
-                    const collections = data.favorite_collections;
+            function renderUserInfo(data) {
+                document.querySelector("h1").textContent = data.name;
+                document.querySelector(".text-muted").textContent = data.email;
+            }
 
-                    if (!collections || collections.length === 0) {
-                        container.innerHTML = '<p class="text-muted text-center">Chưa có tuyển tập nào được yêu thích.</p>';
-                        return;
-                    }
+            function renderFavorites(data) {
+                renderCollectionList("#favorite-collections-container", data.favorite_collections);
+                renderCollectionList("#favorite-posts-container", data.favorite_posts);
+                renderCollectionList("#favorite-lessons-container", data.favorite_lessons);
+            }
 
-                    container.innerHTML = ''; // Xóa nếu có cũ
-                    collections.forEach(col => {
-                        const url = `/tuyen-tap/${col.slug}`;
-                        const image = col.image ? `<div class="square-box">
-                            <img src="/${col.image}" class="centered-img" alt="${col.title}">
-                        </div>` : '';
+            function renderRecentViews(data) {
+                renderCollectionList("#recent-views-container", data.recent_views);
+            }
 
-                        const cardHTML = `
+            function renderCollectionList(containerId, items) {
+                const container = document.querySelector(containerId);
+                if (!items || items.length === 0) {
+                    container.innerHTML = `<p class="text-muted text-center">Chưa có mục nào.</p>`;
+                    return;
+                }
+                container.innerHTML = '';
+                items.forEach(item => {
+                    const url = item.url || '#';
+                    const imgHTML = item.image ? `<div class="square-box"><img src="/${item.image}" class="centered-img" alt="${item.title}"></div>` : '';
+                    const cardHTML = `
                         <div class="col-md-3 mb-4">
                             <div class="card h-100">
-                                <a href="${url}">
-                                    ${image}
-                                </a>
-                                <div class="card-body">
-                                    <h5 class="card-title text-center">
-                                        <a href="${url}">${col.title}</a>
-                                    </h5>
+                                <a href="${url}">${imgHTML}</a>
+                                <div class="card-body text-center">
+                                    <h5><a href="${url}">${item.title}</a></h5>
                                 </div>
                             </div>
                         </div>`;
-                        
-                        container.innerHTML += cardHTML;
-                    });
-                })
-                .catch(error => {
-                    alert(error.message);
+                    container.innerHTML += cardHTML;
                 });
+            }
         });
+
     </script>
 @endsection

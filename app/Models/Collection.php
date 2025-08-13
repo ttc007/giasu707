@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\HasViewsCount;
+use App\Models\Traits\HasLikesCount;
 
 class Collection extends Model
 {
@@ -13,6 +15,9 @@ class Collection extends Model
         'slug'
     ];
 
+    use HasViewsCount;
+    use HasLikesCount;
+
     public function posts()
     {
         return $this->hasMany(Post::class);
@@ -21,12 +26,5 @@ class Collection extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
-    }
-
-    public function favoriteCount(): int
-    {
-        return \DB::table('favorites')
-            ->where('collection_id', $this->id)
-            ->count();
     }
 }

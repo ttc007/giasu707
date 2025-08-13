@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\HasViewsCount;
+use App\Models\Traits\HasLikesCount;
 
 class Post extends Model
 {
@@ -13,6 +15,9 @@ class Post extends Model
         'collection_id',
         'slug'
     ];
+
+    use HasViewsCount;
+    use HasLikesCount;
 
     public function collection()
     {
@@ -38,5 +43,12 @@ class Post extends Model
                      ->where('id', '<', $this->id)
                      ->orderBy('id', 'desc')
                      ->first();
+    }
+
+    public function favoriteCount(): int
+    {
+        return \DB::table('favorites')
+            ->where('collection_id', $this->id)
+            ->count();
     }
 }

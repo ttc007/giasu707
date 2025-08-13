@@ -35,7 +35,10 @@
                         @if ($collection->image)
                             <div class="square-box position-relative">
                                 <img src="{{ asset($collection->image) }}" class="centered-img" alt="{{ $collection->title }}">
-                                <span class="like-badge">❤️{{ $collection->favoriteCount() }}</span>
+                                <div class="like-badge">
+                                    <span>👀 {{ $collection->countView() }}</span>
+                                    <span>❤️{{ $collection->countLikes() }}</span>
+                                </div>
 
                             </div>
                         @endif
