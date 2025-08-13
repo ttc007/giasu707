@@ -9,7 +9,7 @@
         'chapter_slug' => $chapter->slug,
     ]) }}" class=""><strong>{{ $lesson->chapter->title }} - {{ $lesson->chapter->subject->name }}</strong></a></p>
     <h2 class="my-3">{{ $lesson->title }}</h2>
-    <div class="text-center" style="font-size:25px; display: flex; justify-content: center; gap: 30px; align-items: center;">
+    <div class="text-center" style="font-size:20px; display: flex; justify-content: center; gap: 15px; align-items: center;">
         <span id="view-count">👀 {{ $lesson->countView() }}</span>
         <span id="like-count">❤️{{ $lesson->countLikes() }}</span>
         <div id="like-container"></div>

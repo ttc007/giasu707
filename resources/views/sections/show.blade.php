@@ -16,7 +16,7 @@
 
 
     <h1 class="text-center pt-4">{{ $section->title }}</h1>
-    <div class="text-center" style="font-size:25px; display: flex; justify-content: center; gap: 30px; align-items: center;">
+    <div class="text-center" style="font-size:20px; display: flex; justify-content: center; gap: 15px; align-items: center;">
         <span id="view-count">👀 {{ $section->countView() }}</span>
         <span id="like-count">❤️{{ $section->countLikes() }}</span>
         <div id="like-container"></div>
