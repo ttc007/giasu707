@@ -56,7 +56,6 @@
                 .then(res => res.ok ? res.json() : Promise.reject("Không tìm thấy thông tin."))
                 .then(data => {
                     renderUserInfo(data);
-                    renderFavorites(data);
                     renderRecentViews(data);
                 })
                 .catch(err => alert(err));
@@ -85,7 +84,7 @@
                 container.innerHTML = '';
                 items.forEach(item => {
                     const url = item.url || '#';
-                    const imgHTML = item.image ? `<div class="square-box"><img src="/${item.image}" class="centered-img" alt="${item.title}"></div>` : '';
+                    const imgHTML = item.image ? `<div class="square-box"><img src="/${item.image}" class="centered-img" alt="${item.title}"></div>` : `<div class="square-box"><span style="font-size:20px">${item.type}</span></div>`;
                     const cardHTML = `
                         <div class="col-md-3 mb-4">
                             <div class="card h-100">

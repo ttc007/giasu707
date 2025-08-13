@@ -6,6 +6,9 @@ use App\Models\Registration;
 use Illuminate\Http\Request;
 use App\Models\Collection;
 use DB;
+use App\Models\Section;
+use App\Models\Lesson;
+use App\Models\Post;
 
 class RegistrationController extends Controller
 {
@@ -26,64 +29,85 @@ class RegistrationController extends Controller
 
         $registrationId = $registration->id;
 
-        // Favorite Collections
-        $favoriteCollections = DB::table('favorites')
-            ->join('collections', 'favorites.model_id', '=', 'collections.id')
-            ->where('favorites.registration_id', $registrationId)
-            ->where('favorites.model_type', 'Collection')
-            ->select('collections.id', 'collections.title', 'collections.slug', 'collections.image', 'collections.category_id')
-            ->get()
-            ->map(function($col) {
-                $col->url = route('home.collection', $col->slug);
-                return $col;
-            });
-
-        // Favorite Posts
-        $favoritePosts = DB::table('favorites')
-            ->join('posts', 'favorites.model_id', '=', 'posts.id')
-            ->where('favorites.registration_id', $registrationId)
-            ->where('favorites.model_type', 'Post')
-            ->select('posts.id', 'posts.title', 'posts.slug', 'posts.image', 'posts.collection_id')
-            ->get()
-            ->map(function($post) {
-                $post->url = route('home.post.show', [
-                    'slug' => $post->category->slug,
-                    'post_slug' => $post->slug]);
-                return $post;
-            });
-
-        // Favorite Lessons
-        $favoriteLessons = DB::table('favorites')
-            ->join('lessons', 'favorites.model_id', '=', 'lessons.id')
-            ->where('favorites.registration_id', $registrationId)
-            ->where('favorites.model_type', 'Lesson')
-            ->select('lessons.id', 'lessons.title', 'lessons.slug')
-            ->get()
-            ->map(function($lesson) {
-                $lesson->url = route('home.lesson', $lesson->slug);
-                return $lesson;
-            });
-
         // Recent Views (10 view gần nhất)
         $recentViews = DB::table('views')
             ->where('registration_id', $registrationId)
             ->orderByDesc('created_at')
-            ->limit(10)
+            ->limit(12)
             ->get()
             ->map(function($view) {
                 $modelClass = $view->model_type;
-                $item = DB::table(strtolower(class_basename($modelClass)) . 's')
-                    ->where('id', $view->model_id)
-                    ->first();
-                if (!$item) return null;
-                return [
-                    'id' => $item->id,
-                    'title' => $item->title ?? ($item->name ?? 'Không có tiêu đề'),
-                    'slug' => $item->slug ?? '',
-                    'image' => $item->image ?? null,
-                    'url' => url('/' . ($item->slug ?? '')),
-                    'type' => class_basename($modelClass),
-                ];
+                if ($modelClass == 'Section') {
+                    $section = Section::with('lesson.chapter.subject')->find($view->model_id);
+                    if (!$section) return null;
+
+                    $url = route('show.section', [
+                        'subject_slug' => $section->lesson->chapter->subject->slug,
+                        'chapter_slug' => $section->lesson->chapter->slug,
+                        'section_slug' => $section->slug,
+                    ]);
+
+                    return [
+                        'id' => $section->id,
+                        'title' => $section->title,
+                        'slug' => $section->slug,
+                        'image' => null,
+                        'url' => $url,
+                        'type' => 'Section',
+                    ];
+                } elseif ($modelClass == 'Lesson') {
+                    $lesson = Lesson::with('chapter.subject')->find($view->model_id);
+                    if (!$lesson) return null;
+
+                    $url = route('show.lesson', [
+                        'subject_slug' => $lesson->chapter->subject->slug,
+                        'chapter_slug' => $lesson->chapter->slug,
+                        'lesson_slug' => $lesson->slug,
+                    ]);
+
+                    return [
+                        'id' => $lesson->id,
+                        'title' => $lesson->title,
+                        'slug' => $lesson->slug,
+                        'image' => null,
+                        'url' => $url,
+                        'type' => 'Lesson',
+                    ];
+                } elseif ($modelClass == 'Collection') {
+                    $collection = Collection::find($view->model_id);
+                    if (!$collection) return null;
+
+                    $url = route('home.collection', [
+                        'slug' => $collection->slug,
+                    ]);
+
+                    return [
+                        'id' => $collection->id,
+                        'title' => $collection->title,
+                        'slug' => $collection->slug,
+                        'image' => $collection->image,
+                        'url' => $url,
+                        'type' => 'Collection',
+                    ];
+                } else {
+                    $post = Post::with('collection')->find($view->model_id);
+                    if (!$post) return null;
+
+                    $url = route('home.post.show', [
+                        'slug' => $post->collection->slug,
+                        'post_slug' => $post->slug,
+                    ]);
+
+                    return [
+                        'id' => $post->id,
+                        'title' => $post->title,
+                        'slug' => $post->slug,
+                        'image' => $post->image,
+                        'url' => $url,
+                        'type' => 'Post',
+                    ];
+                }
+
             })
             ->filter(); // bỏ null
 
@@ -94,9 +118,6 @@ class RegistrationController extends Controller
             'phone' => $registration->phone,
             'subject' => $registration->subject,
             'note' => $registration->note,
-            'favorite_collections' => $favoriteCollections,
-            'favorite_posts' => $favoritePosts,
-            'favorite_lessons' => $favoriteLessons,
             'recent_views' => $recentViews,
         ]);
     }
