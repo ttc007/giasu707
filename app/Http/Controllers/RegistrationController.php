@@ -327,7 +327,6 @@ class RegistrationController extends Controller
             ->where('model_type', $model)
             ->where('model_id', $model_id)
             ->where('registration_id', $registration->id)
-            ->where('created_at', '>=', $eightHoursAgo)
             ->first();
 
         if (!$existingView) {
@@ -338,6 +337,15 @@ class RegistrationController extends Controller
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
+        } else {
+            $lastUpdated = \Carbon\Carbon::parse($existingView->updated_at);
+            if ($lastUpdated->lt($eightHoursAgo)) {
+                DB::table('views')
+                    ->where('model_type', $model)
+                    ->where('model_id', $model_id)
+                    ->where('registration_id', $registration->id)
+                    ->update(['updated_at' => now()]);
+            }
         }
 
         return response()->json(['success' => true]);

@@ -11,14 +11,14 @@
 </style>
 <div class="container py-4">
 
-    <div class="mb-4">
+    <div class="mb-4 section">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="square-box">
                     <img src="{{ asset($collection->image) }}" class="centered-img" alt="{{ $collection->title }}">
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-8">
                 <h1 class="text-center my-3">{{$collection->title}}</h1>
                 <h5 class="text-center text-muted">Thể loại: <a href="{{ route('home.category', $collection->category->slug) }}">{{ $collection->category->name }}</a></h5>
 
@@ -40,10 +40,8 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="card p-5">
-        <h2 class="mb-5 text-center">Danh sách bài viết</h2>
+        <hr>
+        <h2 class="mb-4 text-center">Danh sách bài viết</h2>
         <div class="row collection-container pt-3">
             @foreach ($posts as $post)
                 <div class="col-md-3 mb-4">
@@ -61,7 +59,7 @@
                         </a>
 
                         <div class="card-body">
-                            <p class="card-title text-center"><a href="{{ route('home.post.show', ['slug' => $post->category->slug,'post_slug' => $post->slug]) }}">{{ $post->title }}</a></p>
+                            <h5 class="card-title text-center"><a href="{{ route('home.post.show', ['slug' => $post->category->slug,'post_slug' => $post->slug]) }}">{{ $post->title }}</a></h5>
                         </div>
                     </div>
                 </div>

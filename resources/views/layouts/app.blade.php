@@ -80,12 +80,14 @@
 
         .square-box {
             width: 100%;
-            aspect-ratio: 1 / 1;
+            aspect-ratio: 1 / 1.33;
             background: #eee;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            border-radius: 6px; /* Bo góc nhẹ */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Đổ bóng */
         }
 
         .centered-img {
