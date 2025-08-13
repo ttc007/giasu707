@@ -33,7 +33,7 @@
                         </div>   
                     </div>
                     
-                    <div class="mt-4">
+                    <div class="mt-4 p-5" style="font-size:25px">
                         {!! $collection->description !!}    
                     </div>
                     
