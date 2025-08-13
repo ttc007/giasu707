@@ -6,12 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\Subject;
 use App\Models\Question;
 use App\Models\Exam;
+use App\Models\Post;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        return view('index');
+        $featuredPosts = Post::with('collection')->latest()->take(6)->get();
+        return view('index', compact('featuredPosts'));
     }
 
     public function priceTableWeb() {

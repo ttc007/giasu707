@@ -16,33 +16,19 @@
                 <a class="nav-link active" id="recent-views-tab" data-bs-toggle="tab" href="#recent-views" role="tab">Xem gần đây</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="favorite-posts-tab" data-bs-toggle="tab" href="#favorite-posts" role="tab">Bài viết yêu thích</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="favorite-lessons-tab" data-bs-toggle="tab" href="#favorite-lessons" role="tab">Bài học yêu thích</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="favorite-collections-tab" data-bs-toggle="tab" href="#favorite-collections" role="tab">Tuyển tập yêu thích</a>
+                <a class="nav-link" id="favorite-tab" data-bs-toggle="tab" href="#favorites" role="tab">Yêu thích</a>
             </li>
         </ul>
 
         <div class="tab-content mt-4" id="profileTabsContent">
             <div class="tab-pane fade show active" id="recent-views" role="tabpanel">
-                <div class="row" id="recent-views-container">
+                <div class="row collection-container pt-3" id="recent-views-container">
                     <!-- JS render recent views -->
                 </div>
             </div>
 
-            <div class="tab-pane fade" id="favorite-posts" role="tabpanel">
-                <div class="row" id="favorite-posts-container"></div>
-            </div>
-
-            <div class="tab-pane fade" id="favorite-lessons" role="tabpanel">
-                <div class="row" id="favorite-lessons-container"></div>
-            </div>
-
-            <div class="tab-pane fade" id="favorite-collections" role="tabpanel">
-                <div class="row" id="favorite-collections-container"></div>
+            <div class="tab-pane fade" id="favorites" role="tabpanel">
+                <div class="row collection-container pt-3" id="favorites-container"></div>
             </div>
         </div>
     </div>
@@ -57,6 +43,7 @@
                 .then(data => {
                     renderUserInfo(data);
                     renderRecentViews(data);
+                    renderFavorites(data);
                 })
                 .catch(err => alert(err));
 
@@ -66,9 +53,7 @@
             }
 
             function renderFavorites(data) {
-                renderCollectionList("#favorite-collections-container", data.favorite_collections);
-                renderCollectionList("#favorite-posts-container", data.favorite_posts);
-                renderCollectionList("#favorite-lessons-container", data.favorite_lessons);
+                renderCollectionList("#favorites-container", data.favorites);
             }
 
             function renderRecentViews(data) {

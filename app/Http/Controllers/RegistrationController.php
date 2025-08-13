@@ -109,6 +109,87 @@ class RegistrationController extends Controller
                 }
 
             })
+            ->filter();
+
+        $favorites = DB::table('favorites')
+            ->where('registration_id', $registrationId)
+            ->orderByDesc('created_at')
+            ->limit(12)
+            ->get()
+            ->map(function($view) {
+                $modelClass = $view->model_type;
+                if ($modelClass == 'Section') {
+                    $section = Section::with('lesson.chapter.subject')->find($view->model_id);
+                    if (!$section) return null;
+
+                    $url = route('show.section', [
+                        'subject_slug' => $section->lesson->chapter->subject->slug,
+                        'chapter_slug' => $section->lesson->chapter->slug,
+                        'section_slug' => $section->slug,
+                    ]);
+
+                    return [
+                        'id' => $section->id,
+                        'title' => $section->title,
+                        'slug' => $section->slug,
+                        'image' => null,
+                        'url' => $url,
+                        'type' => 'Section',
+                    ];
+                } elseif ($modelClass == 'Lesson') {
+                    $lesson = Lesson::with('chapter.subject')->find($view->model_id);
+                    if (!$lesson) return null;
+
+                    $url = route('show.lesson', [
+                        'subject_slug' => $lesson->chapter->subject->slug,
+                        'chapter_slug' => $lesson->chapter->slug,
+                        'lesson_slug' => $lesson->slug,
+                    ]);
+
+                    return [
+                        'id' => $lesson->id,
+                        'title' => $lesson->title,
+                        'slug' => $lesson->slug,
+                        'image' => null,
+                        'url' => $url,
+                        'type' => 'Lesson',
+                    ];
+                } elseif ($modelClass == 'Collection') {
+                    $collection = Collection::find($view->model_id);
+                    if (!$collection) return null;
+
+                    $url = route('home.collection', [
+                        'slug' => $collection->slug,
+                    ]);
+
+                    return [
+                        'id' => $collection->id,
+                        'title' => $collection->title,
+                        'slug' => $collection->slug,
+                        'image' => $collection->image,
+                        'url' => $url,
+                        'type' => 'Collection',
+                    ];
+                } else {
+                    $post = Post::with('collection')->find($view->model_id);
+                    if (!$post) return null;
+
+                    $url = route('home.post.show', [
+                        'slug' => $post->collection->slug,
+                        'post_slug' => $post->slug,
+                    ]);
+
+                    return [
+                        'id' => $post->id,
+                        'title' => $post->title,
+                        'slug' => $post->slug,
+                        'image' => $post->image,
+                        'url' => $url,
+                        'type' => 'Post',
+                    ];
+                }
+
+            })
             ->filter(); // bỏ null
 
         return response()->json([
@@ -119,6 +200,7 @@ class RegistrationController extends Controller
             'subject' => $registration->subject,
             'note' => $registration->note,
             'recent_views' => $recentViews,
+            'favorites' => $favorites
         ]);
     }
 

@@ -49,6 +49,33 @@
                         Mình hy vọng đây sẽ là nơi giúp các bạn học sinh học tập hiệu quả hơn, tự tin hơn trên hành trình ôn thi và tích lũy kiến thức.
                     </p>
                 </div>
+
+                <!-- Bài viết nổi bật -->
+                <div class="mt-5 p-3 bg-white rounded border shadow-sm">
+                    <h4 class="text-success mb-4">🔥 Bài viết nổi bật</h4>
+                    <div class="row collection-container pt-3">
+                        @foreach($featuredPosts as $post)
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    @if($post->image)
+                                    <a href="{{ route('home.post.show', ['slug' => $post->collection->slug, 'post_slug' => $post->slug]) }}" >
+                                        <div class="square-box position-relative">
+                                            <img src="{{ asset($post->image) }}" class="centered-img" alt="{{ $post->title }}">
+                                            <div class="like-badge">
+                                                <span>👀 {{ $post->countView() }}</span>
+                                                <span>❤️{{ $post->countLikes() }}</span>
+                                            </div>
+                                        </div></a>
+                                    @endif
+                                    <div class="card-body d-flex flex-column justify-content-between">
+                                        <h5 class="card-title text-center"><a href="{{ route('home.post.show', ['slug' => $post->collection->slug, 'post_slug' => $post->slug]) }}" >{{ $post->title }}</a></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
                 <div class="mt-4 p-3 bg-white rounded border shadow-sm">
                 <h4 class="mt-4">🧑‍💻 Dịch vụ thiết kế website</h4>
                     <p class="text-justify">

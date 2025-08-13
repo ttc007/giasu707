@@ -3,6 +3,12 @@
 @section('title', $collection->title)
 
 @section('content')
+<style type="text/css">
+    .card-body {
+        height: 125px!important;      /* chiều cao cố định */
+    }
+
+</style>
 <div class="container py-4">
 
     <div class="mb-4">

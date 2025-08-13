@@ -202,7 +202,16 @@
         }
 
         .collection-container .card-body{
-            height:80px;
+            height:100px;
+            display: flex;       /* bật flex */
+            flex-direction: column; /* sắp xếp theo cột */
+            justify-content: center!important; /* canh giữa theo chiều dọc */
+            align-items: center;     /* canh giữa theo chiều ngang nếu muốn */
+            text-align: center;      /* canh chữ ở giữa */
+        }
+
+        h5{
+            font-size: 1rem;
         }
 
         .square-box {
