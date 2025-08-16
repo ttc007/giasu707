@@ -229,17 +229,19 @@ class RegistrationController extends Controller
     public function store(Request $request)
     {
         $registration = Registration::create([
-            'name' => 'Chưa cập nhật', // để trống, sẽ cập nhật sau
-            'email' => 'Chưa cập nhật',
-            'phone' => 'Chưa cập nhật',
-            'subject' => 'Chưa cập nhật',
+            'name'      => 'Chưa cập nhật', // để trống, sẽ cập nhật sau
+            'email'     => 'Chưa cập nhật',
+            'phone'     => 'Chưa cập nhật',
+            'subject'   => 'Chưa cập nhật',
             'client_id' => uniqid('client_', true), // gen ID tạm
+            'user_agent' => $request->userAgent(),
         ]);
 
         return response()->json([
             'client_id' => $registration->client_id,
         ]);
     }
+
 
     public function isFavorite(Request $request, $model, $model_id)
     {

@@ -42,8 +42,9 @@
                 <select id="exam_id" name="exam_id" class="form-select d-inline-block w-auto"></select>
             </div>
         </div>
+        <i class="text-danger">Chọn môn và chế độ thi để bắt đầu kiểm tra năng lực ngay!</i><br>
 
-        <button type="submit" class="btn btn-primary">Bắt đầu thi</button>
+        <button type="submit" class="btn btn-primary mt-3">Bắt đầu thi</button>
     </form>
 </div>
 
