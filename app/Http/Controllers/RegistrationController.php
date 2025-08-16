@@ -234,7 +234,7 @@ class RegistrationController extends Controller
             'phone'     => 'Chưa cập nhật',
             'subject'   => 'Chưa cập nhật',
             'client_id' => uniqid('client_', true), // gen ID tạm
-            'user_agent' => $request->userAgent(),
+            'user_agent' => $request->userAgent() . '- IP:' .  $request->ip(),
         ]);
 
         return response()->json([
