@@ -36,7 +36,8 @@
                     <div class="mt-4 p-5" style="font-size:25px">
                         {!! $collection->description !!}    
                     </div>
-                    
+                    <hr>
+                    <div class="text-muted text-end">Cập nhật gần nhất: {{ $collection->getUpdatedDate() }}</div>
                 </div>
             </div>
         </div>

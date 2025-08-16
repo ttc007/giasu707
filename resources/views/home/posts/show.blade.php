@@ -22,6 +22,7 @@
             <span id="like-count">❤️ {{ $post->countLikes() }}</span>
         </div>
         <div id="like-container"></div>
+        <p class="text-muted text-end">Cập nhật gần nhất: {{ $post->getUpdatedDate() }}</p>
     </div>
 
     <hr>

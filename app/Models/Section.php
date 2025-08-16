@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Traits\HasViewsCount;
 use App\Models\Traits\HasLikesCount;
+use App\Models\Traits\HasFormattedDates;
 
 class Section extends Model
 {
@@ -19,6 +20,7 @@ class Section extends Model
 
     use HasViewsCount;
     use HasLikesCount;
+    use HasFormattedDates;
     
     public function lesson()
     {

@@ -20,7 +20,7 @@
                     'lesson_slug' => $lesson->slug
                 ]) }}">
                     {{ $loop->iteration }}. {{ $lesson->title }}
-                    ({{$lesson->getQuestionsCountAttribute()}} câu hỏi)
+                    ({{ $lesson->countView() }} đã xem, {{$lesson->getQuestionsCountAttribute()}} câu hỏi)
                 </a>
             </strong>
 
@@ -34,7 +34,7 @@
                                 'section_slug' => $section->slug
                             ]) }}">
                                 {{ $section->title ?? 'Phần ' . $loop->iteration }} 
-                                ({{ $section->questions_count }} câu hỏi)
+                                ({{ $lesson->countView() }} đã xem, {{ $section->questions_count }} câu hỏi)
                             </a>
                         </li>
                     @endforeach

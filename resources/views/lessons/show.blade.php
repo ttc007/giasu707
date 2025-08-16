@@ -4,16 +4,17 @@
 
 @section('content')
 <div class="container section">
-    <p><a href="{{ route('show.chapter', [
+    <h4 class="text-center"><a href="{{ route('show.chapter', [
         'subject_slug' => $subject->slug,
         'chapter_slug' => $chapter->slug,
-    ]) }}" class=""><strong>{{ $lesson->chapter->title }} - {{ $lesson->chapter->subject->name }}</strong></a></p>
-    <h2 class="my-3">{{ $lesson->title }}</h2>
-    <div class="text-center" style="font-size:20px; display: flex; justify-content: center; gap: 15px; align-items: center;">
+    ]) }}" class="text-center"><strong>{{ $lesson->chapter->title }} - {{ $lesson->chapter->subject->name }}</strong></a></h4>
+    <h3 class="my-3 text-center">{{ $lesson->title }}</h2>
+    <div class="text-center" style="font-size:18px;  gap: 15px;">
         <span id="view-count">👀 {{ $lesson->countView() }}</span>
         <span id="like-count">❤️{{ $lesson->countLikes() }}</span>
         <div id="like-container"></div>
     </div>
+    <div class="text-muted text-end">Cập nhật gần nhất: {{ $lesson->getUpdatedDate() }}</div>
 
     <hr>
     @if ($lesson->sections->count())
@@ -45,8 +46,8 @@
         <div class="mb-3">
             <label for="mode" class="form-label">Chọn chế độ hiển thị câu hỏi:</label>
             <select id="mode" class="form-select w-auto d-inline-block" onchange="onModeChange()">
-                <option value="ordered" selected>Theo thứ tự</option>
-                <option value="random" >Ngẫu nhiên</option>
+                <option value="ordered" >Theo thứ tự</option>
+                <option value="random" selected>Ngẫu nhiên</option>
             </select>
 
             <div class="d-inline-block ms-3" id="question-number-wrapper" style="display: inline!important;">
