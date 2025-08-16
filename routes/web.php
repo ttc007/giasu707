@@ -77,23 +77,13 @@ Route::prefix('api')->group(function () {
     Route::get('/{type}/{id}/random-question', [ApiQuestionController::class, 'getRandom']);
     // routes/api.php
     Route::get('/{type}/{id}/ordered-question/{number}', [ApiQuestionController::class, 'getOrderedQuestion']);
-
     // routes/web.php
     Route::get('/subject/{id}/exams', [ApiQuestionController::class, 'getExamsBySubject']);
 
-    // routes/api.php
-    Route::post('/register-client', [RegistrationController::class, 'store']);
-    Route::get('/registration/{client_id}', [RegistrationController::class, 'apiShow']);
-
-    Route::get('/{model}/{id}/is-favorite', [RegistrationController::class, 'isFavorite']);
-    // Like collection
+    // Like 
     Route::post('/{model}/{id}/like', [RegistrationController::class, 'like']);
-
-    // Unlike collection
+    // Unlike 
     Route::delete('/{model}/{model_id}/unlike', [RegistrationController::class, 'unlike']);
-
-    // Like collection
-    Route::post('/{model}/view', [RegistrationController::class, 'view']);
 });
 
 Route::post('/upload', [UploadController::class, 'uploadImage'])->name('ckeditor.upload');

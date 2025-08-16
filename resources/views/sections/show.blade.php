@@ -4,22 +4,47 @@
 
 @section('content')
 <div class="container section">
-    <h4 class="text-center"><a href="{{ route('show.chapter', [
-        'subject_slug' => $subject->slug,
-        'chapter_slug' => $chapter->slug,
-    ]) }}" class=""><strong>{{ $section->lesson->chapter->title }} - {{ $section->lesson->chapter->subject->name }}</strong></a></h4>
-    <h5 class="text-center"><a href="{{ route('show.lesson', [
-        'subject_slug' => $subject->slug,
-        'chapter_slug' => $chapter->slug,
-        'lesson_slug' => $section->lesson->slug
-    ]) }}">{{ $section->lesson->title }}</a></h5>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb p-2">
+            <li class="breadcrumb-item">
+                <a href="{{ route('show.chapter', [
+                    'subject_slug' => $subject->slug,
+                    'chapter_slug' => $chapter->slug
+                ]) }}">
+                    {{ $section->lesson->chapter->subject->name }}
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('show.chapter', [
+                    'subject_slug' => $subject->slug,
+                    'chapter_slug' => $chapter->slug
+                ]) }}">
+                    {{ $section->lesson->chapter->title }}
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('show.lesson', [
+                    'subject_slug' => $subject->slug,
+                    'chapter_slug' => $chapter->slug,
+                    'lesson_slug' => $section->lesson->slug
+                ]) }}">
+                    {{ $section->lesson->title }}
+                </a>
+            </li>
+        </ol>
+    </nav>
 
-
-    <h3 class="text-center pt-4">{{ $section->title }}</h1>
+    <h3 class="text-center mt-4">{{$section->title}}</h3>
     <div class="text-center" style="font-size:18px;gap: 15px; align-items: center;">
         <span id="view-count">👀 {{ $section->countView() }}</span>
         <span id="like-count">❤️{{ $section->countLikes() }}</span>
-        <div id="like-container"></div>
+        <div id="like-container">
+            @if($liked)
+            <button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>
+            @else
+            <button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>
+            @endif
+        </div>
         <p class="text-muted text-end">Cập nhật gần nhất: {{ $section->getUpdatedDate() }}</p>
     </div>
     <hr>
@@ -196,73 +221,53 @@
     // Auto load khi trang vừa mở
     document.addEventListener('DOMContentLoaded', loadQuestion);
 
-    document.addEventListener("DOMContentLoaded", function() {
-        let clientId = localStorage.getItem("client_id");
-        fetch(`/api/section/view`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-            },
-            body: JSON.stringify({
-                client_id: clientId,
-                model_id: {{ $section->id }}
-            })
-        });
-    });
-
     document.addEventListener('DOMContentLoaded', function () {
         const collectionId = '{{ $section->id ?? '' }}';
-        const clientId = localStorage.getItem('client_id');
         const container = document.getElementById('like-container');
         const likeCountSpan = document.getElementById('like-count');
         const type = 'section';
 
-        if (collectionId && clientId) {
-            fetch(`/api/${type}/${collectionId}/is-favorite?client_id=${clientId}`)
-                .then(response => response.json())
-                .then(data => {
-                    updateLikeButton(data.liked);
+        updateLikeButtonFunction();
+
+        function updateLikeButton(isLiked) {
+            if (isLiked) {
+                container.innerHTML = `<button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>`;
+            } else {
+                container.innerHTML = `<button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>`;
+            }
+
+            updateLikeButtonFunction();
+        }
+
+        function updateLikeCount(change) {
+            const text = likeCountSpan.textContent.trim(); // ❤️123
+            const number = parseInt(text.replace('❤️', '').trim());
+            likeCountSpan.textContent = `❤️${number + change}`;
+        }
+
+        function updateLikeButtonFunction() {
+            // Gán lại sự kiện sau khi render
+            setTimeout(() => {
+                document.getElementById('like-btn')?.addEventListener('click', function () {
+                    fetch(`/api/${type}/${collectionId}/like`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        }
+                    }).then(() => {updateLikeButton(true); updateLikeCount(1)});
                 });
 
-            function updateLikeButton(isLiked) {
-                if (isLiked) {
-                    container.innerHTML = `<button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>`;
-                } else {
-                    container.innerHTML = `<button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>`;
-                }
-
-                // Gán lại sự kiện sau khi render
-                setTimeout(() => {
-                    document.getElementById('like-btn')?.addEventListener('click', function () {
-                        fetch(`/api/${type}/${collectionId}/like`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            },
-                            body: JSON.stringify({ client_id: clientId })
-                        }).then(() => {updateLikeButton(true); updateLikeCount(1)});
-                    });
-
-                    document.getElementById('unlike-btn')?.addEventListener('click', function () {
-                        fetch(`/api/${type}/${collectionId}/unlike`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            },
-                            body: JSON.stringify({ client_id: clientId })
-                        }).then(() => {updateLikeButton(false); updateLikeCount(-1)});
-                    });
-                }, 10);
-            }
-
-            function updateLikeCount(change) {
-                const text = likeCountSpan.textContent.trim(); // ❤️123
-                const number = parseInt(text.replace('❤️', '').trim());
-                likeCountSpan.textContent = `❤️${number + change}`;
-            }
+                document.getElementById('unlike-btn')?.addEventListener('click', function () {
+                    fetch(`/api/${type}/${collectionId}/unlike`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        }
+                    }).then(() => {updateLikeButton(false); updateLikeCount(-1)});
+                });
+            }, 10);
         }
     });
 </script>

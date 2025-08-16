@@ -8,6 +8,7 @@
             <tr>
                 <th>#</th>
                 <th>Họ tên</th>
+                <th>User Argent</th>
                 <th>IP</th>
                 <th>Email</th>
                 <th>SĐT</th>
@@ -20,7 +21,8 @@
                 <tr>
                     <td>{{ $loop->iteration + ($students->currentPage() - 1) * $students->perPage() }}</td>
                     <td>{{ $student->name }}</td>
-                    <td>{{$student->user_agent}}</td>
+                    <td>{{ $student->user_agent }}</td>
+                    <td>{{ $student->ip_address }}</td>
                     <td>{{ $student->email }}</td>
                     <td>{{ $student->phone }}</td>
                     <td>{{ $student->subject }}</td>

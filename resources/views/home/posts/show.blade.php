@@ -4,24 +4,34 @@
 
 @section('content')
 <div class="container section">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb p-2">
+            <li class="breadcrumb-item">
+                <a href="/thu-vien">Thư viện</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('home.category', $post->collection->category->slug) }}">{{ $post->collection->category->name }}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('home.collection', $post->collection->slug) }}">
+                    {{ $post->collection->title ?? 'Không có' }}
+                </a>
+            </li>
+        </ol>
+    </nav>
     <div class="post-header text-center">
-        <h1 class="collection-title">
-            <a href="{{ route('home.collection', $post->collection->slug) }}">
-                {{ $post->collection->title ?? 'Không có' }}
-            </a>
-        </h1>
-        <h4 class="post-title">{{ $post->title }}</h4>
-        <p class="text-muted category">
-            <strong>Danh mục:</strong>
-            <a href="{{ route('home.category', $post->category->slug) }}">
-                {{ $post->category->name ?? 'Không có' }}
-            </a>
-        </p>
-        <div class="post-stats">
+        <h3 class="post-title mt-4">{{ $post->title }}</h3>
+        <div class="post-stats" style="font-size:20px; display: flex; justify-content: center; gap: 15px; align-items: center;">
             <span class="view-count">👀 {{ $post->countView() }}</span>
             <span id="like-count">❤️ {{ $post->countLikes() }}</span>
         </div>
-        <div id="like-container"></div>
+        <div id="like-container">
+            @if($liked)
+            <button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>
+            @else
+            <button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>
+            @endif
+        </div>
         <p class="text-muted text-end">Cập nhật gần nhất: {{ $post->getUpdatedDate() }}</p>
     </div>
 
@@ -88,21 +98,6 @@
     </div>
 </div>
 <script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function() {
-        let clientId = localStorage.getItem("client_id");
-        fetch(`/api/post/view`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-            },
-            body: JSON.stringify({
-                client_id: clientId,
-                model_id: {{ $post->id }}
-            })
-        });
-    });
-
     document.addEventListener('DOMContentLoaded', function () {
         const collectionId = '{{ $post->id ?? '' }}';
         const clientId = localStorage.getItem('client_id');
@@ -110,51 +105,47 @@
         const likeCountSpan = document.getElementById('like-count');
         const type = 'post';
 
-        if (collectionId && clientId) {
-            fetch(`/api/${type}/${collectionId}/is-favorite?client_id=${clientId}`)
-                .then(response => response.json())
-                .then(data => {
-                    updateLikeButton(data.liked);
+        updateLikeButtonFunction();
+
+        function updateLikeButton(isLiked) {
+            if (isLiked) {
+                container.innerHTML = `<button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>`;
+            } else {
+                container.innerHTML = `<button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>`;
+            }
+
+            updateLikeButtonFunction();
+        }
+
+        function updateLikeCount(change) {
+            const text = likeCountSpan.textContent.trim(); // ❤️123
+            const number = parseInt(text.replace('❤️', '').trim());
+            likeCountSpan.textContent = `❤️ ${number + change}`;
+        }
+
+        function updateLikeButtonFunction() {
+            // Gán lại sự kiện sau khi render
+            setTimeout(() => {
+                document.getElementById('like-btn')?.addEventListener('click', function () {
+                    fetch(`/api/${type}/${collectionId}/like`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        }
+                    }).then(() => {updateLikeButton(true); updateLikeCount(1)});
                 });
 
-            function updateLikeButton(isLiked) {
-                if (isLiked) {
-                    container.innerHTML = `<button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>`;
-                } else {
-                    container.innerHTML = `<button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>`;
-                }
-
-                // Gán lại sự kiện sau khi render
-                setTimeout(() => {
-                    document.getElementById('like-btn')?.addEventListener('click', function () {
-                        fetch(`/api/${type}/${collectionId}/like`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            },
-                            body: JSON.stringify({ client_id: clientId })
-                        }).then(() => {updateLikeButton(true); updateLikeCount(1)});
-                    });
-
-                    document.getElementById('unlike-btn')?.addEventListener('click', function () {
-                        fetch(`/api/${type}/${collectionId}/unlike`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            },
-                            body: JSON.stringify({ client_id: clientId })
-                        }).then(() => {updateLikeButton(false); updateLikeCount(-1)});
-                    });
-                }, 10);
-            }
-
-            function updateLikeCount(change) {
-                const text = likeCountSpan.textContent.trim(); // ❤️123
-                const number = parseInt(text.replace('❤️', '').trim());
-                likeCountSpan.textContent = `❤️${number + change}`;
-            }
+                document.getElementById('unlike-btn')?.addEventListener('click', function () {
+                    fetch(`/api/${type}/${collectionId}/unlike`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        }
+                    }).then(() => {updateLikeButton(false); updateLikeCount(-1)});
+                });
+            }, 10);
         }
     });
 </script>

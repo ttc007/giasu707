@@ -12,26 +12,29 @@ use App\Models\Post;
 
 class RegistrationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('registrations.index');
-    }
+        // Lấy IP từ request
+        $ip = $request->ip();
 
-    public function apiShow($client_id)
-    {
-        $registration = DB::table('registrations')
-            ->where('client_id', $client_id)
-            ->first();
+        // Kiểm tra xem đã có chưa
+        $registration = Registration::where('ip_address', $ip)->firstOrFail();
 
+        // Nếu chưa có thì tạo mới
         if (!$registration) {
-            return response()->json(['error' => 'Not found'], 404);
+            $registration = Registration::create([
+                'name'      => 'Chưa cập nhật', // để trống, sẽ cập nhật sau
+                'email'     => 'Chưa cập nhật',
+                'phone'     => 'Chưa cập nhật',
+                'subject'   => 'Chưa cập nhật',
+                'client_id' => uniqid('client_', true), // gen ID tạm
+                'user_agent' => $request->userAgent(),
+                'ip_address' => $ip,
+            ]);
         }
 
-        $registrationId = $registration->id;
-
-        // Recent Views (10 view gần nhất)
         $recentViews = DB::table('views')
-            ->where('registration_id', $registrationId)
+            ->where('ip_address', $ip)
             ->orderByDesc('created_at')
             ->limit(12)
             ->get()
@@ -112,7 +115,7 @@ class RegistrationController extends Controller
             ->filter();
 
         $favorites = DB::table('favorites')
-            ->where('registration_id', $registrationId)
+            ->where('ip_address', $ip)
             ->orderByDesc('created_at')
             ->limit(12)
             ->get()
@@ -192,21 +195,15 @@ class RegistrationController extends Controller
             })
             ->filter(); // bỏ null
 
-        return response()->json([
-            'id' => $registration->id,
-            'name' => $registration->name,
-            'email' => $registration->email,
-            'phone' => $registration->phone,
-            'subject' => $registration->subject,
-            'note' => $registration->note,
-            'recent_views' => $recentViews,
-            'favorites' => $favorites
-        ]);
+        
+
+        return view('registrations.index', compact('registration', 'recentViews', 'favorites'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        return view('registrations.create');
+        $registration = Registration::where('ip_address', $request->ip())->firstOrFail();
+        return view('registrations.create', compact('registration'));
     }
 
     public function update(Request $request)
@@ -219,70 +216,27 @@ class RegistrationController extends Controller
             'note'    => 'nullable|string',
         ]);
 
-        $registration = Registration::where('client_id', $request->client_id)->firstOrFail();
+        $registration = Registration::where('ip_address', $request->ip())->firstOrFail();
 
         $registration->update($request->only(['name', 'phone', 'email', 'subject', 'note']));
 
         return redirect()->route('registration.index')->with('success', 'Cập nhật thành công!');
     }
 
-    public function store(Request $request)
-    {
-        $registration = Registration::create([
-            'name'      => 'Chưa cập nhật', // để trống, sẽ cập nhật sau
-            'email'     => 'Chưa cập nhật',
-            'phone'     => 'Chưa cập nhật',
-            'subject'   => 'Chưa cập nhật',
-            'client_id' => uniqid('client_', true), // gen ID tạm
-            'user_agent' => $request->userAgent() . '- IP:' .  $request->ip(),
-        ]);
-
-        return response()->json([
-            'client_id' => $registration->client_id,
-        ]);
-    }
-
-
-    public function isFavorite(Request $request, $model, $model_id)
-    {
-        $client_id = $request->query('client_id');
-        $registration = Registration::where('client_id', $client_id)->first();
-
-        if (!$registration) {
-            return response()->json(['liked' => false]);
-        }
-
-        // Lấy đối tượng theo slug và model
-        $modelClass = ucfirst($model);
-        $liked = DB::table('favorites')
-            ->where('registration_id', $registration->id)
-            ->where('model_type', $modelClass)
-            ->where('model_id', $model_id)
-            ->exists();
-
-        return response()->json(['liked' => $liked]);
-    }
-
     public function like(Request $request, $model, $model_id)
     {
-        $client_id = $request->input('client_id');
-        $registration = Registration::where('client_id', $client_id)->first();
-
-        if (!$registration) {
-            return response()->json(['success' => false, 'message' => 'Không tìm thấy đăng ký'], 404);
-        }
-
+        $ip = $request->ip();
         $modelClass = ucfirst($model);
         // Kiểm tra tồn tại rồi mới insert
         $exists = DB::table('favorites')
-            ->where('registration_id', $registration->id)
+            ->where('ip_address', $ip)
             ->where('model_type', $modelClass)
             ->where('model_id', $model_id)
             ->exists();
 
         if (!$exists) {
             DB::table('favorites')->insert([
-                'registration_id' => $registration->id,
+                'ip_address' => $ip,
                 'model_type' => $modelClass,
                 'model_id' => $model_id,
                 'created_at' => now(),
@@ -295,60 +249,14 @@ class RegistrationController extends Controller
 
     public function unlike(Request $request, $model, $model_id)
     {
-        $client_id = $request->input('client_id');
-        $registration = Registration::where('client_id', $client_id)->first();
-
-        if (!$registration) {
-            return response()->json(['success' => false, 'message' => 'Không tìm thấy đăng ký'], 404);
-        }
+        $ip = $request->ip();
 
         $modelClass = ucfirst($model);
         DB::table('favorites')
-            ->where('registration_id', $registration->id)
+            ->where('ip_address', $ip)
             ->where('model_type', $modelClass)
             ->where('model_id', $model_id)
             ->delete();
-
-        return response()->json(['success' => true]);
-    }
-
-    public function view(Request $request, $model)
-    {
-        $client_id = $request->input('client_id');
-        $registration = Registration::where('client_id', $client_id)->first();
-        
-        $model_id = $request->input("model_id");
-
-        if (!$registration) {
-            return response()->json(['success' => false, 'message' => 'Registration not found'], 404);
-        }
-
-        $model = ucfirst($model);
-        $eightHoursAgo = now()->subHours(24);
-        $existingView = DB::table('views')
-            ->where('model_type', $model)
-            ->where('model_id', $model_id)
-            ->where('registration_id', $registration->id)
-            ->first();
-
-        if (!$existingView) {
-            DB::table('views')->insert([
-                'model_type' => $model, // Ví dụ: "Collection"
-                'model_id'   => $model_id,
-                'registration_id'  => $registration->id,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-        } else {
-            $lastUpdated = \Carbon\Carbon::parse($existingView->updated_at);
-            if ($lastUpdated->lt($eightHoursAgo)) {
-                DB::table('views')
-                    ->where('model_type', $model)
-                    ->where('model_id', $model_id)
-                    ->where('registration_id', $registration->id)
-                    ->update(['updated_at' => now()]);
-            }
-        }
 
         return response()->json(['success' => true]);
     }

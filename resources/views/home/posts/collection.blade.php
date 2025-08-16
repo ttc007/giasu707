@@ -12,6 +12,16 @@
 <div class="container py-4">
 
     <div class="mb-4 section">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb p-2">
+                <li class="breadcrumb-item">
+                    <a href="/thu-vien">Thư viện</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{{ route('home.category', $collection->category->slug) }}">{{ $collection->category->name }}</a>
+                </li>
+            </ol>
+        </nav>
         <div class="row">
             <div class="col-md-4">
                 <div class="square-box">
@@ -20,20 +30,23 @@
             </div>
             <div class="col-md-8">
                 <h1 class="text-center my-3">{{$collection->title}}</h1>
-                <h5 class="text-center text-muted">Thể loại: <a href="{{ route('home.category', $collection->category->slug) }}">{{ $collection->category->name }}</a></h5>
 
                 <div class="pb-4">
-                    <div class="text-center" style="font-size:25px; display: flex; justify-content: center; gap: 30px; align-items: center;">
-                        <span id="view-count">👀 {{ $collection->countView() }}</span>
+                    <div class="text-center" style="font-size:20px; display: flex; justify-content: center; gap: 15px; align-items: center;">
+                        <span id="view-count">👀{{ $collection->countView() }}</span>
                         <span id="like-count">❤️{{ $collection->countLikes() }}</span>
                     </div>
-                    <div class="text-center"  style="font-size:25px">
+                    <div class="text-center"  style="font-size:15px">
                         <div id="like-container" class="mt-3 text-center">
-                            <!-- Nút sẽ được hiển thị ở đây -->
+                            @if($liked)
+                            <button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>
+                            @else
+                            <button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>
+                            @endif
                         </div>   
                     </div>
                     
-                    <div class="mt-4 p-5" style="font-size:25px">
+                    <div class="p-4" style="font-size:22px">
                         {!! $collection->description !!}    
                     </div>
                     <hr>
@@ -42,7 +55,7 @@
             </div>
         </div>
         <hr>
-        <h2 class="mb-4 text-center">Danh sách bài viết</h2>
+        <h3 class="mb-4 mt-5 text-center">Danh sách bài viết trong tuyển tập</h2>
         <div class="row collection-container pt-3">
             @foreach ($posts as $post)
                 <div class="col-md-3 mb-4">
@@ -79,68 +92,50 @@
         const clientId = localStorage.getItem('client_id');
         const container = document.getElementById('like-container');
         const likeCountSpan = document.getElementById('like-count');
+        const type = 'collection';
 
-        if (collectionId && clientId) {
-            fetch(`/api/collection/${collectionId}/is-favorite?client_id=${clientId}`)
-                .then(response => response.json())
-                .then(data => {
-                    updateLikeButton(data.liked);
+        updateLikeButtonFunction();
+
+        function updateLikeButton(isLiked) {
+            if (isLiked) {
+                container.innerHTML = `<button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>`;
+            } else {
+                container.innerHTML = `<button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>`;
+            }
+
+            updateLikeButtonFunction();
+        }
+
+        function updateLikeCount(change) {
+            const text = likeCountSpan.textContent.trim(); // ❤️123
+            const number = parseInt(text.replace('❤️', '').trim());
+            likeCountSpan.textContent = `❤️${number + change}`;
+        }
+
+        function updateLikeButtonFunction() {
+            // Gán lại sự kiện sau khi render
+            setTimeout(() => {
+                document.getElementById('like-btn')?.addEventListener('click', function () {
+                    fetch(`/api/${type}/${collectionId}/like`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        }
+                    }).then(() => {updateLikeButton(true); updateLikeCount(1)});
                 });
 
-            function updateLikeButton(isLiked) {
-                if (isLiked) {
-                    container.innerHTML = `<button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>`;
-                } else {
-                    container.innerHTML = `<button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>`;
-                }
-
-                // Gán lại sự kiện sau khi render
-                setTimeout(() => {
-                    document.getElementById('like-btn')?.addEventListener('click', function () {
-                        fetch(`/api/collection/${collectionId}/like`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            },
-                            body: JSON.stringify({ client_id: clientId })
-                        }).then(() => {updateLikeButton(true); updateLikeCount(1)});
-                    });
-
-                    document.getElementById('unlike-btn')?.addEventListener('click', function () {
-                        fetch(`/api/collection/${collectionId}/unlike`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            },
-                            body: JSON.stringify({ client_id: clientId })
-                        }).then(() => {updateLikeButton(false); updateLikeCount(-1)});
-                    });
-                }, 10);
-            }
-
-            function updateLikeCount(change) {
-                const text = likeCountSpan.textContent.trim(); // ❤️123
-                const number = parseInt(text.replace('❤️', '').trim());
-                likeCountSpan.textContent = `❤️${number + change}`;
-            }
+                document.getElementById('unlike-btn')?.addEventListener('click', function () {
+                    fetch(`/api/${type}/${collectionId}/unlike`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        }
+                    }).then(() => {updateLikeButton(false); updateLikeCount(-1)});
+                });
+            }, 10);
         }
     });
-
-document.addEventListener("DOMContentLoaded", function() {
-    let clientId = localStorage.getItem("client_id");
-    fetch(`/api/collection/view`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        },
-        body: JSON.stringify({
-            client_id: clientId,
-            model_id: {{ $collection->id }}
-        })
-    });
-});
 </script>
 @endsection

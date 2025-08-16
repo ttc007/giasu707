@@ -234,6 +234,15 @@
         figure.image img {
             max-width: 100%;
         }
+
+        .breadcrumb {
+            background: #addcb7 !important;
+        }
+
+        .breadcrumb a {
+            margin-right: 5px;
+            color: #121010!important;
+        }
     </style>
 </head>
 <body>
@@ -298,31 +307,5 @@
       };
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const CLIENT_KEY = 'client_id';
-
-            if (!localStorage.getItem(CLIENT_KEY)) {
-                fetch("/api/register-client", {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({})
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.client_id) {
-                        localStorage.setItem(CLIENT_KEY, data.client_id);
-                    }
-                })
-                .catch(error => {
-                    console.error("Lỗi khi tạo client:", error);
-                });
-            }
-        });
-    </script>
 </body>
 </html>
