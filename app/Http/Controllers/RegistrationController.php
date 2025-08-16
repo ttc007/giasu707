@@ -18,7 +18,7 @@ class RegistrationController extends Controller
         $ip = $request->ip();
 
         // Kiểm tra xem đã có chưa
-        $registration = Registration::where('ip_address', $ip)->firstOrFail();
+        $registration = Registration::where('ip_address', $ip)->first();
 
         // Nếu chưa có thì tạo mới
         if (!$registration) {
@@ -202,7 +202,7 @@ class RegistrationController extends Controller
 
     public function create(Request $request)
     {
-        $registration = Registration::where('ip_address', $request->ip())->firstOrFail();
+        $registration = Registration::where('ip_address', $request->ip())->first();
         return view('registrations.create', compact('registration'));
     }
 
@@ -216,7 +216,7 @@ class RegistrationController extends Controller
             'note'    => 'nullable|string',
         ]);
 
-        $registration = Registration::where('ip_address', $request->ip())->firstOrFail();
+        $registration = Registration::where('ip_address', $request->ip())->first();
 
         $registration->update($request->only(['name', 'phone', 'email', 'subject', 'note']));
 
