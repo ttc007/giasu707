@@ -268,12 +268,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url('/vat-li-12') }}">Vật lí 12</a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="{{ url('/toan-12') }}">Toán 12</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url('/hoa-12') }}">Hóa 12</a>
-                    </li>
+                    </li> -->
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url('/thi-thu') }}">Thi thử</a>
                     </li>

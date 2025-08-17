@@ -42,7 +42,11 @@
                     <h4 class="text-success">🎓 Nền tảng học tập trực tuyến miễn phí</h4>
                     <p class="text-justify">
                         Website này là một <strong>nền tảng học tập trực tuyến</strong> được đầu tư biên soạn công phu, kỹ lưỡng.
-                        Nội dung bao gồm đầy đủ các môn học quan trọng trong kỳ thi tốt nghiệp như <strong><a href="{{ url('/toan-12') }}">Toán 12</a>, <a href="{{ url('/vat-li-12') }}">Vật lí 12</a>, <a href="{{ url('/hoa-12') }}">Hóa học 12</a></strong>,
+                        Nội dung bao gồm đầy đủ các môn học quan trọng trong kỳ thi tốt nghiệp như <strong>
+                            <!-- <a href="{{ url('/toan-12') }}">Toán 12</a>, -->
+                         <a href="{{ url('/vat-li-12') }}">Vật lí 12</a>
+                          <!-- , <a href="{{ url('/hoa-12') }}">Hóa học 12</a> -->
+                      </strong>,
                         đến cả các môn học cấp 1, cấp 2 – tất cả đều được xây dựng bài bản và đồ sộ.
                     </p>
                     <p class="text-justify">
