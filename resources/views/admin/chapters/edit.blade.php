@@ -4,13 +4,22 @@
 
 @section('content')
     <h2>📘 Sửa chương</h2>
-    <form method="POST" action="{{ route('chapters.update', $chapter) }}">
+    <form method="POST" action="{{ route('chapters.update', $chapter) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
         <div class="mb-3">
             <label class="form-label">Tên chương</label>
             <input type="text" name="name" class="form-control" value="{{ $chapter->title }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="image" class="form-label">Ảnh đại diện</label>
+            <input type="file" name="image" class="form-control" accept="image/*">
+            
+            @if(isset($chapter) && $chapter->image)
+                <img src="{{ asset($chapter->image) }}" alt="Ảnh tuyển tập" style="max-width: 200px;">
+            @endif
         </div>
 
         <div class="mb-3">

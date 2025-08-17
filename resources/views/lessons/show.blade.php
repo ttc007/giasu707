@@ -28,7 +28,7 @@
     <h3 class="mt-4 text-center">{{ $lesson->title }}</h2>
     <div class="text-center" style="font-size:18px;  gap: 15px;">
         <span id="view-count">👀 {{ $lesson->countView() }}</span>
-        <span id="like-count">❤️{{ $lesson->countLikes() }}</span>
+        <span id="like-count">❤️ {{ $lesson->countLikes() }}</span>
         <div id="like-container">
             @if($liked)
             <button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>

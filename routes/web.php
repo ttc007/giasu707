@@ -48,6 +48,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::resource('categories', AdminCategoryController::class);
 
     Route::get('students', [StudentController::class, 'index'])->name('admin.students.index');
+    Route::get('views', [StudentController::class, 'view'])->name('admin.students.views');
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');

@@ -17,7 +17,9 @@
             @forelse ($chapters as $chapter)
                 <tr>
                     <td><b>{{ $chapter->title }}</b><br>
-                    {{ $chapter->subject->name }}</td>
+                    {{ $chapter->subject->name }}
+                        <img src="{{ asset($chapter->image) }}" width="50">
+                    </td>
                     <td>{!!$chapter->summary!!}</td>
                     <td>
                         <a href="{{ route('chapters.edit', $chapter) }}" class="btn btn-sm btn-primary">Sửa</a>

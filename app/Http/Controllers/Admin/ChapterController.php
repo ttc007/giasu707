@@ -29,12 +29,27 @@ class ChapterController extends Controller
             'subject_id' => 'required|exists:subjects,id',
         ]);
 
-        Chapter::create([
+        $data = [
             'title' => $request->name,
             'slug' => Str::slug($request->name),
             'subject_id' => $request->subject_id,
-            'summary' => $request->summary
-        ]);
+            'summary' => $request->summary,
+        ];
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            $destinationPath = public_path('images/posts');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            $file->move($destinationPath, $filename);
+            $data['image'] = 'images/posts/' . $filename;
+        }
+
+        Chapter::create($data);
 
         return redirect()->route('chapters.index')->with('success', 'Tạo chương thành công');
     }
@@ -51,6 +66,19 @@ class ChapterController extends Controller
             'name' => 'required|string',
             'subject_id' => 'required|exists:subjects,id',
         ]);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            $destinationPath = public_path('images/posts');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            $file->move($destinationPath, $filename);
+            $chapter->image = 'images/posts/' . $filename; // hoặc $collection->image nếu ở controller Collection
+        }
 
         $chapter->update([
             'title' => $request->name,

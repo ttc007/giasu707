@@ -34,7 +34,7 @@
                                         </div>
                                     @else
                                         <div class="square-box">
-                                            <span style="font-size:20px">{{ $item['type'] ?? 'N/A' }}</span>
+                                            <img src="{{ asset('images/lesson_default.jpg') }}" class="centered-img">
                                         </div>
                                     @endif
                                 </a>
@@ -64,7 +64,7 @@
                                         </div>
                                     @else
                                         <div class="square-box">
-                                            <span style="font-size:20px">{{ $item['type'] ?? 'N/A' }}</span>
+                                            <img src="{{ asset('images/lesson_default.jpg') }}" class="centered-img">
                                         </div>
                                     @endif
                                 </a>

@@ -42,6 +42,7 @@ class SectionController extends Controller
                 'model_type' => $model,
                 'model_id'   => $section->id,
                 'ip_address' => $ip,
+                'user_agent' => $request->userAgent(),
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
@@ -55,15 +56,11 @@ class SectionController extends Controller
                     ->update(['updated_at' => now()]);
             }
         }
-
-        $ip = $request->ip();
-        $modelClass = 'Section';
-        $model_id = $section->id;
         
         $liked = DB::table('favorites')
             ->where('ip_address', $ip)
-            ->where('model_type', $modelClass)
-            ->where('model_id', $model_id)
+            ->where('model_type', $model)
+            ->where('model_id', $section->id)
             ->exists();
 
         return view('sections.show', compact('subject', 'chapter', 'section', 'liked'));

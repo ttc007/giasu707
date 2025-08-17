@@ -33,8 +33,8 @@
 
                 <div class="pb-4">
                     <div class="text-center" style="font-size:20px; display: flex; justify-content: center; gap: 15px; align-items: center;">
-                        <span id="view-count">👀{{ $collection->countView() }}</span>
-                        <span id="like-count">❤️{{ $collection->countLikes() }}</span>
+                        <span id="view-count">👀 {{ $collection->countView() }}</span>
+                        <span id="like-count">❤️ {{ $collection->countLikes() }}</span>
                     </div>
                     <div class="text-center"  style="font-size:15px">
                         <div id="like-container" class="mt-3 text-center">
@@ -66,7 +66,7 @@
                                 <img src="{{ asset($post->image) }}" class="centered-img" alt="{{ $post->title }}">
                                 <div class="like-badge">
                                     <span>👀 {{ $post->countView() }}</span>
-                                    <span>❤️{{ $post->countLikes() }}</span>
+                                    <span>❤️ {{ $post->countLikes() }}</span>
                                 </div>
                             </div>
                         @endif

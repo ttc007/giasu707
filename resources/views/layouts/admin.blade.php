@@ -26,7 +26,8 @@
             <a href="{{ route('categories.index') }}">Danh mục bài viết</a> |
             <a href="{{ route('collections.index') }}">Tuyển tập bài viết</a> |
             <a href="{{ route('posts.index') }}">Bài viết</a> |
-            <a href="{{ route('admin.students.index') }}">Danh sách đăng kí học</a>
+            <a href="{{ route('admin.students.index') }}">Danh sách đăng kí học</a> |
+            <a href="{{ route('admin.students.views') }}">View</a>
         </nav>
 
         @if ($errors->any())

@@ -4,44 +4,52 @@
 
 @section('content')
 <div class="container section">
-    <h3 class="text-center"><a href="{{ route('show.subject', [
-                    'subject_slug' => $subject->slug
-                ]) }}">{{ $chapter->subject->name }}</a></h3>
-    <h4 class="text-center">{{ $chapter->title }}</h4>
-
-    <h5>Danh sách bài học:</h5>
-    <div class="card p-3 rounded border">
-    @foreach ($chapter->lessons as $lesson)
-        <div class="mb-3">
-            <strong>
-                <a href="{{ route('show.lesson', [
-                    'subject_slug' => $subject->slug,
-                    'chapter_slug' => $chapter->slug,
-                    'lesson_slug' => $lesson->slug
-                ]) }}">
-                    {{ $loop->iteration }}. {{ $lesson->title }}
-                    ({{ $lesson->countView() }} đã xem, {{$lesson->getQuestionsCountAttribute()}} câu hỏi)
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb p-2">
+            <li class="breadcrumb-item">
+                <a href="/">
+                    Trang chủ
                 </a>
-            </strong>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('show.subject', ['subject_slug' => $chapter->subject->slug])}}">{{ $chapter->subject->name }}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ route('show.chapter', ['subject_slug' => $chapter->subject->slug, 'chapter_slug' => $chapter->slug])}}">{{ $chapter->title }}</a>
+            </li>
+        </ol>
+    </nav>
 
-            @if ($lesson->sections->count())
-                <ul>
-                    @foreach ($lesson->sections as $section)
-                        <li>
-                            <a href="{{ route('show.section', [
+    <h3 class="text-center p-3">DANH SÁCH BÀI HỌC</h3>
+    
+    <div class="row collection-container pt-3">
+        @foreach ($chapter->lessons as $lesson)
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    <a href="{{ route('show.lesson', [
+                        'subject_slug' => $subject->slug,
+                        'chapter_slug' => $chapter->slug,
+                        'lesson_slug' => $lesson->slug
+                    ]) }}">
+                        <div class="square-box position-relative">
+                            <img src="{{ asset('images/lesson_default.jpg') }}" class="centered-img" alt="{{ $lesson->title }}">
+                            <div class="like-badge">
+                                <span>👀 {{ $lesson->countView() }}</span>
+                                <span>❤️ {{ $lesson->countLikes() }}</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <div class="card-body">
+                        <h5 class="card-title text-center"><a href="{{ route('show.lesson', [
                                 'subject_slug' => $subject->slug,
                                 'chapter_slug' => $chapter->slug,
-                                'section_slug' => $section->slug
-                            ]) }}">
-                                {{ $section->title ?? 'Phần ' . $loop->iteration }} 
-                                ({{ $section->countView() }} đã xem, {{ $section->questions_count }} câu hỏi)
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            @endif
-        </div>
-    @endforeach
+                                'lesson_slug' => $lesson->slug
+                            ]) }}">{{ $lesson->title }}</a></h5>
+                    </div>
+                </div>
+            </div>
+        @endforeach
     </div>
     <hr>
     <a href="{{ route('review.chapter', [

@@ -37,7 +37,7 @@
                                 <img src="{{ asset($collection->image) }}" class="centered-img" alt="{{ $collection->title }}">
                                 <div class="like-badge">
                                     <span>👀 {{ $collection->countView() }}</span>
-                                    <span>❤️{{ $collection->countLikes() }}</span>
+                                    <span>❤️ {{ $collection->countLikes() }}</span>
                                 </div>
 
                             </div>

@@ -35,6 +35,7 @@ class RegistrationController extends Controller
 
         $recentViews = DB::table('views')
             ->where('ip_address', $ip)
+            ->whereIn('model_type', ['Post', 'Collection', 'Lesson', 'Section'])
             ->orderByDesc('created_at')
             ->limit(12)
             ->get()

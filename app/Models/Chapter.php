@@ -11,7 +11,8 @@ class Chapter extends Model
         'title',
         'order',
         'slug',
-        'summary'
+        'summary',
+        'image'
     ];
 
     public function subject()

@@ -42,6 +42,7 @@ class LessonController extends Controller
                 'model_type' => $model,
                 'model_id'   => $id,
                 'ip_address' => $ip,
+                'user_agent' => $request->userAgent(),
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
@@ -55,15 +56,11 @@ class LessonController extends Controller
                     ->update(['updated_at' => now()]);
             }
         }
-
-        $ip = $request->ip();
-        $modelClass = 'Lesson';
-        $model_id = $lesson->id;
         
         $liked = DB::table('favorites')
             ->where('ip_address', $ip)
-            ->where('model_type', $modelClass)
-            ->where('model_id', $model_id)
+            ->where('model_type', $model)
+            ->where('model_id', $id)
             ->exists();
 
         return view('lessons.show', compact('subject', 'chapter', 'lesson', 'liked'));

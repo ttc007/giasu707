@@ -3,8 +3,20 @@
 @section('title', 'Bảng giá thiết kế website')
 
 @section('content')
-<div class="container py-4">
-    <h2 class="text-center mb-4">📊 Bảng giá thiết kế website</h2>
+<div class="container py-4 section">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb p-2">
+            <li class="breadcrumb-item">
+                <a href="/">
+                    Trang chủ
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="/bang-gia-thiet-ke-website">Bảng giá thiết kế website</a>
+            </li>
+        </ol>
+    </nav>
+    <h3 class="text-center p-4 mb-4">📊 DANH SÁCH BẢNG GIÁ</h3>
 
     <div class="row g-4">
         <!-- Gói Cơ bản -->

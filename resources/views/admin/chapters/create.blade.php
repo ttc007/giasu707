@@ -4,11 +4,16 @@
 
 @section('content')
     <h2>📘 Tạo chương mới</h2>
-    <form method="POST" action="{{ route('chapters.store') }}">
+    <form method="POST" action="{{ route('chapters.store') }}" enctype="multipart/form-data">
         @csrf
         <div class="mb-3">
             <label class="form-label">Tên chương</label>
             <input type="text" name="name" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="image" class="form-label">Ảnh đại diện</label>
+            <input type="file" name="image" class="form-control" accept="image/*">
         </div>
 
         <div class="mb-3">
