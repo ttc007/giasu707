@@ -4,9 +4,22 @@
 
 @section('content')
     <div class="card p-4">
-        
-        
-        <h2>Cập nhật thông tin cá nhân</h2>
+        <h2 class="text-center p-4">CẬP NHẬT THÔNG TIN CÁ NHÂN</h2>
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
 
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>

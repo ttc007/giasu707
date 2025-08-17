@@ -23,13 +23,13 @@
             </ol>
         </nav>
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4 ">
                 <div class="square-box">
                     <img src="{{ asset($collection->image) }}" class="centered-img" alt="{{ $collection->title }}">
                 </div>
             </div>
-            <div class="col-md-8">
-                <h1 class="text-center my-3">{{$collection->title}}</h1>
+            <div class="col-md-8 collection-title">
+                <h2 class="text-center my-3">{{$collection->title}}</h1>
 
                 <div class="pb-4">
                     <div class="text-center" style="font-size:20px; display: flex; justify-content: center; gap: 15px; align-items: center;">
@@ -46,7 +46,7 @@
                         </div>   
                     </div>
                     
-                    <div class="p-4" style="font-size:22px">
+                    <div class="p-4 collection-description">
                         {!! $collection->description !!}    
                     </div>
                     <hr>

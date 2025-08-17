@@ -8,7 +8,9 @@
             <img src="{{ asset('images/avatar.png') }}" class="rounded-circle shadow mb-3" width="150" alt="Ảnh đại diện">
             <h1 class="mb-1">{{ $registration->name ?? 'Tên người dùng' }}</h1>
             <p class="text-muted mb-3">{{ $registration->email ?? '' }}</p>
-            <a href="{{ route('registration.create') }}" class="btn btn-primary mb-4">Cập nhật thông tin</a>
+            @if ($registration->created_at == $registration->updated_at)
+                <a href="{{ route('registration.create') }}" class="btn btn-primary mb-4">Cập nhật thông tin</a>
+            @endif
         </div>
 
         <ul class="nav nav-tabs" id="profileTabs" role="tablist">

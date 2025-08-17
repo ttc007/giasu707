@@ -20,10 +20,15 @@ class RegistrationController extends Controller
         // Kiểm tra xem đã có chưa
         $registration = Registration::where('ip_address', $ip)->first();
 
+        $letter = chr(rand(65, 90)); // 65-90 là A-Z
+        // 6 chữ số ngẫu nhiên
+        $numbers = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        $name = $letter . $numbers;
+
         // Nếu chưa có thì tạo mới
         if (!$registration) {
             $registration = Registration::create([
-                'name'      => 'Chưa cập nhật', // để trống, sẽ cập nhật sau
+                'name'      => $name, // để trống, sẽ cập nhật sau
                 'email'     => 'Chưa cập nhật',
                 'phone'     => 'Chưa cập nhật',
                 'subject'   => 'Chưa cập nhật',
@@ -204,20 +209,33 @@ class RegistrationController extends Controller
     public function create(Request $request)
     {
         $registration = Registration::where('ip_address', $request->ip())->first();
+
+        if ($registration->created_at != $registration->updated_at) {
+            return redirect()->route('registration.index');
+        }
+
         return view('registrations.create', compact('registration'));
     }
 
     public function update(Request $request)
     {
+        $registration = Registration::where('ip_address', $request->ip())->first();
+
+        if ($registration->created_at != $registration->updated_at) {
+            return redirect()->route('registration.create')
+                             ->with('error', 'Bạn đã đổi tên rồi.');
+        }
+
         $request->validate([
-            'name'    => 'required|string|max:255',
+            'name'    => ['required', 'string', 'min:3', 'max:20'], // chỉ chữ và số, 3-20 ký tự
             'phone'   => 'required|string|max:20',
             'email'   => 'nullable|email|max:255',
             'subject' => 'required|string|max:100',
             'note'    => 'nullable|string',
+        ], [
+            'name.min'   => 'Tên phải từ 3 ký tự trở lên.',
+            'name.max'   => 'Tên không được dài quá 30 ký tự.',
         ]);
-
-        $registration = Registration::where('ip_address', $request->ip())->first();
 
         $registration->update($request->only(['name', 'phone', 'email', 'subject', 'note']));
 

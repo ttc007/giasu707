@@ -76,6 +76,14 @@
                 font-size: 18px;
                 padding: 8px 12px;
             }
+
+            .collection-description {
+                font-size: 15px!important;
+            }
+        }
+
+        .collection-description {
+            font-size: 22px;
         }
 
         .square-box {
@@ -212,6 +220,14 @@
             text-align: center;      /* canh chữ ở giữa */
         }
 
+        .collection-title {
+            display: flex;       /* bật flex */
+            flex-direction: column; /* sắp xếp theo cột */
+            justify-content: center!important; /* canh giữa theo chiều dọc */
+            align-items: center;     /* canh giữa theo chiều ngang nếu muốn */
+            text-align: center;
+        }
+
         h5{
             font-size: 1rem;
         }
@@ -268,10 +284,10 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url('/vat-li-12') }}">Vật lí 12</a>
                     </li>
-                    <!-- <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/toan-12') }}">Toán 12</a>
-                    </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ url('//bang-gia-thiet-ke-website') }}">Bảng giá</a>
+                    </li>
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="{{ url('/hoa-12') }}">Hóa 12</a>
                     </li> -->
                     <li class="nav-item">

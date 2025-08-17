@@ -19,20 +19,34 @@
             </li>
         </ol>
     </nav>
-    <div class="post-header text-center">
-        <h3 class="post-title mt-4">{{ $post->title }}</h3>
-        <div class="post-stats" style="font-size:20px; display: flex; justify-content: center; gap: 15px; align-items: center;">
-            <span class="view-count">👀 {{ $post->countView() }}</span>
-            <span id="like-count">❤️ {{ $post->countLikes() }}</span>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="square-box">
+                <img src="{{ asset($post->image) }}" class="centered-img">
+            </div>
         </div>
-        <div id="like-container">
-            @if($liked)
-            <button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>
-            @else
-            <button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>
-            @endif
+        <div class="col-md-8 collection-title">
+            <h2 class="px-5">{{ $post->title }}</h2>
+            <div class="text-center" style="font-size:20px; display: flex; justify-content: center; gap: 15px; align-items: center;">
+                <span class="view-count">👀 {{ $post->countView() }}</span>
+                <span id="like-count">❤️ {{ $post->countLikes() }}</span>
+            </div>
+            <div class="text-center" style="font-size:15px">
+                <div id="like-container">
+                    @if($liked)
+                    <button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>
+                    @else
+                    <button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>
+                    @endif
+                </div>
+            </div>
+            <hr style="width:100%; border-top:1px solid #111111;">
+
+            <!-- Wrapper để override flex center -->
+            <div style="align-self: flex-end; width:100%; text-align:right;">
+                <div class="text-muted">Cập nhật gần nhất: {{ $post->getUpdatedDate() }}</div>
+            </div>
         </div>
-        <p class="text-muted text-end">Cập nhật gần nhất: {{ $post->getUpdatedDate() }}</p>
     </div>
 
     <hr>
