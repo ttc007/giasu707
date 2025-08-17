@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="col-md-8 collection-title">
-            <h2 class="px-5">{{ $post->title }}</h2>
+            <h2 class="px-3 pt-4">{{ $post->title }}</h2>
             <div class="text-center" style="font-size:20px; display: flex; justify-content: center; gap: 15px; align-items: center;">
                 <span class="view-count">👀 {{ $post->countView() }}</span>
                 <span id="like-count">❤️ {{ $post->countLikes() }}</span>

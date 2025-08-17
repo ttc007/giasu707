@@ -285,7 +285,7 @@
                         <a class="nav-link" href="{{ url('/vat-li-12') }}">Vật lí 12</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('//bang-gia-thiet-ke-website') }}">Bảng giá</a>
+                        <a class="nav-link" href="{{ url('/bang-gia-thiet-ke-website') }}">Bảng giá</a>
                     </li>
                     <!-- <li class="nav-item">
                         <a class="nav-link" href="{{ url('/hoa-12') }}">Hóa 12</a>
