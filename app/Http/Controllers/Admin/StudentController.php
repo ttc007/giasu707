@@ -17,7 +17,7 @@ class StudentController extends Controller
     public function view()
     {
         // Lấy danh sách view, phân trang 10 bản ghi mỗi trang
-        $views = View::orderBy('created_at', 'desc')->paginate(20);
+        $views = View::orderBy('updated_at', 'desc')->paginate(20);
 
         return view('admin.students.view', compact('views'));
     }

@@ -7,8 +7,7 @@ use Carbon\Carbon;
 trait HasFormattedDates
 {
     /**
-     * Trả về ngày cập nhật (updated_at) theo định dạng d-m-Y.
-     * Nếu null thì trả về chuỗi rỗng.
+     * Trả về ngày cập nhật theo dạng "x ngày trước".
      */
     public function getUpdatedDate(): string
     {
@@ -16,16 +15,15 @@ trait HasFormattedDates
             return '';
         }
 
-        // Bảo đảm dùng timezone app
         $dt = $this->updated_at instanceof Carbon
             ? $this->updated_at
             : Carbon::parse($this->updated_at);
 
-        return $dt->timezone(config('app.timezone'))->format('d-m-Y');
+        return $dt->timezone(config('app.timezone'))->diffForHumans();
     }
 
     /**
-     * (Tuỳ chọn) Trả về ngày tạo theo định dạng d-m-Y.
+     * Trả về ngày tạo theo dạng "x ngày trước".
      */
     public function getCreatedDate(): string
     {
@@ -37,6 +35,6 @@ trait HasFormattedDates
             ? $this->created_at
             : Carbon::parse($this->created_at);
 
-        return $dt->timezone(config('app.timezone'))->format('d-m-Y');
+        return $dt->timezone(config('app.timezone'))->diffForHumans();
     }
 }

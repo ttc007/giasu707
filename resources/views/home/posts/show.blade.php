@@ -83,6 +83,48 @@
         @endif
     </div>
 
+    <hr class="mt-4">
+
+    <div class="comments mt-4">
+        <h5>💬 Bình luận</h5>
+
+        <form method="POST" action="{{ route('comments.store') }}">
+            @csrf
+            <input type="hidden" name="commentable_type" value="Post">
+            <input type="hidden" name="commentable_id" value="{{ $post->id }}">
+
+            <div class="mb-3">
+                <textarea name="content" class="form-control" rows="3" maxlength="255"
+                          placeholder="Nhập bình luận của bạn..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Gửi bình luận</button>
+        </form>
+        <hr>
+        <div class="comment-list mt-4">
+            @forelse ($comments as $comment)
+                <div class="comment-item">
+                    <img src="{{ asset('images/avatar.png') }}" class="comment-avatar" alt="Ảnh đại diện">
+                    <div class="comment-body">
+                        <div class="comment-meta">
+                            {{ $comment->registration?->name ?? 'Khách' }} · {{ $comment->getUpdatedDate() }}
+                        </div>
+                        <div class="comment-content">
+                            {{ $comment->content }}
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <p class="text-muted">Chưa có bình luận nào.</p>
+            @endforelse
+
+            <div class="mt-3">
+                {{ $comments->links('vendor.pagination.bootstrap-5') }}
+            </div>
+        </div>
+
+    </div>
+
+
     <!-- Modal Danh sách chương -->
     <div class="modal fade" id="chapterModal" tabindex="-1" aria-labelledby="chapterModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-scrollable">

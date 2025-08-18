@@ -30,10 +30,12 @@
         <span id="view-count">👀 {{ $lesson->countView() }}</span>
         <span id="like-count">❤️ {{ $lesson->countLikes() }}</span>
         <div id="like-container">
-            @if($liked)
-            <button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>
-            @else
-            <button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>
+            @if(session('studentId'))
+                @if($liked)
+                <button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>
+                @else
+                <button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>
+                @endif
             @endif
         </div>
     </div>
@@ -251,7 +253,7 @@
         function updateLikeCount(change) {
             const text = likeCountSpan.textContent.trim(); // ❤️123
             const number = parseInt(text.replace('❤️', '').trim());
-            likeCountSpan.textContent = `❤️${number + change}`;
+            likeCountSpan.textContent = `❤️ ${number + change}`;
         }
 
         function updateLikeButtonFunction() {

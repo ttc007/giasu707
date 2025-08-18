@@ -7,9 +7,8 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb p-2">
             <li class="breadcrumb-item">
-                <a href="{{ route('show.chapter', [
+                <a href="{{ route('show.subject', [
                     'subject_slug' => $subject->slug,
-                    'chapter_slug' => $chapter->slug
                 ]) }}">
                     {{ $section->lesson->chapter->subject->name }}
                 </a>
@@ -242,7 +241,7 @@
         function updateLikeCount(change) {
             const text = likeCountSpan.textContent.trim(); // ❤️123
             const number = parseInt(text.replace('❤️', '').trim());
-            likeCountSpan.textContent = `❤️${number + change}`;
+            likeCountSpan.textContent = `❤️ ${number + change}`;
         }
 
         function updateLikeButtonFunction() {

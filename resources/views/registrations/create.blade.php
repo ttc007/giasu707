@@ -1,9 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Đăng kí học online | Giasu707')
+@section('title', 'Cập nhật thông tin cá nhân| Giasu707')
 
 @section('content')
     <div class="card p-4">
+        <div class="text-center">
+            <img src="{{ asset('images/avatar.png') }}" class="rounded-circle shadow mb-3" width="150" alt="Ảnh đại diện">
+        </div>
         <h2 class="text-center p-4">CẬP NHẬT THÔNG TIN CÁ NHÂN</h2>
         @if ($errors->any())
             <div class="alert alert-danger">

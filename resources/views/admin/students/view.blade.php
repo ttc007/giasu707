@@ -9,6 +9,7 @@
                 <th>#</th>
                 <th>User Argent</th>
                 <th>IP</th>
+                <th>Registration ID</th>
                 <th>Model</th>
                 <th>Model ID</th>
                 <th>Created at</th>
@@ -21,6 +22,7 @@
                     <td>{{ $loop->iteration + ($views->currentPage() - 1) * $views->perPage() }}</td>
                     <td>{{ $student->user_agent }}</td>
                     <td>{{ $student->ip_address }}</td>
+                    <td>{{ $student->registration_id }}</td>
                     <td>{{ $student->model_type }}</td>
                     <td>{{ $student->model_id }}</td>
                     <td>{{ $student->created_at }}</td>

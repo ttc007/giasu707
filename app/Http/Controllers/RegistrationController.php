@@ -15,31 +15,13 @@ class RegistrationController extends Controller
     public function index(Request $request)
     {
         // Lấy IP từ request
-        $ip = $request->ip();
+        $registrationId = session('studentId');
 
         // Kiểm tra xem đã có chưa
-        $registration = Registration::where('ip_address', $ip)->first();
-
-        $letter = chr(rand(65, 90)); // 65-90 là A-Z
-        // 6 chữ số ngẫu nhiên
-        $numbers = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-        $name = $letter . $numbers;
-
-        // Nếu chưa có thì tạo mới
-        if (!$registration) {
-            $registration = Registration::create([
-                'name'      => $name, // để trống, sẽ cập nhật sau
-                'email'     => 'Chưa cập nhật',
-                'phone'     => 'Chưa cập nhật',
-                'subject'   => 'Chưa cập nhật',
-                'client_id' => uniqid('client_', true), // gen ID tạm
-                'user_agent' => $request->userAgent(),
-                'ip_address' => $ip,
-            ]);
-        }
+        $registration = Registration::find($registrationId);
 
         $recentViews = DB::table('views')
-            ->where('ip_address', $ip)
+            ->where('registration_id', $registrationId)
             ->whereIn('model_type', ['Post', 'Collection', 'Lesson', 'Section'])
             ->orderByDesc('created_at')
             ->limit(12)
@@ -121,7 +103,7 @@ class RegistrationController extends Controller
             ->filter();
 
         $favorites = DB::table('favorites')
-            ->where('ip_address', $ip)
+            ->where('registration_id', $registrationId)
             ->orderByDesc('created_at')
             ->limit(12)
             ->get()
@@ -244,22 +226,28 @@ class RegistrationController extends Controller
 
     public function like(Request $request, $model, $model_id)
     {
-        $ip = $request->ip();
-        $modelClass = ucfirst($model);
-        // Kiểm tra tồn tại rồi mới insert
-        $exists = DB::table('favorites')
-            ->where('ip_address', $ip)
-            ->where('model_type', $modelClass)
-            ->where('model_id', $model_id)
-            ->exists();
+        $registrationId = session('studentId');
+        $ip             = $request->ip();
+        $modelClass     = ucfirst($model);
 
-        if (!$exists) {
+        $query = DB::table('favorites')
+            ->where('model_type', $modelClass)
+            ->where('model_id', $model_id);
+
+        if ($registrationId) {
+            $query->where('registration_id', $registrationId);
+        } else {
+            $query->where('ip_address', $ip);
+        }
+
+        if (!$query->exists()) {
             DB::table('favorites')->insert([
-                'ip_address' => $ip,
-                'model_type' => $modelClass,
-                'model_id' => $model_id,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'registration_id' => $registrationId,
+                'ip_address'      => $ip,
+                'model_type'      => $modelClass,
+                'model_id'        => $model_id,
+                'created_at'      => now(),
+                'updated_at'      => now(),
             ]);
         }
 
@@ -268,14 +256,21 @@ class RegistrationController extends Controller
 
     public function unlike(Request $request, $model, $model_id)
     {
-        $ip = $request->ip();
+        $registrationId = session('studentId');
+        $ip             = $request->ip();
+        $modelClass     = ucfirst($model);
 
-        $modelClass = ucfirst($model);
-        DB::table('favorites')
-            ->where('ip_address', $ip)
+        $query = DB::table('favorites')
             ->where('model_type', $modelClass)
-            ->where('model_id', $model_id)
-            ->delete();
+            ->where('model_id', $model_id);
+
+        if ($registrationId) {
+            $query->where('registration_id', $registrationId);
+        } else {
+            $query->where('ip_address', $ip);
+        }
+
+        $query->delete();
 
         return response()->json(['success' => true]);
     }

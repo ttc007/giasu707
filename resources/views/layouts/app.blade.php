@@ -83,7 +83,7 @@
         }
 
         .collection-description {
-            font-size: 22px;
+            font-size: 18px;
         }
 
         .square-box {
@@ -259,6 +259,51 @@
             margin-right: 5px;
             color: #121010!important;
         }
+
+        .comment-list {
+            margin: 0 auto;
+        }
+
+        .comment-list .comment-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+
+        .comment-list .comment-item:hover {
+            background: #fafafa;
+        }
+
+        .comment-list .comment-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .comment-list .comment-body {
+            flex: 1;
+        }
+
+        .comment-list .comment-meta {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 4px;
+            margin-top:5px;
+        }
+
+        .comment-list .comment-content {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #222;
+            white-space: pre-line; /* xuống dòng theo nội dung */
+        }
+
     </style>
 </head>
 <body>

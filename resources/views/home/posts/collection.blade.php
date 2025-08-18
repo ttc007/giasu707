@@ -109,7 +109,7 @@
         function updateLikeCount(change) {
             const text = likeCountSpan.textContent.trim(); // ❤️123
             const number = parseInt(text.replace('❤️', '').trim());
-            likeCountSpan.textContent = `❤️${number + change}`;
+            likeCountSpan.textContent = `❤️ ${number + change}`;
         }
 
         function updateLikeButtonFunction() {

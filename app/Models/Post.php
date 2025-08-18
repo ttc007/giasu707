@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Traits\HasViewsCount;
 use App\Models\Traits\HasLikesCount;
 use App\Models\Traits\HasFormattedDates;
+use App\Models\Traits\GetComments;
 
 class Post extends Model
 {
@@ -20,6 +21,7 @@ class Post extends Model
     use HasViewsCount;
     use HasLikesCount;
     use HasFormattedDates;
+    use GetComments;
 
     public function collection()
     {

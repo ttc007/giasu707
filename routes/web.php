@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\ExamController as AdminExamController;
 use App\Http\Controllers\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Admin\CollectionController as AdminCollectionController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
-use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 
 use App\Http\Controllers\Api\QuestionController as ApiQuestionController;
 use App\Http\Controllers\Api\ExamQuestionController;
@@ -23,12 +23,16 @@ use App\Http\Controllers\UploadController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HomePostController;
 use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\CommentController;
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Models\Chapter;
 use App\Models\Lesson;
 use App\Models\Section;
 use App\Models\Collection;
+
+use App\Http\Middleware\StudentAuth;
 
 Route::get('/', [HomeController::class, 'index']);
 
@@ -47,8 +51,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::resource('collections', AdminCollectionController::class);
     Route::resource('categories', AdminCategoryController::class);
 
-    Route::get('students', [StudentController::class, 'index'])->name('admin.students.index');
-    Route::get('views', [StudentController::class, 'view'])->name('admin.students.views');
+    Route::get('students', [AdminStudentController::class, 'index'])->name('admin.students.index');
+    Route::get('views', [AdminStudentController::class, 'view'])->name('admin.students.views');
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -99,9 +103,25 @@ Route::get('/danh-muc/{slug}', [HomePostController::class, 'category'])->name('h
 Route::get('/tuyen-tap/{slug}', [HomePostController::class, 'collection'])->name('home.collection');
 Route::get('/tuyen-tap/{slug}/{post_slug}', [HomePostController::class, 'show'])->name('home.post.show');
 
-Route::get('/trang-ca-nhan', [RegistrationController::class, 'index'])->name('registration.index');
-Route::get('/cap-nhat-trang-ca-nhan', [RegistrationController::class, 'create'])->name('registration.create');
-Route::post('/dang-ky', [RegistrationController::class, 'update'])->name('registration.store');
+Route::middleware(StudentAuth::class)->group(function () {
+    Route::get('/trang-ca-nhan', [RegistrationController::class, 'index'])->name('registration.index');
+    Route::get('/cap-nhat-trang-ca-nhan', [RegistrationController::class, 'create'])->name('registration.create');
+    Route::post('/dang-ky', [RegistrationController::class, 'update'])->name('registration.store');
+
+    Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+});
+
+Route::get('/dang-nhap', [StudentController::class, 'showLoginForm'])->name('student.login');
+Route::post('/dang-nhap', [StudentController::class, 'login'])->name('student.login.post');
+// Hiển thị form đăng ký
+Route::get('/dang-ki', [StudentController::class, 'showRegisterForm'])->name('student.register');
+// Xử lý đăng ký
+Route::post('/dang-ki', [StudentController::class, 'register'])->name('student.register.post');
+// Kích hoạt tài khoản student
+Route::get('/kich-hoat-tai-khoan/{key}', [StudentController::class, 'activate'])
+     ->name('student.activate');
+Route::get('/dang-xuat', [StudentController::class, 'logout'])
+     ->name('student.logout');
 
 // Trang môn học
 Route::get('/{subject_slug}', [SubjectController::class, 'showSubject'])->name('show.subject');

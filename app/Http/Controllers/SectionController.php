@@ -30,37 +30,43 @@ class SectionController extends Controller
         $ip = $request->ip();
         $model = 'Section';
         $twentyFourHoursAgo = now()->subHours(24);
+        $registrationId = session('studentId');
+        $id = $section->id;
 
-        $existingView = DB::table('views')
+        // Điều kiện chung
+        $query = DB::table('views')
             ->where('model_type', $model)
-            ->where('model_id', $section->id)
-            ->where('ip_address', $ip)
-            ->first();
+            ->where('model_id', $id);
+
+        if ($registrationId) {
+            $query->where('registration_id', $registrationId);
+        } else {
+            $query->where('ip_address', $ip);
+        }
+
+        $existingView = $query->first();
 
         if (!$existingView) {
             DB::table('views')->insert([
-                'model_type' => $model,
-                'model_id'   => $section->id,
-                'ip_address' => $ip,
-                'user_agent' => $request->userAgent(),
-                'created_at' => now(),
-                'updated_at' => now()
+                'model_type'      => $model,
+                'model_id'        => $id,
+                'ip_address'      => $ip,
+                'user_agent'      => $request->userAgent(),
+                'registration_id' => $registrationId,
+                'created_at'      => now(),
+                'updated_at'      => now()
             ]);
         } else {
             $lastUpdated = \Carbon\Carbon::parse($existingView->updated_at);
             if ($lastUpdated->lt($twentyFourHoursAgo)) {
-                DB::table('views')
-                    ->where('model_type', $model)
-                    ->where('model_id', $section->id)
-                    ->where('ip_address', $ip)
-                    ->update(['updated_at' => now()]);
+                $query->update(['updated_at' => now()]);
             }
         }
         
         $liked = DB::table('favorites')
-            ->where('ip_address', $ip)
+            ->where('registration_id', $registrationId)
             ->where('model_type', $model)
-            ->where('model_id', $section->id)
+            ->where('model_id', $id)
             ->exists();
 
         return view('sections.show', compact('subject', 'chapter', 'section', 'liked'));

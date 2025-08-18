@@ -9,8 +9,9 @@
             <h1 class="mb-1">{{ $registration->name ?? 'Tên người dùng' }}</h1>
             <p class="text-muted mb-3">{{ $registration->email ?? '' }}</p>
             @if ($registration->created_at == $registration->updated_at)
-                <a href="{{ route('registration.create') }}" class="btn btn-primary mb-4">Cập nhật thông tin</a>
+                <a href="{{ route('registration.create') }}" class="btn btn-primary mx-2">Cập nhật thông tin</a>
             @endif
+            <a href="{{route('student.logout')}}" class="btn btn-outline-secondary">Đăng xuất</a>
         </div>
 
         <ul class="nav nav-tabs" id="profileTabs" role="tablist">
