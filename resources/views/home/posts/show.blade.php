@@ -30,6 +30,7 @@
             <div class="text-center" style="font-size:20px; display: flex; justify-content: center; gap: 15px; align-items: center;">
                 <span class="view-count">👀 {{ $post->countView() }}</span>
                 <span id="like-count">❤️ {{ $post->countLikes() }}</span>
+                <a href="#commet-div">💬 {{ $post->commentsCount() }}</a>
             </div>
             <div class="text-center" style="font-size:15px">
                 <div id="like-container">
@@ -85,7 +86,7 @@
 
     <hr class="mt-4">
 
-    <div class="comments mt-4">
+    <div class="comments mt-4" id="commet-div">
         <h5>💬 Bình luận</h5>
 
         <form method="POST" action="{{ route('comments.store') }}">

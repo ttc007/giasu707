@@ -31,5 +31,17 @@ trait GetComments
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
     }
+
+    /**
+     * Đếm tổng số comments của model hiện tại
+     */
+    public function commentsCount()
+    {
+        $modelType = class_basename($this);
+
+        return Comment::where('model_type', $modelType)
+            ->where('model_id', $this->id)
+            ->count();
+    }
 }
 
