@@ -38,10 +38,12 @@
         <span id="view-count">👀 {{ $section->countView() }}</span>
         <span id="like-count">❤️ {{ $section->countLikes() }}</span>
         <div id="like-container">
-            @if($liked)
-            <button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>
-            @else
-            <button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>
+            @if(session('studentId'))
+                @if($liked)
+                <button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>
+                @else
+                <button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>
+                @endif
             @endif
         </div>
         <p class="text-muted text-end">Cập nhật gần nhất: {{ $section->getUpdatedDate() }}</p>

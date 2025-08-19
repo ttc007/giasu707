@@ -34,10 +34,12 @@
             </div>
             <div class="text-center" style="font-size:15px">
                 <div id="like-container">
-                    @if($liked)
-                    <button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>
-                    @else
-                    <button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>
+                    @if(session('studentId'))
+                        @if($liked)
+                        <button class="btn btn-secondary" id="unlike-btn">💔 Bỏ thích</button>
+                        @else
+                        <button class="btn btn-outline-danger" id="like-btn">❤️ Thích</button>
+                        @endif
                     @endif
                 </div>
             </div>
