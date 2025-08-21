@@ -10,6 +10,7 @@
                 <th>Registration ID</th>
                 <th>Model</th>
                 <th>Model ID</th>
+                <th>Comment</th>
                 <th>Created at</th>
                 <th>Updated at</th>
             </tr>
@@ -21,6 +22,7 @@
                     <td>{{ $student->registration_id }}</td>
                     <td>{{ $student->model_type }}</td>
                     <td>{{ $student->model_id }}</td>
+                    <td>{{ $student->content }}</td>
                     <td>{{ $student->created_at }}</td>
                     <td>{{ $student->updated_at }}</td>
                 </tr>
