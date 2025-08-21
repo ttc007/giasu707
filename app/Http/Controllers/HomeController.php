@@ -11,41 +11,27 @@ use DB;
 
 class HomeController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $ip = $request->ip();
-        $model = 'Home';
-        $twentyFourHoursAgo = now()->subHours(24);
-        $id = 0;
+        // 3 bài viết mới
+        $latestPosts = Post::with('collection')
+            ->latest()
+            ->take(3)
+            ->get();
 
-        $existingView = DB::table('views')
-            ->where('model_type', $model)
-            ->where('model_id', $id)
-            ->where('ip_address', $ip)
-            ->first();
+        // 3 bài viết xem nhiều nhất
+        $popularPosts = Post::with('collection')
+            ->select('posts.*', DB::raw('COUNT(views.id) as views_count'))
+            ->leftJoin('views', function ($join) {
+                $join->on('views.model_id', '=', 'posts.id')
+                     ->where('views.model_type', '=', 'Post');
+            })
+            ->groupBy('posts.id')
+            ->orderByDesc('views_count')
+            ->take(3)
+            ->get();
 
-        if (!$existingView) {
-            DB::table('views')->insert([
-                'model_type' => $model,
-                'model_id'   => $id,
-                'ip_address' => $ip,
-                'user_agent' => $request->userAgent(),
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-        } else {
-            $lastUpdated = \Carbon\Carbon::parse($existingView->updated_at);
-            if ($lastUpdated->lt($twentyFourHoursAgo)) {
-                DB::table('views')
-                    ->where('model_type', $model)
-                    ->where('model_id', $id)
-                    ->where('ip_address', $ip)
-                    ->update(['updated_at' => now()]);
-            }
-        }
-
-        $featuredPosts = Post::with('collection')->latest()->take(6)->get();
-        return view('index', compact('featuredPosts'));
+        return view('index', compact('latestPosts', 'popularPosts'));
     }
 
     public function priceTableWeb(Request $request) {

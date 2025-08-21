@@ -53,6 +53,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 
     Route::get('students', [AdminStudentController::class, 'index'])->name('admin.students.index');
     Route::get('views', [AdminStudentController::class, 'view'])->name('admin.students.views');
+    Route::get('comments', [AdminStudentController::class, 'comment'])->name('admin.students.comments');
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');

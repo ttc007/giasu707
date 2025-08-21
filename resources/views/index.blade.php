@@ -54,25 +54,60 @@
                     </p>
                 </div>
 
-                <!-- Bài viết nổi bật -->
                 <div class="mt-5 p-3 bg-white rounded border shadow-sm">
-                    <h4 class="text-success mb-4">🔥 Bài viết nổi bật</h4>
+                    <h4 class="text-primary mb-4">🔥 Bài viết nổi bật</h4>
                     <div class="row collection-container pt-3">
-                        @foreach($featuredPosts as $post)
+                        @foreach($popularPosts as $post)
                             <div class="col-md-4 mb-3">
                                 <div class="card h-100">
                                     @if($post->image)
-                                    <a href="{{ route('home.post.show', ['slug' => $post->collection->slug, 'post_slug' => $post->slug]) }}" >
-                                        <div class="square-box position-relative">
-                                            <img src="{{ asset($post->image) }}" class="centered-img" alt="{{ $post->title }}">
-                                            <div class="like-badge">
-                                                <span>👀 {{ $post->countView() }}</span>
-                                                <span>❤️{{ $post->countLikes() }}</span>
+                                        <a href="{{ route('home.post.show', ['slug' => $post->collection->slug, 'post_slug' => $post->slug]) }}">
+                                            <div class="square-box position-relative">
+                                                <img src="{{ asset($post->image) }}" class="centered-img" alt="{{ $post->title }}">
+                                                <div class="like-badge">
+                                                    <span>👀 {{ $post->views_count ?? $post->countView() }}</span>
+                                                    <span>❤️ {{ $post->countLikes() }}</span>
+                                                </div>
                                             </div>
-                                        </div></a>
+                                        </a>
                                     @endif
                                     <div class="card-body d-flex flex-column justify-content-between">
-                                        <h5 class="card-title text-center"><a href="{{ route('home.post.show', ['slug' => $post->collection->slug, 'post_slug' => $post->slug]) }}" >{{ $post->title }}</a></h5>
+                                        <h5 class="card-title text-center">
+                                            <a href="{{ route('home.post.show', ['slug' => $post->collection->slug, 'post_slug' => $post->slug]) }}">
+                                                {{ $post->title }}
+                                            </a>
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Bài viết nổi bật -->
+                <div class="mt-5 p-3 bg-white rounded border shadow-sm">
+                    <h4 class="text-success mb-4">🆕 Bài viết mới nhất</h4>
+                    <div class="row collection-container pt-3">
+                        @foreach($latestPosts as $post)
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    @if($post->image)
+                                        <a href="{{ route('home.post.show', ['slug' => $post->collection->slug, 'post_slug' => $post->slug]) }}">
+                                            <div class="square-box position-relative">
+                                                <img src="{{ asset($post->image) }}" class="centered-img" alt="{{ $post->title }}">
+                                                <div class="like-badge">
+                                                    <span>👀 {{ $post->countView() }}</span>
+                                                    <span>❤️ {{ $post->countLikes() }}</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    @endif
+                                    <div class="card-body d-flex flex-column justify-content-between">
+                                        <h5 class="card-title text-center">
+                                            <a href="{{ route('home.post.show', ['slug' => $post->collection->slug, 'post_slug' => $post->slug]) }}">
+                                                {{ $post->title }}
+                                            </a>
+                                        </h5>
                                     </div>
                                 </div>
                             </div>
