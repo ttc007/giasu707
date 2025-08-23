@@ -9,11 +9,5 @@ use App\Models\Question;
 
 class ExamQuestionController extends Controller
 {
-    public function destroy(Exam $exam, Question $question)
-    {
-        $exam->questions()->detach($question->id);
-
-        return response()->json(['message' => 'Removed successfully']);
-    }
-
+    //
 }

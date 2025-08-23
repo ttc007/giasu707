@@ -61,8 +61,6 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::prefix('api')->group(function () {
-    Route::delete('/exams/{exam}/questions/{question}', [ExamQuestionController::class, 'destroy']);
-
     Route::get('/chapters-by-subject/{subject_id}', function ($subject_id) {
         return Chapter::where('subject_id', $subject_id)->get(['id', 'title']);
     });
