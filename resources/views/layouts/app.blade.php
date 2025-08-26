@@ -10,7 +10,10 @@
     <link rel="icon" type="image/png" href="{{ asset('images/icon.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
+    <meta name="google-adsense-account" content="ca-pub-8136511242887704">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8136511242887704"
+     crossorigin="anonymous"></script>
+     
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,7 +49,7 @@
 
         #timer {
             position: fixed;
-            top: 320px;
+            top: 470px;
             right: 230px;
             background-color: white;
             padding: 10px 15px;
