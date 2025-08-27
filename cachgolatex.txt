@@ -68,3 +68,6 @@ echo "✅ Backup xong: $BACKUP_DIR/full_backup_$DATE.zip"
 
 Chạy backup Windown
 powershell -ExecutionPolicy Bypass -File "D:\xampp1\htdocs\giasu707\get_backup.ps1"
+
+Sinh sitemap
+php artisan sitemap:generate

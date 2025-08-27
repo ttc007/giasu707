@@ -1,2 +1,10 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /login
+Disallow: /dang-nhap
+Disallow: /dang-ki
+Disallow: /dang-xuat
+Disallow: /api
+Disallow: /upload
+
+Sitemap: https://giasu707.com/sitemap.xml
