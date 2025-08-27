@@ -27,9 +27,12 @@ class GenerateSitemap extends Command
                     str_starts_with($path, 'dang-ki') ||
                     str_starts_with($path, 'dang-xuat') ||
                     str_starts_with($path, 'api') ||
-                    str_starts_with($path, 'upload')
+                    str_starts_with($path, 'upload') ||
+                    str_starts_with($path, 'trang-ca-nhan') ||
+                    str_starts_with($path, 'cap-nhat-trang-ca-nhan') ||
+                    str_starts_with($path, 'kich-hoat-tai-khoan') 
                 ) {
-                    return;
+                    return false;
                 }
 
                 return $url;

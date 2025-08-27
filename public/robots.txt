@@ -6,5 +6,8 @@ Disallow: /dang-ki
 Disallow: /dang-xuat
 Disallow: /api
 Disallow: /upload
+Disallow: /kich-hoat-tai-khoan
+Disallow: /trang-ca-nhan
+Disallow: /cap-nhat-trang-ca-nhan
 
 Sitemap: https://giasu707.com/sitemap.xml
