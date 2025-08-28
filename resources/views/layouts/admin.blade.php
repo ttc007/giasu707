@@ -17,6 +17,7 @@
     <div class="container my-4">
         <h1 class="mb-4">Trang Quản Trị - Gia Sư 707</h1>
         <nav class="mb-4">
+            <a href="{{ route('admin.index') }}">Thống kê</a> |
             <a href="{{ route('subjects.index') }}">Môn học</a> |
             <a href="{{ route('chapters.index') }}">Chương</a> |
             <a href="{{ route('lessons.index') }}">Bài</a> |

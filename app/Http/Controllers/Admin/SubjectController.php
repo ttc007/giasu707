@@ -16,7 +16,7 @@ use Str;
 
 class SubjectController extends Controller
 {
-    public function index()
+    public function admin()
     {
         $views = View::select('model_type', 'model_id')
             ->selectRaw('COUNT(*) as total_views')
@@ -90,6 +90,12 @@ class SubjectController extends Controller
         });
 
         return view('admin.index', compact('views'));
+    }
+
+    public function index() 
+    {
+        $subjects = Subject::all();
+        return view('admin.subjects.index', compact('subjects'));
     }
 
     public function create()

@@ -37,7 +37,7 @@ use App\Http\Middleware\StudentAuth;
 Route::get('/', [HomeController::class, 'index']);
 
 Route::prefix('admin')->middleware('auth')->group(function () {
-    Route::get('/', [AdminSubjectController::class, 'index'])->name('admin.index');
+    Route::get('/', [AdminSubjectController::class, 'admin'])->name('admin.index');
     Route::resource('subjects', AdminSubjectController::class);
     Route::resource('chapters', AdminChapterController::class);
     Route::resource('lessons', AdminLessonController::class);
