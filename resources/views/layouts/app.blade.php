@@ -11,9 +11,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="google-adsense-account" content="ca-pub-8136511242887704">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8136511242887704"
-     crossorigin="anonymous"></script>
-     
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8136511242887704"
+     crossorigin="anonymous"></script> -->
+    <script src="https://fpyf8.com/88/tag.min.js" data-zone="166985" async data-cfasync="false"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
