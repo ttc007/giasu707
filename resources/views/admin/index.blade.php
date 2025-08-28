@@ -6,7 +6,6 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Thống kê lượt xem</h2>
-        <a href="{{ route('subjects.create') }}" class="btn btn-success">+ Thêm Môn học</a>
     </div>
 
     @if (session('success'))
