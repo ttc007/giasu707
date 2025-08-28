@@ -38,9 +38,6 @@
         </tbody>
     </table>
 
-    {{ $views->links() }}
-
-
     {{ $views->links('vendor.pagination.bootstrap-5') }}
 
 </div>
