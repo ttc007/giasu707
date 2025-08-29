@@ -13,7 +13,7 @@
     <meta name="google-adsense-account" content="ca-pub-8136511242887704">
     <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8136511242887704"
      crossorigin="anonymous"></script> -->
-    <script>(s=>{s.dataset.zone=9789426,s.src='https://groleegni.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+    <!-- <script>(s=>{s.dataset.zone=9789426,s.src='https://groleegni.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script> -->
 
     <!-- <script>(s=>{s.dataset.zone=9788910,s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script> -->
 
