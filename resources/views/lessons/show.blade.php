@@ -43,28 +43,21 @@
 
     <hr>
     @if ($lesson->sections->count())
-        <h5 class="mt-4">📚 Các phần trong bài học</h5>
-        <ul class="list-group mb-4">
-            @foreach ($lesson->sections as $section)
-                <li class="list-group-item">
-                    <a href="{{ route('show.section', [
-                        'subject_slug' => $subject->slug,
-                        'chapter_slug' => $chapter->slug,
-                        'section_slug' => $section->slug
-                    ]) }}">
-                        {{ $section->title ?? 'Phần ' . $loop->iteration }}
-                    </a>
-                </li>
-            @endforeach
-        </ul>
+        @foreach ($lesson->sections as $section)
+            <h4>
+                {{ $section->title }}
+            </h4>                
+                    
+            {!! $section->content !!}
+        @endforeach
     @endif
 
-    <hr>
+    <!-- <hr>
     <div class="p-3 mb-4">
         <h5 class="text-muted">Nội dung tổng hợp</h5>
         {!! $lesson->summary !!}
     </div>
-
+ -->
     <hr>
     <h4>Bài tập ôn tập ({{ $lesson->getQuestionsCountAttribute() }} tổng câu hỏi)</h4>
     <i class='text-danger'>*Lưu ý: làm hết câu này rồi đến câu khác. Xin đừng nôn nóng.</i>

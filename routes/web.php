@@ -131,8 +131,5 @@ Route::get('/{subject_slug}/{chapter_slug}', [ChapterController::class, 'show'])
 // Trang ôn tập chương
 Route::get('{subject_slug}/{chapter_slug}/on-tap', [ChapterController::class, 'review'])->name('review.chapter');
 
-// Trang section
-Route::get('{subject_slug}/{chapter_slug}/{section_slug}', [SectionController::class, 'show'])->name('show.section');
-
 // Trang lesson
 Route::get('{subject_slug}/{chapter_slug}/lesson/{lesson_slug}', [LessonController::class, 'show'])->name('show.lesson');

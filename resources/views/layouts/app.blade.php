@@ -11,12 +11,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="google-adsense-account" content="ca-pub-8136511242887704">
-    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8136511242887704"
-     crossorigin="anonymous"></script> -->
-    <script>(s=>{s.dataset.zone=9789426,s.src='https://groleegni.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-
-    <!-- <script>(s=>{s.dataset.zone=9788910,s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script> -->
-
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8136511242887704"
+     crossorigin="anonymous"></script>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -47,7 +44,7 @@
         }
 
         h2, h4, h1 {
-            color: #699238!important;
+            color: #3aa147!important;
         }
 
         #timer {
