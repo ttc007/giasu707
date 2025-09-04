@@ -25,11 +25,7 @@
                 <tr>
                     <td>{{ $view->model_type }}</td>
                     <td>
-                        @if(!empty($view->url))
-                            <a href="{{ $view->url }}" target="_blank">{{ $view->title }}</a>
-                        @else
-                            {{ $view->title ?? 'N/A' }}
-                        @endif
+                        {{ $view->title }}
                     </td>
                     <td>{{ $view->total_views }}</td>
                 </tr>

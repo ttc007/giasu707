@@ -8,6 +8,25 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/icon.png') }}">
+
+    <!-- SEO Basic -->
+    <meta name="description" content="Blog chia sẻ về học tập, giải trí, thư giãn, trồng cây và cờ tướng. Nội dung nhẹ nhàng, hữu ích và gần gũi.">
+    <meta name="keywords" content="blog học tập, blog giải trí, blog thư giãn, blog trồng cây, cờ tướng online, cờ tướng AI, gia sư 707">
+    <meta name="author" content="Gia Sư 707">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Gia Sư 707 - Blog học tập, cờ tướng & thư giãn">
+    <meta property="og:description" content="Chào mừng bạn đến với blog. Nơi chia sẻ về học tập, giải trí, cờ tướng, thư giãn và trồng cây.">
+    <meta property="og:image" content="{{ asset('images/preview.png') }}">
+    <meta property="og:url" content="https://giasu707.com">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Gia Sư 707 - Blog học tập, cờ tướng & thư giãn">
+    <meta name="twitter:description" content="Nơi chia sẻ học tập, giải trí, cờ tướng, thư giãn và trồng cây.">
+    <meta name="twitter:image" content="{{ asset('images/preview.png') }}">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="google-adsense-account" content="ca-pub-8136511242887704">

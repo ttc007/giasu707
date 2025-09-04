@@ -33,58 +33,23 @@ class SubjectController extends Controller
                 $section = Section::with('lesson.chapter.subject')->find($view->model_id);
                 if ($section) {
                     $view->title = $section->title;
-                    $view->url = route('show.section', [
-                        'subject_slug' => $section->lesson->chapter->subject->slug,
-                        'chapter_slug' => $section->lesson->chapter->slug,
-                        'section_slug' => $section->slug,
-                    ]);
                 }
             } elseif ($modelClass === 'Lesson') {
                 $lesson = Lesson::with('chapter.subject')->find($view->model_id);
                 if ($lesson) {
                     $view->title = $lesson->title;
-                    $view->url = route('show.lesson', [
-                        'subject_slug' => $lesson->chapter->subject->slug,
-                        'chapter_slug' => $lesson->chapter->slug,
-                        'lesson_slug' => $lesson->slug,
-                    ]);
                 }
             } elseif ($modelClass === 'Collection') {
                 $collection = Collection::find($view->model_id);
                 if ($collection) {
                     $view->title = $collection->title;
-                    $view->url = route('home.collection', [
-                        'slug' => $collection->slug,
-                    ]);
                 }
             } elseif ($modelClass === 'Post') {
                 $post = Post::with('collection')->find($view->model_id);
                 if ($post) {
                     $view->title = $post->title;
-                    $view->url = route('home.post.show', [
-                        'slug' => $post->collection->slug,
-                        'post_slug' => $post->slug,
-                    ]);
                 }
             } 
-            // elseif ($modelClass === 'Chapter') {
-            //     $chapter = Chapter::with('subject')->find($view->model_id);
-            //     if ($chapter) {
-            //         $view->title = $chapter->title;
-            //         $view->url = route('show.chapter', [
-            //             'subject_slug' => $chapter->subject->slug,
-            //             'chapter_slug' => $chapter->slug,
-            //         ]);
-            //     }
-            // } elseif ($modelClass === 'Subject') {
-            //     $subject = Subject::find($view->model_id);
-            //     if ($subject) {
-            //         $view->title = $subject->name;
-            //         $view->url = route('show.subject', [
-            //             'subject_slug' => $subject->slug,
-            //         ]);
-            //     }
-            // }
 
             return $view;
         });

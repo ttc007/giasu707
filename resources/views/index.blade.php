@@ -12,13 +12,14 @@
                     <img src="{{ asset('images/avata.jpg') }}" class="rounded-circle shadow" width="150" alt="Ảnh đại diện">
                 </div>
                 <h2 class="text-center">Xin chào, mình là Trương Thành Công</h2>
-                <p class="mt-3 text-justify">
-                    Mình từng là một lập trình viên. Nhưng đến một ngày mình chán cái cảnh làm 8 tiếng mỗi ngày bán mình cho tư bản...
-                    Mình đã quyết định nghỉ làm để về quê. Trồng cây và dạy học online.
+                <p class="mt-3 text-center text-muted fs-5">
+                    🌱 Chào mừng bạn đến với <strong>blog nhỏ</strong> của mình! <br>
+                    <span class="d-block mt-2">Học tập • Giải trí • Thư giãn • Cờ tướng • Trồng cây</span>
                 </p>
 
+
                 <!-- Giới thiệu Gia sư 707 -->
-                <div class="mt-5 p-3 bg-light rounded border">
+                <!-- <div class="mt-5 p-3 bg-light rounded border">
                     <h4 class="">📚 Gia sư 707 là gì?</h4>
                     <p class="text-justify">
                         <strong>Gia sư 707</strong> là một nhóm học tập nhỏ mà mình lập ra để giúp các bạn học sinh có thể hỏi bài mọi lúc mọi nơi.
@@ -33,9 +34,7 @@
                             Follow Facebook
                         </a>
                     </p>
-
-
-                </div>
+                </div> -->
 
                 <!-- Giới thiệu nền tảng học tập -->
                 <div class="mt-4 p-3 bg-white rounded border shadow-sm">
