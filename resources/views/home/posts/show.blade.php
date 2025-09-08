@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
-@section('title', $post->collection->title . ' | ' . $post->title)
+@section('title', $post->title . ' | ' . $post->title)
+@extends('layouts.app')
+
+@section('title', $post->title . ' | Gia sư 707')
+@section('description', Str::limit(strip_tags($post->content), 160))
+@section('keywords', $post->title . ', Gia sư 707, blog học tập, cờ tướng, sống chậm')
+@section('image', asset($post->image))
 
 @section('content')
 <div class="container section">
