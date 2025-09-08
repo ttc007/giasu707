@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('title', 'Ôn tập chương- ' . $chapter->title . ' | ' . $subject->name)
+@section('description', 'Ôn tập chương bài học thuộc môn ' . $chapter->subject->name . ' tại Gia sư 707.')
+@section('keywords', $chapter->title . ', Gia sư 707, blog học tập, cờ tướng, sống chậm')
+@section('image', asset($chapter->image))
+
 
 @section('content')
 <div class="container section">

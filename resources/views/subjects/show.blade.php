@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Danh sách chương - ' . $subject->name . ' | Giasu707')
+@section('description', 'Môn học tại Gia sư 707.')
+@section('keywords', $subject->name . ', Gia sư 707, blog học tập, cờ tướng, sống chậm')
 
 @section('content')
 <div class="container section">

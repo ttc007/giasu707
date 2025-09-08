@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('title', 'Thi thử | Giasu707')
+@section('description', 'Thi thử tốt nghiệp taị Gia sư 707')
+@section('keywords', 'Thi thử tốt nghiệp, Gia sư 707, blog học tập, cờ tướng, sống chậm')
+@section('image', asset('images/thithu.png'))
 
 @section('content')
 <div class="container section p-3">

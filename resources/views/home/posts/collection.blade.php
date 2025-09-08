@@ -3,7 +3,7 @@
 @section('title', $collection->title . ' | Gia sư 707')
 @section('description', $collection->description ?? 'Tuyển tập bài viết thuộc chủ đề ' . $collection->title . ' tại Gia sư 707.')
 @section('keywords', $collection->title . ', Gia sư 707, tuyển tập blog')
-@section('image', $collection->image ? asset($collection->image) : asset('images/preview.png'))
+@section('image', $collection->image ? asset($collection->image) : asset('images/icon.png'))
 
 @section('content')
 <style type="text/css">

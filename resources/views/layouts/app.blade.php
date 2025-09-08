@@ -18,7 +18,7 @@
     <!-- Open Graph -->
     <meta property="og:title" content="@yield('title', 'Gia Sư 707 - Blog học tập, cờ tướng & thư giãn')">
     <meta property="og:description" content="@yield('description', 'Chào mừng bạn đến với blog. Nơi chia sẻ về học tập, giải trí, cờ tướng, thư giãn và trồng cây.')">
-    <meta property="og:image" content="@yield('image', asset('images/preview.png'))">
+    <meta property="og:image" content="@yield('image', asset('images/icon.png'))">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:type" content="article">
 
@@ -26,7 +26,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('title', 'Gia Sư 707 - Blog học tập, cờ tướng & thư giãn')">
     <meta name="twitter:description" content="@yield('description', 'Nơi chia sẻ học tập, giải trí, cờ tướng, thư giãn và trồng cây.')">
-    <meta name="twitter:image" content="@yield('image', asset('images/preview.png'))">
+    <meta name="twitter:image" content="@yield('image', asset('images/icon.png'))">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">

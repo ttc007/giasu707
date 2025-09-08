@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('title', $lesson->title . ' - ' . $chapter->title . ' | Gia sư 707')
-@section('description', $lesson->description ?? Str::limit(strip_tags($lesson->content), 160))
+@section('description', $lesson->content ?? Str::limit(strip_tags($lesson->content), 160))
 @section('keywords', $lesson->title . ', ' . $chapter->title . ', Gia sư 707, học online')
-@section('image', $lesson->image ? asset($lesson->image) : asset('images/preview.png'))
+@section('image', asset('images/lesson_default.jpg'))
 
 @section('content')
 <div class="container section">
