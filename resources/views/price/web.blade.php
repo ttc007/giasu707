@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Bảng giá thiết kế website')
-@section('description', 'Bảng giá thiết kế website tại Gi sư 707')
+@section('description', 'Bảng giá thiết kế website tại Gia sư 707')
 @section('keywords', 'Bảng giá thiết kế website, Gia sư 707, blog học tập, cờ tướng, sống chậm, thiết kế web')
 @section('image', asset('images/bg.jpg'))
 

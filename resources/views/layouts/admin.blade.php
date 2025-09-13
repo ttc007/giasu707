@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Admin Panel')</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <!-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> -->
     <!-- Bootstrap CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -29,7 +29,8 @@
             <a href="{{ route('posts.index') }}">Bài viết</a> |
             <a href="{{ route('admin.students.index') }}">Danh sách đăng kí học</a> |
             <a href="{{ route('admin.students.views') }}">View</a> |
-            <a href="{{ route('admin.students.comments') }}">Bình luận</a>
+            <a href="{{ route('admin.students.comments') }}">Bình luận</a> |
+            <a href="{{ route('admin.books.index') }}">Cờ tướng book</a>
         </nav>
 
         @if ($errors->any())

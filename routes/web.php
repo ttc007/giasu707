@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Admin\CollectionController as AdminCollectionController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
+use App\Http\Controllers\Admin\BookController;
 
 use App\Http\Controllers\Api\QuestionController as ApiQuestionController;
 use App\Http\Controllers\Api\ExamQuestionController;
@@ -25,6 +26,8 @@ use App\Http\Controllers\HomePostController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\BauCuaController;
+
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Models\Chapter;
@@ -54,6 +57,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('students', [AdminStudentController::class, 'index'])->name('admin.students.index');
     Route::get('views', [AdminStudentController::class, 'view'])->name('admin.students.views');
     Route::get('comments', [AdminStudentController::class, 'comment'])->name('admin.students.comments');
+
+    Route::get('books', [BookController::class, 'index'])->name('admin.books.index');
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -88,6 +93,10 @@ Route::prefix('api')->group(function () {
     Route::post('/{model}/{id}/like', [RegistrationController::class, 'like']);
     // Unlike 
     Route::delete('/{model}/{model_id}/unlike', [RegistrationController::class, 'unlike']);
+
+    Route::post('/books', [BookController::class, 'store']);
+    Route::get('/books/opening/{opening_id}', [BookController::class, 'getOpeningFirstStep']);
+    Route::get('/get-book-from-variation/{id}', [BookController::class, 'getBookFromVariation']);
 });
 
 Route::post('/upload', [UploadController::class, 'uploadImage'])->name('ckeditor.upload');
@@ -121,6 +130,9 @@ Route::get('/kich-hoat-tai-khoan/{key}', [StudentController::class, 'activate'])
      ->name('student.activate');
 Route::get('/dang-xuat', [StudentController::class, 'logout'])
      ->name('student.logout');
+
+// Trang chơi game
+Route::get('/co-tuong-book', [BauCuaController::class, 'index'])->name('bau-cua.index');
 
 // Trang môn học
 Route::get('/{subject_slug}', [SubjectController::class, 'showSubject'])->name('show.subject');

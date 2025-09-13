@@ -366,6 +366,9 @@
                         <a class="nav-link" href="{{ url('/thu-vien') }}">Thư viện</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ url('/co-tuong-book') }}">Cờ tướng book</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ url('/trang-ca-nhan') }}"><img src="{{ asset('images/avatar.png') }}" class="rounded-circle shadow" width="25" alt="Ảnh đại diện"></a>
                     </li>
                 </ul>
