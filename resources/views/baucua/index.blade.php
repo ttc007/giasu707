@@ -50,7 +50,7 @@
     to   { background-position: 800px 400px; }
   }
 
-  
+
 
   /* Nhóm nút chung */
   .button-group {
@@ -151,7 +151,11 @@
 
             
         </div>
-        <canvas id="chessboard" width="355" height="420"></canvas>
+        
+        <div class="board-wrapper">
+          <canvas id="chessboard" width="355" height="420"></canvas>
+        </div>
+
         <div id="result" style="min-height:100px; text-align: left;" class="card p-2 mb-3 mt-2 mx-3"></div>
 
         <div class="my-3 text-center" style="display:none;">
