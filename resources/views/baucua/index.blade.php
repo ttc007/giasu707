@@ -137,7 +137,7 @@
             <button id="newButton"><img src="{{ asset('images/new.png') }}" alt="New"></button>
             <button id="backButton"><img src="{{ asset('images/back.png') }}" alt="Back"></button>
             <button id="rotateButton"><img src="{{ asset('images/xoay.jpg') }}" alt="Rotate"></button>
-            <button onclick='saveBook()'><img src="{{ asset('images/save.png') }}" style="display:none;" alt="Save"></button>
+            <button onclick='saveBook()' style="display:none;"><img src="{{ asset('images/save.png') }}" alt="Save"></button>
         </div>
     </div>
 </div>
