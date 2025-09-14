@@ -166,6 +166,7 @@ function rotate() {
 
 function newGame() {
   history = [];
+  lastMoveToDraw = null;
   const openingIdStart = document.getElementById('openingSelect').value;
   loadOpening(openingIdStart);
   canvas.addEventListener('click', handleCanvasClick);
@@ -939,6 +940,7 @@ document.getElementById('backButton').addEventListener('click', undoMove);
 
 // Hàm undoMove để quay lại trạng thái trước đó
 function undoMove() {
+  lastMoveToDraw = null;
   if (history.length === 1) {
     document.getElementById('result').innerHTML = 'Không có nươc nào để quay lại';
     return;
