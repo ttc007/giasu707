@@ -369,7 +369,7 @@ function drawSelectedPiece() {
 
 function drawCornerSquare(x, y) {
   const size = cellSize;    // kích thước 1 ô
-  const pad = -1;            // khoảng cách viền ra ngoài (giảm lại)
+  const pad = -2;            // khoảng cách viền ra ngoài (giảm lại)
   const len = 8;            // độ dài đoạn vẽ ở góc (giảm lại)
 
   const left = x - size / 2 - pad;
@@ -971,6 +971,13 @@ function undoMove() {
     color: lastMove.color
   }
   moving(board, move);
+  lastMoveToDraw = {
+    fromX: move.fromX,
+    fromY: move.fromY,
+    toX: move.toX,
+    toY: move.toY,
+    color: 'blue'
+  };
   red = board.red;
   green = board.green;
   turn = lastMove.color === 'red' ? 'green' : 'red';

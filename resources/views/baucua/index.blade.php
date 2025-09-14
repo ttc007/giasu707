@@ -16,16 +16,41 @@
     max-width: 500px;
   }
 
-  /* Bàn cờ */
-  canvas {
-    border: 2px solid #333;
-    border-radius: 8px;
-    background-image: url("{{ asset('images/go2.png') }}");
-    background-size: cover;
-    background-position: center;
-    display: block;
-    margin: 0 auto;
+  .board-wrapper {
+    position: relative; /* thêm để ::after bám vào */
+    overflow: hidden;
+    border: 2px solid rgba(220,220,255,0.8);
+    box-shadow: 0 0 30px rgba(180, 200, 255, 0.8),
+                0 0 60px rgba(200, 220, 255, 0.5) inset;
+    background: linear-gradient(135deg, #f8f9ff, #e6f0ff, #d9d9f2, #cccccc);
+    padding: 5px;
   }
+
+  /* mây bay */
+  .board-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    background: url("{{ asset('images/textture_may.png') }}") repeat;
+    background-size: 400px 400px;
+    animation: clouds 20s linear infinite;
+    opacity: 0.5;
+    z-index: 1;
+  }
+
+  canvas {
+    border: 3px solid #aaa;
+    position: relative;
+    z-index: 2; /* để nổi trên mây */
+    border-radius: 3px;
+  }
+
+  @keyframes clouds {
+    from { background-position: 0 0; }
+    to   { background-position: 800px 400px; }
+  }
+
+  
 
   /* Nhóm nút chung */
   .button-group {

@@ -65,8 +65,7 @@ function computerMove() {
 }
 
 document.getElementById('openingSelect').addEventListener('change', async function () {
-    const openingId = this.value;
-    loadOpening(openingId);
+    newGame();
 });
 
 // Hàm loadBookById để gọi API lấy hình cờ của biến thể
