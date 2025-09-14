@@ -5,11 +5,10 @@
   /* Container bọc ngoài */
   .game-container {
     background: #f1f1f1;
-    padding: 20px;
     border-radius: 12px;
     box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
     text-align: center;
-    max-width: 600px;
+    max-width: 500px;
   }
 
   /* Bàn cờ */
@@ -38,7 +37,7 @@
     border-radius: 8px;
     background-color: #f8f9fa;
     cursor: pointer;
-    padding: 10px;
+    padding: 5px;
     transition: background-color 0.3s, transform 0.1s;
   }
 
@@ -79,13 +78,32 @@
   }
 
   .variation-btn {
-    width: 200px;
+    width: 150px;
     border: 1px solid #123 !important;
   }
+
+  #variations-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 5px;
+  }
+
+  .variation-btn {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      background: #f7f7f7;
+      cursor: pointer;
+      border-radius: 4px;
+  }
+  .variation-btn:hover {
+      background: #e0e0e0;
+  }
+
 </style>
 <div class="text-center button-group">
     
-    <div class="game-container mb-5">
+    <div class="game-container mb-5 pt-3">
         <div class="button-group">
             <label for="openingSelect" class="form-label d-block">Vui lòng chọn 1 thế trận để luyện tập</label>
             <select id="openingSelect" class="form-select" style="max-width: 300px;">
@@ -103,10 +121,8 @@
 
             
         </div>
-        <div id="result" style="min-height:100px; text-align: left;" class="card p-2 mb-3 mx-3">
-                
-        </div>
-        <canvas id="chessboard" width="420" height="500"></canvas>
+        <canvas id="chessboard" width="355" height="420"></canvas>
+        <div id="result" style="min-height:100px; text-align: left;" class="card p-2 mb-3 mt-2 mx-3"></div>
 
         <div class="my-3 text-center">
             <textarea id="comment" class="form-control" rows="3" style="max-width: 400px; margin: 0 auto;"></textarea>
@@ -121,7 +137,8 @@
     </div>
 </div>
 
-<script src="{{ asset('js/script.js') }}"></script>
 <script src="{{ asset('js/book.js') }}"></script>
 <script src="{{ asset('js/computerAI.js') }}"></script>
+<script src="{{ asset('js/script.js') }}"></script>
+
 @endsection

@@ -6,59 +6,20 @@ let history = [];
 let direct = 'forward';
 let result = null;
 let computerColor = '';
-
-// Lấy hai nút trong JavaScript
-  // const btnComputerGreen = document.getElementById('btnComputerGreen');
-  // const btnComputerRed = document.getElementById('btnComputerRed');
-
-  // // Xử lý sự kiện khi nhấn nút Computer Green
-  // btnComputerGreen.addEventListener('click', () => {
-  //   if (computerColor === turn) return;
-
-  //   if (btnComputerGreen.classList.contains('active-green')) {
-  //     btnComputerGreen.classList.remove('active-green');
-  //     btnComputerGreen.classList.add('inactive');
-  //     computerColor = '';
-  //   } else {
-  //     btnComputerGreen.classList.add('active-green');
-  //     btnComputerGreen.classList.remove('inactive');
-  //     btnComputerRed.classList.remove('active-red');
-  //     btnComputerRed.classList.add('inactive');
-  //     computerColor = 'green';
-  //     if (computerColor === turn) setTimeout(computerMove, 1000);
-  //   }
-  // });
-
-  // // Xử lý sự kiện khi nhấn nút Computer Đỏ
-  // btnComputerRed.addEventListener('click', () => {
-  //   if (computerColor === turn) return;
-
-  //   if (btnComputerRed.classList.contains('active-red')) {
-  //     btnComputerRed.classList.remove('active-red');
-  //     btnComputerRed.classList.add('inactive');
-  //     computerColor = '';
-  //   } else {
-  //     btnComputerRed.classList.add('active-red');
-  //     btnComputerRed.classList.remove('inactive');
-  //     btnComputerGreen.classList.remove('active-green');
-  //     btnComputerGreen.classList.add('inactive');
-  //     computerColor = 'red';
-  //     if (computerColor === turn) setTimeout(computerMove, 1000);
-  //   }
-  // });
+let lastMoveToDraw = null;
 
 const canvas = document.getElementById("chessboard");
 const ctx = canvas.getContext("2d");
 
-const cellSize = 45;
+const cellSize = 39;
 const boardCols = 9;
 const boardRows = 10;
 const boardWidth = (boardCols - 1) * cellSize;
 const boardHeight = (boardRows - 1) * cellSize;
 const margin = 50;
 
-const offsetX = 30;
-const offsetY = 50;
+const offsetX = 22;
+const offsetY = 33;
 
 function drawGrid() {
   ctx.strokeStyle = "#000";
@@ -191,64 +152,22 @@ function drawCannonPosition(x, y) {
 }
 
 document.getElementById('rotateButton').addEventListener('click', function() {
-  if (computerColor === turn) return;
+  rotate();
+});
+
+function rotate() {
+  // if (computerColor === turn) return;
 
   direct = direct === 'forward'? 'reverse' : 'forward';
   selectedPiece = null;
   drawBoard();
   displayPieces();
-
-});
+}
 
 function newGame() {
-  playerColor = 'red';
-  turn = 'red';
   history = [];
-
-  if (playerColor == 'red') {
-    red = {
-      '仕': [{x: 4, y : 1}, {x: 6, y: 1}],
-      '相': [{x: 3, y : 1}, {x:7, y: 1}],
-      '傌': [{x: 2, y : 1}, {x:8, y: 1}],
-      '俥': [{x: 1, y : 1}, {x:9, y: 1}],
-      '炮': [{x: 2, y : 3}, {x:8, y: 3}],
-      '卒':[{x:1, y:4}, {x:3, y:4}, {x:5, y:4}, {x:7, y:4}, {x:9, y:4}],
-      '帥': [{x: 5, y : 1}]
-    };
-
-    green = {
-      '士': [{x: 4, y : 10}, {x: 6, y: 10}],
-      '象': [{x: 3, y : 10}, {x:7, y: 10}],
-      '馬': [{x: 2, y : 10}, {x:8, y: 10}],
-      '車': [{x: 1, y : 10}, {x:9, y: 10}],
-      '砲': [{x: 2, y : 8}, {x:8, y: 8}],
-      '兵':[{x:1, y:7}, {x:3, y:7}, {x:5, y:7}, {x:7, y:7}, {x:9, y:7}],
-      '將': [{x: 5, y : 10}]
-    };
-  } else {
-    red = {
-      '仕': [{x: 4, y : 10}, {x: 6, y: 10}],
-      '相': [{x: 3, y : 10}, {x:7, y: 10}],
-      '傌': [{x: 2, y : 10}, {x:8, y: 10}],
-      '俥': [{x: 1, y : 10}, {x:9, y: 10}],
-      '砲': [{x: 2, y : 8}, {x:8, y: 8}],
-      '卒':[{x:1, y:7}, {x:3, y:7}, {x:5, y:7}, {x:7, y:7}, {x:9, y:7}],
-      '帥': [{x: 5, y : 10}]
-    };
-
-    green = {
-      '士': [{x: 4, y : 1}, {x: 6, y: 1}],
-      '象': [{x: 3, y : 1}, {x:7, y: 1}],
-      '馬': [{x: 2, y : 1}, {x:8, y: 1}],
-      '車': [{x: 1, y : 1}, {x:9, y: 1}],
-      '炮': [{x: 2, y : 3}, {x:8, y: 3}],
-      '兵':[{x:1, y:4}, {x:3, y:4}, {x:5, y:4}, {x:7, y:4}, {x:9, y:4}],
-      '將': [{x: 5, y : 1}]
-    };
-  }
-
-  drawBoard(); // Vẽ bàn cờ lại
-  displayPieces(); // Hiển thị quân cờ
+  const openingIdStart = document.getElementById('openingSelect').value;
+  loadOpening(openingIdStart);
   canvas.addEventListener('click', handleCanvasClick);
 }
 
@@ -291,13 +210,13 @@ function drawPiece(piece, x, y, color) {
     ctx.strokeStyle = color; // Màu viền
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.arc(pieceX, pieceY, 19, 0, Math.PI * 2); // Hình tròn cho quân cờ
+    ctx.arc(pieceX, pieceY, 16, 0, Math.PI * 2); // Hình tròn cho quân cờ
     ctx.stroke();
     ctx.fill();
 
     // Vẽ ký tự quân cờ
     ctx.fillStyle = color; // Màu ký tự
-    ctx.font = '23px Arial';
+    ctx.font = '22px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(piece, pieceX, pieceY);
@@ -307,6 +226,7 @@ function drawPiece(piece, x, y, color) {
 function drawBoard() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawGrid();
+    drawMoveArrow();
 }
 
 document.getElementById('newButton').addEventListener('click', function() {
@@ -334,8 +254,6 @@ function getClickXY(cX, cY) {
 // Hàm xử lý click trên canvas
 function handleCanvasClick(event) {
     if(result) return;
-
-    if(computerColor == turn) return;
 
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left; // Tọa độ x trên canvas
@@ -377,6 +295,13 @@ function handleCanvasClick(event) {
         // Tìm và xóa quân cờ khỏi vị trí ban đầu trong mảng quân cờ của người chơi
         var simulatedBoard = JSON.parse(JSON.stringify(board));
         moving(board, move);
+        lastMoveToDraw = {
+          fromX: move.fromX,
+          fromY: move.fromY,
+          toX: move.toX,
+          toY: move.toY,
+          color: 'blue'
+        };
 
         history.push({
           'color' : turn, 
@@ -402,15 +327,6 @@ function handleCanvasClick(event) {
         // Chuyển lượt chơi
         turn = turn === 'red' ? 'green' : 'red';
 
-        // var bestMove = getBestMove(board, turn);
-        // if (!bestMove.bestMove) {
-        //   result = turn === 'red' ? 'Cờ xanh thắng' : 'Cờ đỏ thắng';
-        //   ctx.font = "16px Arial";
-        //   ctx.fillStyle = "red";
-        //   ctx.textAlign = "center";
-        //   ctx.fillText(result, 165,209);
-        //   return;
-        // }
         document.getElementById('result').innerText = '';
         document.getElementById('comment').value = '';
 
@@ -422,7 +338,9 @@ function handleCanvasClick(event) {
         }
         
         // Máy tính thực hiện nước đi của mình
-        if (computerColor === turn) setTimeout(computerMove, 1000);
+        if (computerColor === turn) {
+          computerMove();
+        };
       }
     }
 }
@@ -441,12 +359,74 @@ function drawSelectedPiece() {
       } else {
         ctx.arc(offsetX + ((10 - piece.x) * cellSize) - (cellSize), offsetY + ((piece.y - 1) * cellSize), cellSize / 2 - 2, 0, Math.PI * 2);
       }
-      ctx.strokeStyle = 'blue'; // Màu viền của vòng tròn
+      ctx.strokeStyle = 'yellow'; // Màu viền của vòng tròn
       ctx.lineWidth = 2;
       ctx.stroke();
       ctx.closePath();
     }
-    
+}
+
+function drawCornerSquare(x, y) {
+  const size = cellSize;    // kích thước 1 ô
+  const pad = -1;            // khoảng cách viền ra ngoài (giảm lại)
+  const len = 8;            // độ dài đoạn vẽ ở góc (giảm lại)
+
+  const left = x - size / 2 - pad;
+  const top = y - size / 2 - pad;
+  const right = x + size / 2 + pad;
+  const bottom = y + size / 2 + pad;
+
+  ctx.strokeStyle = 'blue';  // luôn dùng màu xanh
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+  // Góc trên trái
+  ctx.moveTo(left, top + len);
+  ctx.lineTo(left, top);
+  ctx.lineTo(left + len, top);
+
+  // Góc trên phải
+  ctx.moveTo(right - len, top);
+  ctx.lineTo(right, top);
+  ctx.lineTo(right, top + len);
+
+  // Góc dưới trái
+  ctx.moveTo(left, bottom - len);
+  ctx.lineTo(left, bottom);
+  ctx.lineTo(left + len, bottom);
+
+  // Góc dưới phải
+  ctx.moveTo(right - len, bottom);
+  ctx.lineTo(right, bottom);
+  ctx.lineTo(right, bottom - len);
+
+  ctx.stroke();
+  ctx.closePath();
+}
+
+function drawMoveArrow() {
+  if (!lastMoveToDraw) return;
+
+  const { fromX, fromY, toX, toY } = lastMoveToDraw;
+  let fx, fy, tx, ty;
+
+  if (direct === 'forward') {
+    fx = offsetX + (fromX * cellSize) - cellSize;
+    fy = offsetY + ((10 - fromY) * cellSize);
+
+    tx = offsetX + (toX * cellSize) - cellSize;
+    ty = offsetY + ((10 - toY) * cellSize);
+  } else {
+    fx = offsetX + ((10 - fromX) * cellSize) - cellSize;
+    fy = offsetY + ((fromY - 1) * cellSize);
+
+    tx = offsetX + ((10 - toX) * cellSize) - cellSize;
+    ty = offsetY + ((toY - 1) * cellSize);
+  }
+
+  // Vẽ khung góc ở from và to
+  drawCornerSquare(fx, fy);
+  drawCornerSquare(tx, ty);
 }
 
 // Kiểm tra nếu nước đi có hợp lệ cho quân cờ đã chọn
@@ -671,6 +651,7 @@ function getPiece(board, x, y) {
 // Hàm vẽ ô vuông mờ
 function drawHoverSquare(x, y) {
     drawSelectedPiece();
+
     ctx.beginPath();
 
     if (direct == 'forward') {
@@ -808,7 +789,7 @@ function saveBook() {
 
     // Kiểm tra màu hợp lệ
     if (lastMove.color !== opening_color) {
-        alert("Không tìm thấy nước đi để lưu (màu không khớp với thế trận)!");
+        document.getElementById('result').innerHTML = 'Không tìm thấy nước đi để lưu (màu không khớp với thế trận)!';
         return;
     }
 
@@ -836,7 +817,7 @@ function saveBook() {
     };
 
     // Gửi API
-    fetch('/api/books', {
+    fetch('/admin/books', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -847,49 +828,12 @@ function saveBook() {
     })
     .then(res => res.json())
     .then(data => {
-        console.log("Book đã lưu:", data);
-        alert("Lưu thành công!");
+        document.getElementById('result').innerHTML = 'Lưu book thành công!';
     })
     .catch(err => {
         console.error(err);
         alert("Có lỗi khi lưu book!");
     });
-}
-
-function getBookMove() {
-  var board = {red:red, green:green};
-  var moveImageBook = getMoveForCurrentBoard(board, turn);
-  if (moveImageBook) {
-    var moveFromBook = getMoveFromFormat(moveImageBook);
-    if (moveFromBook) return moveFromBook;
-  }
-
-  // Nếu không tìm thấy nước đi từ hình cờ, chuyển sang duyệt cây kỳ phổ (openingBook)
-  let currentNode = JSON.parse(localStorage.getItem('openingBook')) || {};
-
-  for (let move of history) {
-    const formatMove1 = formatMove(move.piece, move.fromX, move.fromY, move.toX, move.toY);
-    if (currentNode[formatMove1]) {
-      currentNode = currentNode[formatMove1];
-    } else {
-      return null; // Không có kỳ phổ cho tổ hợp này
-    }
-  }
-
-  // Chọn nước đi tốt nhất từ currentNode trong kỳ phổ
-  let bestMove = null;
-  for (let move in currentNode) {
-    bestMove = move;
-    break; // Lấy nước đi đầu tiên tìm được
-  }
-
-  // Trả về nước đi từ kỳ phổ nếu tìm thấy
-  if (bestMove) {
-    const moveObject = getMoveFromFormat(bestMove);
-    if (moveObject) return moveObject;
-  }
-
-  return null; // Trả về null nếu không tìm thấy nước đi phù hợp
 }
   
 function getMoves(board, piece, color) {
@@ -995,21 +939,45 @@ document.getElementById('backButton').addEventListener('click', undoMove);
 
 // Hàm undoMove để quay lại trạng thái trước đó
 function undoMove() {
-  if (history.length > 0) {
-    // Lấy bước đi trước đó từ `history` và loại bỏ nó khỏi mảng
-    const lastMove = history.pop();
-
-    // Khôi phục trạng thái `board` về trạng thái trước nước đi
-    board = JSON.parse(lastMove.imageChess);
-
-    red = board.red;
-    green = board.green;
-
-    turn = lastMove.color;
-    result = '';
-    drawBoard();
-    displayPieces();
-  } else {
-    console.log("Không có nước đi nào để quay lại.");
+  if (history.length === 1) {
+    document.getElementById('result').innerHTML = 'Không có nươc nào để quay lại';
+    return;
   }
+
+  // Trường hợp nước cuối cùng là của máy -> lùi 2 nước
+  if (history[history.length - 1].color === computerColor) {
+    // Lùi nước của máy
+    history.pop();
+    // Lùi thêm 1 nước của người
+    if (history.length > 0) {
+      history.pop();
+    }
+  } else {
+    // Trường hợp nước cuối cùng là của người -> chỉ lùi 1 nước
+    history.pop();
+  }
+
+  // Nếu còn lịch sử thì lấy trạng thái trước đó
+  const lastMove = history[history.length - 1];
+  board = JSON.parse(lastMove.imageChess);
+  let move = {
+    piece: lastMove.piece,
+    fromX: lastMove.fromX,
+    fromY: lastMove.fromY, 
+    toX: lastMove.toX, 
+    toY : lastMove.toY, 
+    color: lastMove.color
+  }
+  moving(board, move);
+  red = board.red;
+  green = board.green;
+  turn = lastMove.color === 'red' ? 'green' : 'red';
+
+  let book = {comment: lastMove.comment}
+  let variations = lastMove.variations;
+  loadBookCommentAndVariations(variations, book);
+
+  result = '';
+  drawBoard();
+  displayPieces();
 }

@@ -1,5 +1,67 @@
 function computerMove() {
-  
+	const bookData = {
+		image_chess: encodeBoard(red, green),
+		color: computerColor
+	}
+
+	fetch(`/api/get-book-from-image`, {
+	        method: 'POST',
+	        headers: {
+	            'Content-Type': 'application/json',
+	            'Accept': 'application/json',
+	            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+	        },
+	        body: JSON.stringify(bookData)
+    	})
+        .then(res => res.json())
+        .then(data => {
+        	if (data.data) {
+        		const book = data.data.book;
+		        const variations = data.data.variations;
+
+	            // Giải mã hình cờ từ book
+	            const decoded = decodeBoard(book.image_chess);
+	            board = decoded;
+	            move = JSON.parse(book.move);
+	            move.color = book.color;
+	            var simulatedBoard = JSON.parse(JSON.stringify(board));
+		        moving(board, move);
+
+		        lastMoveToDraw = {
+				  fromX: move.fromX,
+				  fromY: move.fromY,
+				  toX: move.toX,
+				  toY: move.toY,
+				  color: 'blue'
+				};
+
+		        history.push({
+		          'color' : book.color, 
+		          'piece' : move.piece,
+		          'fromX' : move.fromX,
+		          'fromY' : move.fromY,
+		          'toX': move.toX ,
+		          'toY': move.toY ,
+		          'imageChess' : JSON.stringify(simulatedBoard),
+		          'comment': book.comment,
+		          'variations': variations
+		        });
+
+		        red = board.red;
+		        green = board.green;
+
+		        drawBoard();
+		        displayPieces();
+
+		        // Chuyển lượt chơi
+		        turn = book.color === 'red' ? 'green' : 'red';
+
+		        document.getElementById('comment').value = book.comment;
+		        loadBookCommentAndVariations(variations, book);
+        	} else {
+        		document.getElementById('result').innerHTML = "Chưa có trong book";
+        	}
+        });
 }
 
 document.getElementById('openingSelect').addEventListener('change', async function () {
@@ -12,87 +74,174 @@ function loadBookByVariationId(id) {
     fetch(`/api/get-book-from-variation/${id}`)
         .then(res => res.json())
         .then(data => {
+        	// Chuyển lượt chơi
+
             const book = data.data.book;
+	        const variations = data.data.variations;
 
-	            // Giải mã hình cờ từ book
-	            const decoded = decodeBoard(book.image_chess);
-	            board = decoded;
-	            move = JSON.parse(book.move);
-	            move.color = book.color;
-	            var simulatedBoard = JSON.parse(JSON.stringify(board));
-		        moving(board, move);
+	        turn = book.color === 'red' ? 'green' : 'red';
 
-		        history.push({
-		          'color' : book.color, 
-		          'piece' : move.piece,
-		          'fromX' : move.fromX,
-		          'fromY' : move.fromY,
-		          'toX': move.toX ,
-		          'toY': move.toY ,
-		          'imageChess' : JSON.stringify(simulatedBoard)
-		        });
+            // Giải mã hình cờ từ book
+            const decoded = decodeBoard(book.image_chess);
+            board = decoded;
+            move = JSON.parse(book.move);
+            move.color = book.color;
 
-		        red = board.red;
-		        green = board.green;
+            history.push({
+				'color' : turn, 
+				'imageChess' : JSON.stringify(board),
+	        });
 
-		        drawBoard();
-		        displayPieces();
+            var simulatedBoard = JSON.parse(JSON.stringify(board));
+	        moving(board, move);
+		    lastMoveToDraw = {
+			  fromX: move.fromX,
+			  fromY: move.fromY,
+			  toX: move.toX,
+			  toY: move.toY,
+			  color: 'blue'
+			};
 
-		        // Chuyển lượt chơi
-		        turn = book.color === 'red' ? 'green' : 'red';
 
-		        document.getElementById('comment').value = book.comment;
-		        const variations = data.data.variations;
-		        loadBookCommentAndVariations(variations, book);
+	        history.push({
+				'color' : book.color, 
+				'piece' : move.piece,
+				'fromX' : move.fromX,
+				'fromY' : move.fromY,
+				'toX': move.toX ,
+				'toY': move.toY ,
+				'imageChess' : JSON.stringify(simulatedBoard),
+				'comment': book.comment,
+				'variations': variations
+	        });
+
+	        red = board.red;
+	        green = board.green;
+
+	        drawBoard();
+	        displayPieces();
+
+	        document.getElementById('comment').value = book.comment;
+	        loadBookCommentAndVariations(variations, book);
         });
 }
 
 function loadOpening(openingId) {
+	const select = document.getElementById('openingSelect');
+    const selectedOption = select.options[select.selectedIndex];
+
+    const opening_color = selectedOption.dataset.color;
+	computerColor = opening_color;
+
+    if ((opening_color === 'green' && direct === 'forward') || ((opening_color === 'red' && direct !== 'forward'))) {
+    	rotate();
+    }
+
+    let step = 1;
+    if (opening_color === 'green') step = 2;
     try {
-        fetch(`/api/books/opening/${openingId}`)
+        fetch(`/api/books/opening/${openingId}/${step}`)
 	        .then(res => res.json())
 	    	.then(data => {
-		        const book = data.data.book;
+	    		if (data.data) {
+	    			const book = data.data.book;
 
-	            // Giải mã hình cờ từ book
-	            const decoded = decodeBoard(book.image_chess);
-	            board = decoded;
-	            move = JSON.parse(book.move);
-	            move.color = book.color;
-	            var simulatedBoard = JSON.parse(JSON.stringify(board));
-		        moving(board, move);
+		            // Giải mã hình cờ từ book
+		            const decoded = decodeBoard(book.image_chess);
+		            board = decoded;
+		            move = JSON.parse(book.move);
+		            move.color = book.color;
+		            var simulatedBoard = JSON.parse(JSON.stringify(board));
+			        moving(board, move);
+		        	lastMoveToDraw = {
+					  fromX: move.fromX,
+					  fromY: move.fromY,
+					  toX: move.toX,
+					  toY: move.toY,
+					  color: 'blue'
+					};
 
-		        history.push({
-		          'color' : book.color, 
-		          'piece' : move.piece,
-		          'fromX' : move.fromX,
-		          'fromY' : move.fromY,
-		          'toX': move.toX ,
-		          'toY': move.toY ,
-		          'imageChess' : JSON.stringify(simulatedBoard)
-		        });
+			        red = board.red;
+			        green = board.green;
 
-		        red = board.red;
-		        green = board.green;
+			        drawBoard();
+			        displayPieces();
 
-		        drawBoard();
-		        displayPieces();
+			        // Chuyển lượt chơi
+			        turn = book.color === 'red' ? 'green' : 'red';
 
-		        // Chuyển lượt chơi
-		        turn = book.color === 'red' ? 'green' : 'red';
+			        document.getElementById('comment').value = book.comment;
+			        const variations = data.data.variations;
+			        loadBookCommentAndVariations(variations, book);
+			        history.push({
+						'color' : book.color, 
+						'piece' : move.piece,
+						'fromX' : move.fromX,
+						'fromY' : move.fromY,
+						'toX': move.toX ,
+						'toY': move.toY ,
+						'imageChess' : JSON.stringify(simulatedBoard),
+						'comment': book.comment,
+						'variations': variations
+			        });
+	    		} else {
+    				playerColor = 'red';
+					turn = 'red';
+					history = [];
 
-		        document.getElementById('comment').value = book.comment;
-		        const variations = data.data.variations;
-		        loadBookCommentAndVariations(variations, book);
+					if (playerColor == 'red') {
+					red = {
+					  '仕': [{x: 4, y : 1}, {x: 6, y: 1}],
+					  '相': [{x: 3, y : 1}, {x:7, y: 1}],
+					  '傌': [{x: 2, y : 1}, {x:8, y: 1}],
+					  '俥': [{x: 1, y : 1}, {x:9, y: 1}],
+					  '炮': [{x: 2, y : 3}, {x:8, y: 3}],
+					  '卒':[{x:1, y:4}, {x:3, y:4}, {x:5, y:4}, {x:7, y:4}, {x:9, y:4}],
+					  '帥': [{x: 5, y : 1}]
+					};
+
+					green = {
+					  '士': [{x: 4, y : 10}, {x: 6, y: 10}],
+					  '象': [{x: 3, y : 10}, {x:7, y: 10}],
+					  '馬': [{x: 2, y : 10}, {x:8, y: 10}],
+					  '車': [{x: 1, y : 10}, {x:9, y: 10}],
+					  '砲': [{x: 2, y : 8}, {x:8, y: 8}],
+					  '兵':[{x:1, y:7}, {x:3, y:7}, {x:5, y:7}, {x:7, y:7}, {x:9, y:7}],
+					  '將': [{x: 5, y : 10}]
+					};
+					} else {
+					red = {
+					  '仕': [{x: 4, y : 10}, {x: 6, y: 10}],
+					  '相': [{x: 3, y : 10}, {x:7, y: 10}],
+					  '傌': [{x: 2, y : 10}, {x:8, y: 10}],
+					  '俥': [{x: 1, y : 10}, {x:9, y: 10}],
+					  '砲': [{x: 2, y : 8}, {x:8, y: 8}],
+					  '卒':[{x:1, y:7}, {x:3, y:7}, {x:5, y:7}, {x:7, y:7}, {x:9, y:7}],
+					  '帥': [{x: 5, y : 10}]
+					};
+
+					green = {
+					  '士': [{x: 4, y : 1}, {x: 6, y: 1}],
+					  '象': [{x: 3, y : 1}, {x:7, y: 1}],
+					  '馬': [{x: 2, y : 1}, {x:8, y: 1}],
+					  '車': [{x: 1, y : 1}, {x:9, y: 1}],
+					  '炮': [{x: 2, y : 3}, {x:8, y: 3}],
+					  '兵':[{x:1, y:4}, {x:3, y:4}, {x:5, y:4}, {x:7, y:4}, {x:9, y:4}],
+					  '將': [{x: 5, y : 1}]
+					};
+					}
+
+					drawBoard(); // Vẽ bàn cờ lại
+					displayPieces(); // Hiển thị quân cờ
+					document.getElementById('result').innerHTML = 'Chưa có trong book!';
+					document.getElementById('comment').value = '';
+	    		}
+		        
 	    	});
     } catch (err) {
-        console.error(err);
         alert("Có lỗi khi tải thế trận!");
     }
 }
-
-const openingIdStart = document.getElementById('openingSelect').value;
-loadOpening(openingIdStart);
 
 const pieceMap = {
   'R': '俥', 'N': '傌', 'B': '相', 'A': '仕', 'K': '帥', 'C': '炮', 'P': '卒',
@@ -129,19 +278,31 @@ function decodeBoard(encoded) {
 }
 
 function loadBookCommentAndVariations(variations, book) {
-    let resultHTML = book.comment ? `<p><strong>Lời bình:</strong> ${book.comment}</p>` : "";
+    let resultHTML = "";
 
-	if (variations && variations.length > 0) {
-	    resultHTML += `<p><strong>Các biến thể của đối phương thường gặp:</strong></p>`;
-	    variations.forEach((v, index) => {
-	    	let move = JSON.parse(v.move);
-	        // Tạo button, khi click sẽ gọi hàm loadBookById với id của book biến thể
-	        resultHTML += `<button class="variation-btn" onclick="loadBookByVariationId(${v.id})">
-	            ${index + 1}. ${move.piece} (${move.fromX},${move.fromY}) -> (${move.toX},${move.toY})
-	        </button><br>`;
-	    });
+    // Nếu có lời bình
+    if (book.comment && book.comment.trim() !== "") {
+        resultHTML += `<p><strong>Lời bình:</strong> ${book.comment}</p>`;
+    }
 
-	}
+    // Nếu có biến thể
+    if (variations && variations.length > 0) {
+        resultHTML += `<p><strong>Các biến thể thường gặp của đối phương:</strong></p>`;
+        resultHTML += `<div id="variations-container">`;
+
+        variations.forEach((v, index) => {
+            let move = JSON.parse(v.move);
+            resultHTML += `
+                <button class="variation-btn" 
+                        onclick="loadBookByVariationId(${v.id})" >
+                    ${index + 1}. ${move.piece} (${move.fromX},${move.fromY}) → (${move.toX},${move.toY})
+                </button>
+            `;
+        });
+
+        resultHTML += `</div>`;
+    }
+
+    // Render ra giao diện
     document.getElementById('result').innerHTML = resultHTML;
-
 }

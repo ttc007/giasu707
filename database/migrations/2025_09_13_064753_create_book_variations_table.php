@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('book_variations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('book_id')->constrained('books')->onDelete('cascade');
+            $table->unsignedBigInteger('book_id');
             $table->string('move');
             $table->timestamps();
         });

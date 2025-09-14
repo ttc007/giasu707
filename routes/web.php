@@ -59,6 +59,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('comments', [AdminStudentController::class, 'comment'])->name('admin.students.comments');
 
     Route::get('books', [BookController::class, 'index'])->name('admin.books.index');
+
+    Route::post('/books', [BookController::class, 'store']);
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -94,9 +96,9 @@ Route::prefix('api')->group(function () {
     // Unlike 
     Route::delete('/{model}/{model_id}/unlike', [RegistrationController::class, 'unlike']);
 
-    Route::post('/books', [BookController::class, 'store']);
-    Route::get('/books/opening/{opening_id}', [BookController::class, 'getOpeningFirstStep']);
+    Route::get('/books/opening/{opening_id}/{step}', [BookController::class, 'getOpeningFirstStep']);
     Route::get('/get-book-from-variation/{id}', [BookController::class, 'getBookFromVariation']);
+    Route::post('/get-book-from-image', [BookController::class, 'getBookFromImage']);
 });
 
 Route::post('/upload', [UploadController::class, 'uploadImage'])->name('ckeditor.upload');

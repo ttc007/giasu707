@@ -51,10 +51,14 @@ class BookController extends Controller
                           ->first();
 
             if ($parent) {
-                $book_var = $parent->variations()->create([
-                    'book_id' => $parent->id,
-                    'move'    => $validated['pre_move'],
-                ]);
+                $book_var = BookVariation::where('book_id', $parent->id)->first();
+
+                if (!$book_var) {
+                    $book_var = $parent->variations()->create([
+                        'book_id' => $parent->id,
+                        'move'    => $validated['pre_move'],
+                    ]);
+                } 
             }
         }
 
@@ -71,18 +75,18 @@ class BookController extends Controller
         ], 201);
     }
 
-    public function getOpeningFirstStep($opening_id)
+    public function getOpeningFirstStep($opening_id, $step)
     {
         // Tìm bản ghi đầu tiên theo opening_id và step = 1
         $book = Book::where('opening_id', $opening_id)
-                    ->where('step', 1)
+                    ->where('step', $step)
                     ->first();
 
         if (!$book) {
             return response()->json([
-                'success' => false,
+                'success' => true,
                 'message' => 'Không tìm thấy thế trận khởi đầu'
-            ], 404);
+            ]);
         }
 
         // Lấy các biến thể của book
@@ -105,6 +109,29 @@ class BookController extends Controller
                 'success' => false,
                 'message' => 'Không tìm thấy thế trận khởi đầu'
             ], 404);
+        }
+
+        // Lấy các biến thể của book
+        $variations = $book->variations;
+
+        return response()->json([
+            'success' => true,
+            'data'    => [
+                'book' => $book,
+                'variations' => $variations 
+            ],
+        ]);
+    }
+
+    public function getBookFromImage(Request $request) {
+        $book = Book::where('image_chess', $request->image_chess)
+                    ->where('color', $request->color)->first();
+        
+        if (!$book) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy thế trận khởi đầu'
+            ], 200);
         }
 
         // Lấy các biến thể của book
