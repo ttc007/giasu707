@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\BookVariation;
+use Illuminate\Support\Facades\Cache;
 
 class BookController extends Controller
 {
@@ -81,10 +82,14 @@ class BookController extends Controller
     public function getOpeningFirstStep($opening_id, $step)
     {
         // Tìm bản ghi đầu tiên theo opening_id và step = 1
-        $book = Book::where('opening_id', $opening_id)
-                    ->where('step', $step)
-                    ->where('is_hidden', 0)
-                    ->first();
+        $book = Cache::remember("book_{$opening_id}_{$step}", now()->addMinutes(60), function () use ($opening_id, $step) {
+            \Log::info("Query DB opening_id={$opening_id}, step={$step}");
+
+            return Book::where('opening_id', $opening_id)
+                        ->where('step', $step)
+                        ->where('is_hidden', 0)
+                        ->first();
+        });
 
         if (!$book) {
             return response()->json([
@@ -109,7 +114,11 @@ class BookController extends Controller
     }
 
     public function getBookFromVariation($id) {
-        $book = Book::where('book_variation_id', $id)->where('is_hidden', 0)->first();
+        $book = Cache::remember("book_by_variation_{$id}", now()->addMinutes(60), function () use ($id) {
+            return Book::where('book_variation_id', $id)
+                       ->where('is_hidden', 0)
+                       ->first();
+        });
         
         if (!$book) {
             return response()->json([
@@ -135,9 +144,16 @@ class BookController extends Controller
     }
 
     public function getBookFromImage(Request $request) {
-        $book = Book::where('image_chess', $request->image_chess)
-                    ->where('color', $request->color)
-                    ->where('is_hidden', 0)->first();
+        $book = Cache::remember(
+            "book_by_image_{$request->color}_" . md5($request->image_chess), 
+            now()->addMinutes(60), 
+            function () use ($request) {
+                return Book::where('image_chess', $request->image_chess)
+                           ->where('color', $request->color)
+                           ->where('is_hidden', 0)
+                           ->first();
+            }
+        );
         
         if (!$book) {
             return response()->json([
