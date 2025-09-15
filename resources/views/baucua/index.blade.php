@@ -26,7 +26,7 @@
     padding: 5px;
   }
 
-  /* mây bay */
+  /* lớp mây nhanh */
   .board-wrapper::after {
     content: "";
     position: absolute;
@@ -34,15 +34,27 @@
     background: url("{{ asset('images/textture_may.png') }}") repeat;
     background-size: 400px 400px;
     animation: clouds 20s linear infinite;
-    opacity: 0.5;
+    opacity: 0.6;
+    mix-blend-mode: screen;
     z-index: 1;
   }
 
-  canvas {
-    border: 3px solid #aaa;
-    position: relative;
-    z-index: 2; /* để nổi trên mây */
-    border-radius: 3px;
+  /* lớp mây chậm */
+  .board-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    background: url("{{ asset('images/textture_may.png') }}") repeat;
+    background-size: 600px 600px;
+    animation: clouds-slow 60s linear infinite;
+    opacity: 0.3;
+    mix-blend-mode: screen;
+    z-index: 1;
+  }
+
+  @keyframes clouds-slow {
+    from { background-position: 0 0; }
+    to   { background-position: 1200px 600px; }
   }
 
   @keyframes clouds {
@@ -50,7 +62,12 @@
     to   { background-position: 800px 400px; }
   }
 
-
+  canvas {
+      border: 3px solid #aaa;
+      position: relative;
+      z-index: 2; /* để nổi trên mây */
+      border-radius: 3px;
+    }
 
   /* Nhóm nút chung */
   .button-group {
@@ -171,7 +188,8 @@
     </div>
 </div>
 
-<script src="{{ asset('js/book.js') }}"></script>
-<script src="{{ asset('js/computerAI.js') }}"></script>
-<script src="{{ asset('js/script.js') }}"></script>
+<script src="{{ asset('js/book.js') }}?t={{ time() }}"></script>
+<script src="{{ asset('js/computerAI.js') }}?t={{ time() }}"></script>
+<script src="{{ asset('js/script.js') }}?t={{ time() }}"></script>
+
 @endsection
