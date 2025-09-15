@@ -305,3 +305,26 @@ function loadBookCommentAndVariations(variations, book) {
     // Render ra giao diện
     document.getElementById('result').innerHTML = resultHTML;
 }
+
+function hiddenBook() {
+	let lastMove = history[history.length - 1];
+	let image_chess = JSON.parse(lastMove.imageChess);
+	const bookData = {
+		image_chess: encodeBoard(image_chess.red, image_chess.green),
+		color: computerColor
+	}
+
+	fetch(`/admin/books/hidden`, {
+	        method: 'POST',
+	        headers: {
+	            'Content-Type': 'application/json',
+	            'Accept': 'application/json',
+	            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+	        },
+	        body: JSON.stringify(bookData)
+    	})
+        .then(res => res.json())
+        .then(data => {
+        	document.getElementById('result').innerHTML = "Xóa book thành công!";
+        });
+}

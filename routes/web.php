@@ -61,6 +61,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('books', [BookController::class, 'index'])->name('admin.books.index');
 
     Route::post('/books', [BookController::class, 'store']);
+    Route::post('/books/hidden', [BookController::class, 'hidden']);
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');

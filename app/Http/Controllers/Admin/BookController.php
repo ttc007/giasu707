@@ -37,6 +37,7 @@ class BookController extends Controller
             $book->update([
                 'move'    => $validated['move'],
                 'comment' => $validated['comment'] ?? $book->comment,
+                'is_hidden' => 0
             ]);
         } else {
             // Nếu chưa có thì create
@@ -80,6 +81,7 @@ class BookController extends Controller
         // Tìm bản ghi đầu tiên theo opening_id và step = 1
         $book = Book::where('opening_id', $opening_id)
                     ->where('step', $step)
+                    ->where('is_hidden', 0)
                     ->first();
 
         if (!$book) {
@@ -89,8 +91,11 @@ class BookController extends Controller
             ]);
         }
 
-        // Lấy các biến thể của book
-        $variations = $book->variations;
+        $variations = BookVariation::join('books', 'books.book_variation_id', '=', 'book_variations.id')
+                        ->where('book_variations.book_id', $book->id)
+                        ->where('books.is_hidden', 0)
+                        ->select('book_variations.*', 'books.is_hidden')
+                        ->get();
 
         return response()->json([
             'success' => true,
@@ -102,7 +107,7 @@ class BookController extends Controller
     }
 
     public function getBookFromVariation($id) {
-        $book = Book::where('book_variation_id', $id)->first();
+        $book = Book::where('book_variation_id', $id)->where('is_hidden', 0)->first();
         
         if (!$book) {
             return response()->json([
@@ -112,7 +117,11 @@ class BookController extends Controller
         }
 
         // Lấy các biến thể của book
-        $variations = $book->variations;
+        $variations = BookVariation::join('books', 'books.book_variation_id', '=', 'book_variations.id')
+                        ->where('book_variations.book_id', $book->id)
+                        ->where('books.is_hidden', 0)
+                        ->select('book_variations.*', 'books.is_hidden')
+                        ->get();
 
         return response()->json([
             'success' => true,
@@ -125,7 +134,8 @@ class BookController extends Controller
 
     public function getBookFromImage(Request $request) {
         $book = Book::where('image_chess', $request->image_chess)
-                    ->where('color', $request->color)->first();
+                    ->where('color', $request->color)
+                    ->where('is_hidden', 0)->first();
         
         if (!$book) {
             return response()->json([
@@ -135,7 +145,11 @@ class BookController extends Controller
         }
 
         // Lấy các biến thể của book
-        $variations = $book->variations;
+        $variations = BookVariation::join('books', 'books.book_variation_id', '=', 'book_variations.id')
+                        ->where('book_variations.book_id', $book->id)
+                        ->where('books.is_hidden', 0)
+                        ->select('book_variations.*', 'books.is_hidden')
+                        ->get();
 
         return response()->json([
             'success' => true,
@@ -143,6 +157,18 @@ class BookController extends Controller
                 'book' => $book,
                 'variations' => $variations 
             ],
+        ]);
+    }
+
+    public function hidden(Request $request) {
+        $book = Book::where('image_chess', $request->image_chess)
+                    ->where('color', $request->color)->first();
+
+        $book->update(['is_hidden' => 1]);
+        
+        return response()->json([
+            'success' => true,
+            'book' => $book
         ]);
     }
 }
