@@ -52,7 +52,9 @@ class BookController extends Controller
                           ->first();
 
             if ($parent) {
-                $book_var = BookVariation::where('book_id', $parent->id)->first();
+                $book_var = BookVariation::where('book_id', $parent->id)
+                    ->where('move', $validated['pre_move'])
+                    ->first();
 
                 if (!$book_var) {
                     $book_var = $parent->variations()->create([

@@ -69,8 +69,12 @@ document.getElementById('openingSelect').addEventListener('change', async functi
 });
 
 // Hàm loadBookById để gọi API lấy hình cờ của biến thể
-function loadBookByVariationId(id) {
-    fetch(`/api/get-book-from-variation/${id}`)
+function loadBookByVariationId(btn) {
+	const variationId = btn.dataset.id;
+    const premove = JSON.parse(btn.dataset.move);
+    const color = btn.dataset.color;
+
+    fetch(`/api/get-book-from-variation/${variationId}`)
         .then(res => res.json())
         .then(data => {
         	// Chuyển lượt chơi
@@ -87,7 +91,12 @@ function loadBookByVariationId(id) {
             move.color = book.color;
 
             history.push({
-				'color' : turn, 
+				'color' : turn,
+				'piece' : premove.piece,
+				'fromX' : premove.fromX,
+				'fromY' : premove.fromY,
+				'toX': premove.toX ,
+				'toY': premove.toY ,
 				'imageChess' : JSON.stringify(board),
 	        });
 
@@ -292,8 +301,11 @@ function loadBookCommentAndVariations(variations, book) {
         variations.forEach((v, index) => {
             let move = JSON.parse(v.move);
             resultHTML += `
-                <button class="variation-btn" 
-                        onclick="loadBookByVariationId(${v.id})" >
+                <button class="variation-btn"
+                        data-id="${v.id}"
+                        data-move='${JSON.stringify(move)}'
+                        data-color="${v.color}"
+                        onclick="loadBookByVariationId(this)">
                     ${index + 1}. ${move.piece} (${move.fromX},${move.fromY}) → (${move.toX},${move.toY})
                 </button>
             `;
