@@ -154,6 +154,11 @@ class BookController extends Controller
                            ->first();
             }
         );
+
+        $book = Book::where('image_chess', $request->image_chess)
+                   ->where('color', $request->color)
+                   ->where('is_hidden', 0)
+                   ->first();
         
         if (!$book) {
             return response()->json([
