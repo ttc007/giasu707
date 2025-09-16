@@ -772,6 +772,7 @@ function saveBook() {
     // Xác định parent_image_chess
     let parent_image_chess = null;
     let preMove = null;
+    let parent_move = null;
     if (history.length >= 3) {
         const parentMove = history[history.length - 3];
         const parentImageObj = JSON.parse(parentMove.imageChess);
@@ -786,6 +787,14 @@ function saveBook() {
           piece: preMove.piece,
           color: preMove.color
         });
+
+        parent_move = JSON.stringify({
+          fromX: parentMove.fromX,
+          fromY: parentMove.fromY,
+          toX: parentMove.toX,
+          toY: parentMove.toY,
+          piece: parentMove.piece
+        })
     }
 
     // Kiểm tra màu hợp lệ
@@ -806,6 +815,8 @@ function saveBook() {
         piece: lastMove.piece
     });
 
+
+
     const bookData = {
         image_chess: image_chess,
         color: lastMove.color,
@@ -815,6 +826,7 @@ function saveBook() {
         step: history.length,
         pre_move: preMove,
         parent_image_chess: parent_image_chess,
+        parent_move: parent_move
     };
 
     // Gửi API

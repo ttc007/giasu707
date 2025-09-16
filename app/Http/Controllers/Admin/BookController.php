@@ -31,18 +31,29 @@ class BookController extends Controller
         // Tìm book đã tồn tại
         $book = Book::where('image_chess', $validated['image_chess'])
                     ->where('color', $validated['color'])
+                    ->where('move', $validated['move'])
+                    ->where('is_hidden', 0)
                     ->first();
 
         if ($book) {
             // Nếu có thì update
             $book->update([
-                'move'    => $validated['move'],
                 'comment' => $validated['comment'] ?? $book->comment,
-                'is_hidden' => 0
             ]);
         } else {
-            // Nếu chưa có thì create
-            $book = Book::create($validated);
+            $book = Book::where('image_chess', $validated['image_chess'])
+                    ->where('color', $validated['color'])
+                    ->where('move', $validated['move'])
+                    ->where('is_hidden', 1)
+                    ->first();
+            if ($book) {
+                $book->update([
+                    'comment' => $validated['comment'] ?? $book->comment,
+                    'is_hidden' => 0
+                ]);
+            } else {
+                $book = Book::create($validated);
+            }
         }
 
         // Nếu có parent thì lưu biến thể
@@ -50,6 +61,8 @@ class BookController extends Controller
         if (!empty($validated['parent_image_chess']) && !empty($validated['pre_move'])) {
             $parent = Book::where('image_chess', $validated['parent_image_chess'])
                           ->where('color', $validated['color'])
+                          ->where('move', $validated['parent_move'])
+                          ->where('is_hidden', 0)
                           ->first();
 
             if ($parent) {
@@ -83,7 +96,6 @@ class BookController extends Controller
     {
         // Tìm bản ghi đầu tiên theo opening_id và step = 1
         $book = Cache::remember("book_{$opening_id}_{$step}", now()->addMinutes(60), function () use ($opening_id, $step) {
-            \Log::info("Query DB opening_id={$opening_id}, step={$step}");
 
             return Book::where('opening_id', $opening_id)
                         ->where('step', $step)
@@ -144,16 +156,16 @@ class BookController extends Controller
     }
 
     public function getBookFromImage(Request $request) {
-        $book = Cache::remember(
-            "book_by_image_{$request->color}_" . md5($request->image_chess), 
-            now()->addMinutes(60), 
-            function () use ($request) {
-                return Book::where('image_chess', $request->image_chess)
-                           ->where('color', $request->color)
-                           ->where('is_hidden', 0)
-                           ->first();
-            }
-        );
+        // $book = Cache::remember(
+        //     "book_by_image_{$request->color}_" . md5($request->image_chess), 
+        //     now()->addMinutes(60), 
+        //     function () use ($request) {
+        //         return Book::where('image_chess', $request->image_chess)
+        //                    ->where('color', $request->color)
+        //                    ->where('is_hidden', 0)
+        //                    ->first();
+        //     }
+        // );
 
         $book = Book::where('image_chess', $request->image_chess)
                    ->where('color', $request->color)
