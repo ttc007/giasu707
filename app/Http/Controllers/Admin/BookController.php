@@ -26,6 +26,7 @@ class BookController extends Controller
             'step'              => 'nullable|integer',
             'parent_image_chess'=> 'nullable|string',
             'pre_move'          => 'nullable|string',
+            'parent_move'        => 'nullable|string', 
         ]);
 
         // Tìm book đã tồn tại
