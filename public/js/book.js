@@ -321,9 +321,17 @@ function loadBookCommentAndVariations(variations, book) {
 function hiddenBook() {
 	let lastMove = history[history.length - 1];
 	let image_chess = JSON.parse(lastMove.imageChess);
+	const move = JSON.stringify({
+        fromX: lastMove.fromX,
+        fromY: lastMove.fromY,
+        toX: lastMove.toX,
+        toY: lastMove.toY,
+        piece: lastMove.piece
+    });
 	const bookData = {
 		image_chess: encodeBoard(image_chess.red, image_chess.green),
-		color: computerColor
+		color: computerColor,
+		move: move
 	}
 
 	fetch(`/admin/books/hidden`, {

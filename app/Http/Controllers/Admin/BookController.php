@@ -197,7 +197,9 @@ class BookController extends Controller
 
     public function hidden(Request $request) {
         $book = Book::where('image_chess', $request->image_chess)
-                    ->where('color', $request->color)->first();
+                    ->where('move', $request->move)
+                    ->where('color', $request->color)
+                    ->first();
 
         $book->update(['is_hidden' => 1]);
         
