@@ -13,7 +13,6 @@ class Book extends Model
         'comment',
         'opening_id',
         'step',
-        'book_variation_id',
         'is_hidden'
     ];
 

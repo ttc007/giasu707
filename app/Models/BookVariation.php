@@ -8,7 +8,8 @@ class BookVariation extends Model
 {
     protected $fillable = [
         'book_id',
-        'move'
+        'move',
+        'book_des_id',
     ];
 
     public function book()

@@ -67,24 +67,19 @@ class BookController extends Controller
                           ->first();
 
             if ($parent) {
-                $book_var = BookVariation::where('book_id', $parent->id)
+                 $book_var = BookVariation::where('book_id', $parent->id)
                     ->where('move', $validated['pre_move'])
+                    ->where('book_des_id', $book->id)
                     ->first();
 
                 if (!$book_var) {
                     $book_var = $parent->variations()->create([
                         'book_id' => $parent->id,
                         'move'    => $validated['pre_move'],
+                        'book_des_id' => $book->id,
                     ]);
                 } 
             }
-        }
-
-        // Chỉ update nếu book_var tồn tại
-        if ($book_var) {
-            $book->update([
-                'book_variation_id' => $book_var->id
-            ]);
         }
 
         return response()->json([
@@ -95,9 +90,8 @@ class BookController extends Controller
 
     public function getOpeningFirstStep($opening_id, $step)
     {
-        // Tìm bản ghi đầu tiên theo opening_id và step = 1
+        // Cache book
         $book = Cache::remember("book_{$opening_id}_{$step}", now()->addMinutes(60), function () use ($opening_id, $step) {
-
             return Book::where('opening_id', $opening_id)
                         ->where('step', $step)
                         ->where('is_hidden', 0)
@@ -111,7 +105,8 @@ class BookController extends Controller
             ]);
         }
 
-        $variations = BookVariation::join('books', 'books.book_variation_id', '=', 'book_variations.id')
+        // Lấy variations: book -> variations -> book_des
+        $variations = BookVariation::join('books', 'books.id', '=', 'book_variations.book_des_id')
                         ->where('book_variations.book_id', $book->id)
                         ->where('books.is_hidden', 0)
                         ->select('book_variations.*', 'books.is_hidden')
@@ -120,28 +115,32 @@ class BookController extends Controller
         return response()->json([
             'success' => true,
             'data'    => [
-                'book' => $book,
+                'book'       => $book,
                 'variations' => $variations 
             ],
         ]);
     }
 
-    public function getBookFromVariation($id) {
+    public function getBookFromVariation($id) 
+    {
+        // Tìm book dựa trên book_des_id
         $book = Cache::remember("book_by_variation_{$id}", now()->addMinutes(60), function () use ($id) {
-            return Book::where('book_variation_id', $id)
-                       ->where('is_hidden', 0)
+            return Book::join('book_variations', 'books.id', '=', 'book_variations.book_des_id')
+                       ->where('book_variations.id', $id)
+                       ->where('books.is_hidden', 0)
+                       ->select('books.*')
                        ->first();
         });
         
         if (!$book) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy thế trận khởi đầu'
+                'message' => 'Không tìm thấy thế trận'
             ], 404);
         }
 
-        // Lấy các biến thể của book
-        $variations = BookVariation::join('books', 'books.book_variation_id', '=', 'book_variations.id')
+        // Lấy các biến thể tiếp theo của book
+        $variations = BookVariation::join('books', 'books.id', '=', 'book_variations.book_des_id')
                         ->where('book_variations.book_id', $book->id)
                         ->where('books.is_hidden', 0)
                         ->select('book_variations.*', 'books.is_hidden')
@@ -150,11 +149,12 @@ class BookController extends Controller
         return response()->json([
             'success' => true,
             'data'    => [
-                'book' => $book,
+                'book'       => $book,
                 'variations' => $variations 
             ],
         ]);
     }
+
 
     public function getBookFromImage(Request $request) {
         // $book = Cache::remember(
@@ -181,7 +181,7 @@ class BookController extends Controller
         }
 
         // Lấy các biến thể của book
-        $variations = BookVariation::join('books', 'books.book_variation_id', '=', 'book_variations.id')
+        $variations = BookVariation::join('books', 'books.id', '=', 'book_variations.book_des_id')
                         ->where('book_variations.book_id', $book->id)
                         ->where('books.is_hidden', 0)
                         ->select('book_variations.*', 'books.is_hidden')
