@@ -24,6 +24,23 @@ return [
             'id' => 5,
             'name' => 'Pháo đầu phá sĩ giác pháo'
         ],
+        [
+            'id' => 6,
+            'name' => 'Pháo đầu phá phi tượng cuộc'
+        ],
+        [
+            'id' => 7,
+            'name' => 'Tiên nhân chỉ lộ phá khởi mã cuộc'
+        ],
+        [
+            'id' => 8,
+            'name' => 'Pháo đầu phá pháo tuần hà'
+        ],
+        [
+            'id' => 9,
+            'name' => 'Pháo đầu phá pháo hàng tốt'
+        ],
+        
     ]
 
 ];
