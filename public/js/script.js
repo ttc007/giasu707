@@ -271,7 +271,7 @@ function handleCanvasClick(event) {
       playerPieces = turn == 'red' ? red : green; 
       for (const piece in playerPieces) {
         playerPieces[piece].forEach(position => {
-          if(col > position.x - 0.5 && col < position.x + 0.5 && row > position.y - 0.5 && row < position.y + 0.5) {
+          if(col > position.x - 0.45 && col < position.x + 0.45 && row > position.y - 0.45 && row < position.y + 0.45) {
             selectedPiece = {piece: piece, x: position.x, y: position.y , color: turn};
             drawSelectedPiece();
             isClickPiece = true;
@@ -332,10 +332,10 @@ function handleCanvasClick(event) {
         document.getElementById('comment').value = '';
 
         if (isAttackKing(board, turn)) {
-          ctx.font = "16px Arial";
+          ctx.font = "18px Arial";
           ctx.fillStyle = "red";
           ctx.textAlign = "center";
-          ctx.fillText("Chiếu", 165,209);
+          ctx.fillText("Chiếu", 180,209);
         }
         
         // Máy tính thực hiện nước đi của mình

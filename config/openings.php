@@ -40,7 +40,10 @@ return [
             'id' => 9,
             'name' => 'Pháo đầu phá pháo hàng tốt'
         ],
-        
+        [
+            'id' => 10,
+            'name' => 'Nổ mã đối phế mã cuộc'
+        ],
     ]
 
 ];
