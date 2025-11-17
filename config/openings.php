@@ -21,6 +21,10 @@ return [
             'name' => 'Pháo đầu phá quá cung pháo'
         ],
         [
+            'id' => 11,
+            'name' => 'Pháo đầu phá kim câu pháo'
+        ],
+        [
             'id' => 5,
             'name' => 'Pháo đầu phá sĩ giác pháo'
         ],
