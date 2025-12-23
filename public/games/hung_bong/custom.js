@@ -2,7 +2,8 @@
 
 window.addEventListener('load', () => {
     const checkVM = setInterval(() => {
-        if (window.vm && window.vm.runtime) {
+        setTimeout(() => {
+            if (window.vm && window.vm.runtime) {
             clearInterval(checkVM);
             const stage = window.vm.runtime.getTargetForStage();
             const allVars = stage.variables;
@@ -37,7 +38,6 @@ window.addEventListener('load', () => {
                     if (savedName) {
                         // Nếu đã có tên lưu sẵn, ghi đè lên giá trị -1 của Scratch
                         nameVar.value = savedName;
-                        console.log("Đã khôi phục tên từ máy:", savedName);
                     }
                     isSetName.value = 1;
                 }
@@ -47,9 +47,6 @@ window.addEventListener('load', () => {
                     currentName = currentName.substring(0, 10);
                 }
 
-                console.log(currentName);
-                console.log(lastName);
-                console.log(savedName);
                 if (currentName !== lastName && savedName == null &&
                     currentName != "-1" && currentName !== "") {
                     localStorage.setItem('game_user_name', currentName);
@@ -111,5 +108,6 @@ window.addEventListener('load', () => {
                 }
             }, 500);
         }
+        }, 3000);
     }, 500);
 });
