@@ -17,25 +17,6 @@
                     <span class="d-block mt-2">Học tập • Giải trí • Thư giãn • Cờ tướng • Trồng cây</span>
                 </p>
 
-
-                <!-- Giới thiệu Gia sư 707 -->
-                <!-- <div class="mt-5 p-3 bg-light rounded border">
-                    <h4 class="">📚 Gia sư 707 là gì?</h4>
-                    <p class="text-justify">
-                        <strong>Gia sư 707</strong> là một nhóm học tập nhỏ mà mình lập ra để giúp các bạn học sinh có thể hỏi bài mọi lúc mọi nơi.
-                        Các bạn có thể gửi câu hỏi qua <strong>Zalo: 0909707000</strong>, mình sẽ trả lời nhanh và dễ hiểu nhất có thể.<br>
-                        Hoặc follow mình trên <strong>Facebook</strong> để tiện nhắn tin nhé.
-                    </p>
-                    <p>
-                        👉 <a href="https://zalo.me/0909707000" target="_blank" class="btn btn-outline-success btn-sm">
-                            Nhắn tin Zalo ngay
-                        </a> <br><br>
-                        👉 <a href="https://www.facebook.com/truong.thanh.cong.201321" target="_blank" class="btn btn-outline-primary btn-sm">
-                            Follow Facebook
-                        </a>
-                    </p>
-                </div> -->
-
                 <!-- Giới thiệu nền tảng học tập -->
                 <div class="mt-4 p-3 bg-white rounded border shadow-sm">
                     <h4 class="text-success">🎓 Nền tảng học tập trực tuyến miễn phí</h4>
@@ -126,19 +107,6 @@
                         </a>
                     </p>
                 </div>
-                <!-- Kêu gọi ủng hộ -->
-                <div class="mt-4 p-3 bg-light rounded border">
-                    <h4 class="text-danger">❤️ Ủng hộ tác giả</h4>
-                    <p class="text-justify">
-                        Nếu bạn thấy website hữu ích và muốn góp phần giúp mình duy trì và phát triển nội dung, có thể ủng hộ qua:
-                    </p>
-                    <ul>
-                        <li><strong>Ngân hàng NCB</strong> – Trương Thành Công</li>
-                        <li><strong>Số tài khoản:</strong> <span class="text-primary">100007635197</span></li>
-                    </ul>
-                    <p class="mb-0">Mình rất cảm ơn sự quan tâm và ủng hộ của các bạn 💖</p>
-                </div>
-
 
                 <h4 class="mt-5">🌱 Những cái cây mình trồng</h4>
                 <div class="d-flex flex-wrap gap-3 justify-content-center">
@@ -152,14 +120,31 @@
 
     <!-- Cột hình ảnh học sinh -->
     <div class="col-md-4">
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm border-0 bg-light">
             <div class="card-body">
-                <h4 class="text-success">📘 Thành quả học sinh</h4>
+                <h4 class="text-success fw-bold mb-3">
+                    <i class="bi bi-controller"></i> Kho game
+                </h4>
                 <div class="d-flex flex-column gap-3">
-                    @for ($i = 1; $i <= 3; $i++)
-                        <img src="{{ asset("images/kt$i.jpg") }}" alt="Bài làm $i" class="img-fluid img-thumbnail shadow-sm">
-                    @endfor
-                </div>
+                    <a href="{{ url('/games/hung_bong') }}" class="game-card-link text-decoration-none">
+                        <div class="card h-100 border-0 shadow-sm hover-up">
+                            <div class="row g-0 align-items-center">
+                                <div class="col-4 p-2 text-center">
+                                    <img src="{{ asset('images/thumnail.jpg') }}" 
+                                         class="rounded-3 img-fluid shadow-sm" 
+                                         alt="Hứng bóng">
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body p-2">
+                                        <h5 class="card-title text-dark mb-1">Game hứng bóng</h5>
+                                        <p class="card-text text-muted small mb-0">Thiết kế bởi Scratch</p>
+                                        <span class="badge bg-success-soft text-success mt-1">Chơi ngay</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    </div>
             </div>
         </div>
     </div>

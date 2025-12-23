@@ -148,5 +148,3 @@ Route::get('{subject_slug}/{chapter_slug}/on-tap', [ChapterController::class, 'r
 
 // Trang lesson
 Route::get('{subject_slug}/{chapter_slug}/lesson/{lesson_slug}', [LessonController::class, 'show'])->name('show.lesson');
-
-Route::view('/game/hung_bong', 'game.hung_bong');

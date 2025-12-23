@@ -20,7 +20,7 @@ def init_db():
         )
     ''')
 
-    cursor.execute('DELETE FROM players')
+    # cursor.execute('DELETE FROM players')
     
     print("Database đã được làm sạch!")
     conn.commit()

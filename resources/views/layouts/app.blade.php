@@ -328,6 +328,32 @@
         }
 
     </style>
+    <style>
+    /* Hiệu ứng nhấc card lên khi di chuột vào */
+    .hover-up {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .hover-up:hover {
+        transform: translateY(-5px); /* Nhấc lên 5px */
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        background-color: #f8f9fa;
+    }
+
+    /* Màu cho badge Chơi ngay */
+    .bg-success-soft {
+        background-color: #e8f5e9;
+        font-size: 0.7rem;
+        padding: 4px 8px;
+        border-radius: 50px;
+    }
+
+    .game-card-link:hover .card-title {
+        color: #198754 !important; /* Đổi màu chữ sang xanh khi hover */
+    }
+</style>
 </head>
 <body>
     <div class="container">
