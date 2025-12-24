@@ -2,10 +2,15 @@
 
 window.addEventListener('load', () => {
     const checkVM = setInterval(() => {
-        setTimeout(() => {
-            if (window.vm && window.vm.runtime) {
+        if (window.vm && window.vm.runtime) {
             clearInterval(checkVM);
             const stage = window.vm.runtime.getTargetForStage();
+            if (!stage) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+            window.parent.postMessage({ type: 'SCRATCH_READY' }, '*');
             const allVars = stage.variables;
 
             // 1. Tìm đúng đối tượng biến Name và Score
@@ -59,13 +64,23 @@ window.addEventListener('load', () => {
 
                 const currentGameStatus = gameStatus.value;
                 if (currentGameStatus == 1 && scoreVar.value > 0) {
+                    let csrfToken = '';
+                    try {
+                        csrfToken = window.parent.document.querySelector('meta[name="csrf-token"]').content;
+                    } catch (e) {
+                        console.error("Không tìm thấy CSRF Token ở trang cha!", e);
+                    }
                     // 1. Gọi lên server Python để lấy bảng điểm mới nhất
-                    fetch('http://localhost:5000/save_score', { 
+                    fetch('/api/save-score', { 
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken // Gửi token lấy được từ trang cha
+                        },
                         body: JSON.stringify({
-                            id: localStorage.getItem('game_user_id'),
-                            name: localStorage.getItem('game_user_name'),
+                            user_id: localStorage.getItem('game_user_id'),
+                            user_name: localStorage.getItem('game_user_name'),
                             score: scoreVar.value
                         })
                     })
@@ -108,6 +123,5 @@ window.addEventListener('load', () => {
                 }
             }, 500);
         }
-        }, 1000);
     }, 500);
 });

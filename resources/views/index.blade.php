@@ -126,7 +126,7 @@
                     <i class="bi bi-controller"></i> Kho game
                 </h4>
                 <div class="d-flex flex-column gap-3">
-                    <a href="{{ url('/games/hung_bong') }}" class="game-card-link text-decoration-none">
+                    <a href="{{ url('/game/hung-bong') }}" class="game-card-link text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm hover-up">
                             <div class="row g-0 align-items-center">
                                 <div class="col-4 p-2 text-center">

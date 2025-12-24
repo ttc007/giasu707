@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\BookController;
 
 use App\Http\Controllers\Api\QuestionController as ApiQuestionController;
 use App\Http\Controllers\Api\ExamQuestionController;
+use App\Http\Controllers\Api\GameScoreController;
 
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\ChapterController;
@@ -69,6 +70,8 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::prefix('api')->group(function () {
+    Route::post('/save-score', [GameScoreController::class, 'saveScore']);
+
     Route::get('/chapters-by-subject/{subject_id}', function ($subject_id) {
         return Chapter::where('subject_id', $subject_id)->get(['id', 'title']);
     });
@@ -121,6 +124,11 @@ Route::middleware(StudentAuth::class)->group(function () {
 
     Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
 });
+
+// routes/web.php
+Route::get('/game/hung-bong', function () {
+    return view('game.hung_bong_view'); // Đây là file Blade chứa Iframe
+})->name('game.play');
 
 Route::get('/dang-nhap', [StudentController::class, 'showLoginForm'])->name('student.login');
 Route::post('/dang-nhap', [StudentController::class, 'login'])->name('student.login.post');
