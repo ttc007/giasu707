@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+<style type="text/css">
+    .game-not-show {
+        display: none;
+    }
+</style>
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-success fw-bold"><i class="bi bi-controller"></i> Game Hứng Bóng</h2>
