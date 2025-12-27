@@ -507,7 +507,6 @@ function executeMove(scene, piece, col, row) {
 
                 // 4. Kiểm tra trạng thái để in thông báo phụ (Tùy chọn)
                 const isCheck = isKingInDanger(nextTurn);
-                console.log(isCheck ? "CHIẾU BÍ!" : "HẾT NƯỚC ĐI!");
 
                 // 5. Hiển thị thông báo kết thúc
                 showGameOver(scene, finalResult);
@@ -941,7 +940,7 @@ function showGameOver(scene, result) {
 
     // 4. Vẽ chữ chính (Có đổ bóng rực rỡ)
     const mainText = scene.add.text(0, -20, mainMsg, {
-        fontSize: '80px',
+        fontSize: isMobile ? '45px' : '80px',
         fontFamily: 'Montserrat',
         color: mainColor,
         stroke: '#000000',
@@ -951,7 +950,7 @@ function showGameOver(scene, result) {
 
     // 5. Vẽ chữ phụ
     const subText = scene.add.text(0, 60, subMsg, {
-        fontSize: '30px',
+        fontSize: isMobile ? '25px' : '30px',
         fontFamily: 'Montserrat',
         color: '#ffffff',
         fontStyle: 'bold'
@@ -1055,10 +1054,6 @@ async function startAIOrder(scene) {
         const data = await response.json();
 
         if (data.status === "success" && data.move) {
-            // Log để bạn biết nước đi này lấy từ nguồn nào (Sách hay Thống kê)
-            console.log(data);
-            console.log(`AI sử dụng ${data.source}:`, data.move);
-
             const { fromCol, fromRow, toCol, toRow } = data.move;
 
             // Tìm quân cờ tại vị trí xuất phát
@@ -1136,7 +1131,6 @@ function sendFinalStats(finalResult) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Laravel Response:", data.message);
         gameHistory = []; 
     })
     .catch(error => console.error("Error:", error));
@@ -1176,8 +1170,6 @@ function serializeBoard() {
         }
     });
 
-    console.log(grid.map(row => row.join('')).join(''));
-    // 2. Nối chuỗi 90 ký tự
     // Nếu kết quả vẫn bị ngược Đen/Đỏ thì bạn thêm .reverse() vào trước .map nhé
     return grid.map(row => row.join('')).join('');
 }function serializeBoard() {
