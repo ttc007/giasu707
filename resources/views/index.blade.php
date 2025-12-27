@@ -144,7 +144,27 @@
                             </div>
                         </div>
                     </a>
-                    </div>
+                </div>
+                <div class="d-flex flex-column gap-3">
+                    <a href="{{ url('/game/co-tuong') }}" class="game-card-link text-decoration-none">
+                        <div class="card h-100 border-0 shadow-sm hover-up">
+                            <div class="row g-0 align-items-center">
+                                <div class="col-4 p-2 text-center">
+                                    <img src="{{ asset('images/thumbnail_cotuong.png') }}" 
+                                         class="rounded-3 img-fluid shadow-sm" 
+                                         alt="Hứng bóng">
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body p-2">
+                                        <h5 class="card-title text-dark mb-1">Cờ tướng với máy</h5>
+                                        <p class="card-text text-muted small mb-0">Thiết kế bởi Pharse</p>
+                                        <span class="badge bg-success-soft text-success mt-1">Chơi ngay</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
     </div>

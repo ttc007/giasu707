@@ -71,6 +71,8 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::prefix('api')->group(function () {
     Route::post('/save-score', [GameScoreController::class, 'saveScore']);
+    Route::post('/update-stats', [GameScoreController::class, 'updateStats']);
+    Route::post('/ai-move', [GameScoreController::class, 'getAiMove']);
 
     Route::get('/chapters-by-subject/{subject_id}', function ($subject_id) {
         return Chapter::where('subject_id', $subject_id)->get(['id', 'title']);
@@ -129,6 +131,9 @@ Route::middleware(StudentAuth::class)->group(function () {
 Route::get('/game/hung-bong', function () {
     return view('game.hung_bong_view'); // Đây là file Blade chứa Iframe
 })->name('game.play');
+Route::get('/game/co-tuong', function () {
+    return view('game.co_tuong'); // Đây là file Blade chứa Iframe
+})->name('game.co_tuong');
 
 Route::get('/dang-nhap', [StudentController::class, 'showLoginForm'])->name('student.login');
 Route::post('/dang-nhap', [StudentController::class, 'login'])->name('student.login.post');
