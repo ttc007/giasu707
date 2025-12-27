@@ -2,7 +2,8 @@
 
 const isMobile = window.innerWidth < 768;
 const CELL_SIZE = isMobile ? 35 : 40; 
-const BOARD_OFFSET_X = 225; // Lề trái để bảng tên
+const BOARD_OFFSET_X = isMobile ? 0 : 225; // Lề trái để bảng tên
+const BOARD_OFFSET_Y = isMobile ? 200: 0;
 const PADDING = 40;         // Khoảng cách từ mép bàn cờ đến quân cờ đầu tiên
 
 // Tính toán chính xác độ rộng bàn cờ
@@ -19,19 +20,27 @@ let turn = 'R';
 let playerSide = localStorage.getItem('playerSide') || 'R';
 let gameHistory = []; // Lưu các đối tượng {board, turn, move}
 
+// Tính toán kích thước logic của game
+const isMobileDevice = window.innerWidth < window.innerHeight; // Kiểm tra nhanh mobile
+const GAME_WIDTH = isMobileDevice ? BOARD_WIDTH : (BOARD_WIDTH + 450);
+// Trên mobile, tăng height để có chỗ cho 2 bảng tên bên trên
+const GAME_HEIGHT = isMobileDevice ? (BOARD_HEIGHT + 200) : BOARD_HEIGHT; 
+
 const config = {
     type: Phaser.AUTO,
     scale: {
-        mode: Phaser.Scale.FIT, // Co giãn để vừa khung trình duyệt
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: BOARD_WIDTH + 450, 
-        height: BOARD_HEIGHT
+        mode: Phaser.Scale.FIT,
+        // TRÊN MOBILE: Chỉ căn giữa ngang (CENTER_HORIZONTALLY) 
+        // để game dính vào mép trên màn hình.
+        autoCenter: isMobileDevice ? Phaser.Scale.CENTER_HORIZONTALLY : Phaser.Scale.CENTER_BOTH,
+        width: GAME_WIDTH,
+        height: GAME_HEIGHT
     },
     parent: 'game-container',
     dom: {
         createContainer: true
     },
-    backgroundColor: '#2c3e50', // Màu nền ngoài bàn cờ
+    backgroundColor: '#2c3e50',
     scene: {
         preload: preload,
         create: create
@@ -119,7 +128,7 @@ function checkUserInfo(scene, callback) {
     // TẠO INPUT ẨN ĐỂ GÕ TIẾNG VIỆT
     const hiddenInput = document.createElement('input');
     hiddenInput.type = 'text';
-    hiddenInput.maxLength = 20; // Giới hạn 10 ký tự
+    hiddenInput.maxLength = 10; // Giới hạn 10 ký tự
     hiddenInput.style = "position:absolute; opacity:0; pointer-events:none;";
     document.body.appendChild(hiddenInput);
 
@@ -160,55 +169,61 @@ function checkUserInfo(scene, callback) {
 }
 
 function showProfile(scene, name, side, isPlayer) {
-    const y = 30; 
-    const x = isPlayer ? 15 : (scene.cameras.main.width - 195);
-    const container = scene.add.container(x, y).setDepth(1000);
+    const screenWidth = scene.cameras.main.width;
+    
+    // 1. Cấu hình mặc định cho PC
+    let scale = 1;
+    let y = 30;
+    let x = isPlayer ? 15 : (screenWidth - 195);
 
-    // 1. Tạo đối tượng graphics cho khung nền
+    // 2. Điều chỉnh riêng cho MOBILE
+    if (typeof isMobile !== 'undefined' && isMobile) {
+        scale = 0.8; // Nhỏ lại một chút nữa để tránh đụng nhau
+        y = 80;       // Đẩy xuống thấp hơn (khoảng 80px) để né nút Trang Chủ
+        
+        const areaWidth = screenWidth / 2;
+        const boxWidth = 180 * scale;
+        
+        // Thêm một khoảng đệm nhỏ (gap) ở giữa màn hình
+        const centerGap = 10; 
+
+        if (isPlayer) {
+            // Player: Căn lề phải của nửa màn hình trái, trừ đi khoảng gap
+            x = areaWidth - boxWidth - centerGap;
+        } else {
+            // AI: Căn lề trái của nửa màn hình phải, cộng thêm khoảng gap
+            x = areaWidth + centerGap;
+        }
+    }
+
+    const container = scene.add.container(x, y).setDepth(2000).setScale(scale);
+
+    // --- Giữ nguyên phần vẽ đồ họa của bạn ---
     const bg = scene.add.graphics();
     container.add(bg);
-
-    // Xác định màu sắc dựa trên tham số 'side' truyền vào hàm
-    // Nếu side là 'R' thì dùng màu Đỏ, ngược lại (side là 'B') dùng màu Trắng
     const frameColor = (side === 'R') ? 0xff0000 : 0xffffff;
-    
-    // Vẽ khung cố định dựa trên side
-    bg.clear();
-    bg.fillStyle(0x1a1a1a, 0.9); // Nền tối mờ
-    bg.lineStyle(4, frameColor, 1); // Viền: 4px, Màu: Đỏ hoặc Trắng
+    bg.fillStyle(0x1a1a1a, 0.9); 
+    bg.lineStyle(4, frameColor, 1); 
     bg.fillRoundedRect(0, 0, 180, 110, 15);
     bg.strokeRoundedRect(0, 0, 180, 110, 15);
 
-    // Hàm này giữ lại để nếu sau này bạn muốn làm hiệu ứng mờ/sáng khi đến lượt
-    container.drawBackground = (color, alpha = 0.9, strokeWidth = 4) => {
-        bg.clear();
-        bg.fillStyle(0x1a1a1a, alpha); 
-        bg.lineStyle(strokeWidth, color, 1);
-        bg.fillRoundedRect(0, 0, 180, 110, 15);
-        bg.strokeRoundedRect(0, 0, 180, 110, 15);
-    };
-
-    // 2. Tên và Icon
     const icon = scene.add.text(40, 40, isPlayer ? "👤" : "🤖", { fontSize: '40px' }).setOrigin(0.5);
     const nameTxt = scene.add.text(75, 40, name.toUpperCase(), {
         fontSize: '14px', 
         fontFamily: 'Arial', 
         fontStyle: 'bold', 
-        color: '#ffffff',
-        wordWrap: { width: 100 }
+        color: '#ffffff'
     }).setOrigin(0, 0.5);
     container.add([icon, nameTxt]);
 
-    // 3. Text hiển thị Timer
     const timerText = scene.add.text(90, 85, "00:00", {
-        fontSize: '24px', 
+        fontSize: '28px', 
         fontFamily: 'Courier', 
         fontStyle: 'bold', 
-        color: (side === 'R') ? '#ff0000' : '#ffffff' // Màu chữ Timer cũng theo phe
-    }).setOrigin(0.5).setVisible(false);
+        color: (side === 'R') ? '#ff0000' : '#ffffff'
+    }).setOrigin(0.5);
     container.add(timerText);
 
-    // 4. Lưu tham chiếu để dùng cho Timer
     if (isPlayer) {
         scene.playerProfile = container;
         scene.playerTimerText = timerText;
@@ -321,7 +336,7 @@ function create() {
     const boardCenterX = BOARD_OFFSET_X + (BOARD_REAL_WIDTH / 2);
     
     // Y của tâm bàn cờ đơn giản là chiều cao bàn cờ chia đôi (cộng thêm PADDING nếu cần)
-    const boardCenterY = BOARD_REAL_HEIGHT / 2; 
+    const boardCenterY = BOARD_OFFSET_Y + BOARD_REAL_HEIGHT / 2; 
 
     const boardImg = this.add.image(boardCenterX, boardCenterY, 'board')
                          .setDisplaySize(BOARD_REAL_WIDTH, BOARD_REAL_HEIGHT)
@@ -355,7 +370,7 @@ function create() {
         const displayRow = getDisplayRow(p.row);
     
         const x = BOARD_OFFSET_X + PADDING + (p.col * CELL_SIZE);
-        const y = PADDING + (displayRow * CELL_SIZE);
+        const y = BOARD_OFFSET_Y + PADDING + (displayRow * CELL_SIZE);
         
         let piece = this.add.image(x, y, p.key).setDisplaySize(CELL_SIZE * 0.9, CELL_SIZE * 0.9);
         piece.setInteractive().setDepth(5);
@@ -385,7 +400,7 @@ function create() {
     boardImg.on('pointerdown', (pointer) => {
         if (selectedPiece) {
             const col = Math.round((pointer.x - BOARD_OFFSET_X - PADDING) / CELL_SIZE);
-            const displayRow = Math.round((pointer.y - PADDING) / CELL_SIZE);
+            const displayRow = Math.round((pointer.y - BOARD_OFFSET_Y - PADDING) / CELL_SIZE);
             
             // Chuyển từ hàng hiển thị về hàng logic để check luật
             const pSide = localStorage.getItem('playerSide') || 'R';
@@ -450,7 +465,7 @@ function executeMove(scene, piece, col, row) {
 
     const newX = BOARD_OFFSET_X + PADDING + col * CELL_SIZE;
     //const newY = PADDING + row * CELL_SIZE;
-    const newY = PADDING + (targetDisplayRow * CELL_SIZE);
+    const newY = BOARD_OFFSET_Y + PADDING + (targetDisplayRow * CELL_SIZE);
 
     // 3. Thực hiện di chuyển
     scene.tweens.add({
