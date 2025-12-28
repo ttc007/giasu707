@@ -73,12 +73,10 @@ class GameScoreController extends Controller
         $boardStats = $request->input('board'); // Chuỗi 189 ký tự
         $turn = $request->input('turn'); // 'R' hoặc 'B'
 
-        // --- BƯỚC 1: TRUY VẤN BẢNG BOOKS ---
-        $boardForBook = $boardStats;
-        $colorForBook = ($turn === 'R') ? 'red' : 'green'; // Dựa theo ảnh của bạn dùng 'green'
-
+        // --- BƯỚC 1: TRUY VẤN BẢNG BOOKS (Giữ nguyên logic ưu tiên) ---
+        $colorForBook = ($turn === 'R') ? 'red' : 'green'; 
         $bookMove = DB::table('books')
-            ->where('image_chess', $boardForBook)
+            ->where('image_chess', $boardStats)
             ->where('color', $colorForBook)
             ->where('is_hidden', 0)
             ->first();
@@ -88,38 +86,51 @@ class GameScoreController extends Controller
             return response()->json([
                 'status' => 'success',
                 'source' => 'book',
-                'move' => [
+                'move' => [ // Trả về nước đơn lẻ vì Book là chuẩn nhất
                     'fromCol' => -1 + (int)$moveData->fromX,
-                    'fromRow' => 10 - (int)$moveData->fromY, // Đảo ngược lại để khớp Phaser
+                    'fromRow' => 10 - (int)$moveData->fromY,
                     'toCol' => -1 + (int)$moveData->toX,
-                    'toRow' => 10 - (int)$moveData->toY    // Đảo ngược lại để khớp Phaser
+                    'toRow' => 10 - (int)$moveData->toY
                 ],
                 'comment' => $bookMove->comment
             ]);
         }
-        // --- BƯỚC 2: TRUY VẤN BẢNG MOVE_STATS ---
-        $statMove = DB::table('move_stats')
+
+        // --- BƯỚC 2: TRUY VẤN TẤT CẢ MOVE_STATS ---
+        // Không dùng first(), dùng get() để lấy toàn bộ danh sách nước đi đã học được
+        $statMoves = DB::table('move_stats')
             ->where('board', $boardStats)
             ->where('turn', $turn)
-            ->orderByRaw('(win_count + draw_count * 0.5 - lose_count) DESC')
-            ->first();
+            ->get();
 
-        if ($statMove) {
-            // Parse chuỗi "1,7 to 4,7" thành tọa độ
-            preg_match('/(\d+),(\d+) to (\d+),(\d+)/', $statMove->move_text, $matches);
-            return response()->json([
-                'status' => 'success',
-                'source' => 'stats',
-                'move' => [
+        if ($statMoves->isNotEmpty()) {
+            $processedMoves = $statMoves->map(function ($item) {
+                preg_match('/(\d+),(\d+) to (\d+),(\d+)/', $item->move_text, $matches);
+                
+                // Công thức tính điểm: Thắng + Hòa*0.5 - Thua
+                $score = $item->win_count + ($item->draw_count * 0.5) - $item->lose_count;
+
+                return [
                     'fromCol' => (int)$matches[1],
                     'fromRow' => (int)$matches[2],
                     'toCol' => (int)$matches[3],
-                    'toRow' => (int)$matches[4]
-                ]
+                    'toRow' => (int)$matches[4],
+                    'score' => $score
+                ];
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'source' => 'stats',
+                'moves' => $processedMoves // Trả về mảng danh sách nước đi
             ]);
         }
 
-        return response()->json(['status' => 'no_data']);
+        return response()->json([
+                'status' => 'success',
+                'source' => 'stats',
+                'moves' => [] // Trả về mảng danh sách nước đi
+            ]);
     }
 
     private function convertToBookFormat($boardStats) {

@@ -4,7 +4,7 @@ const isMobile = window.innerWidth < 768;
 const CELL_SIZE = isMobile ? 35 : 40; 
 const BOARD_OFFSET_X = isMobile ? 0 : 225; // Lề trái để bảng tên
 const BOARD_OFFSET_Y = isMobile ? 200: 0;
-const PADDING = 40;         // Khoảng cách từ mép bàn cờ đến quân cờ đầu tiên
+const PADDING = isMobile ? 35 : 40;         // Khoảng cách từ mép bàn cờ đến quân cờ đầu tiên
 
 // Tính toán chính xác độ rộng bàn cờ
 const BOARD_REAL_WIDTH = CELL_SIZE * 8 + PADDING * 2;
@@ -28,6 +28,14 @@ const GAME_HEIGHT = isMobileDevice ? (BOARD_HEIGHT + 200) : BOARD_HEIGHT;
 
 const config = {
     type: Phaser.AUTO,
+    render: {
+        antialias: true,                // QUAN TRỌNG: Bật chống răng cưa để thu nhỏ ảnh mịn
+        antialiasGL: true,              // Chống răng cưa riêng cho WebGL
+        mipmapFilter: 'LINEAR_MIPMAP_LINEAR', // Giúp ảnh khi thu nhỏ (downscale) không bị nhiễu vằn
+        roundPixels: false,             // ĐỂ FALSE: Cho phép quân cờ nằm ở tọa độ lẻ giúp mượt hơn khi di chuyển
+        pixelArt: false                 // QUAN TRỌNG: Phải để false vì chúng ta dùng ảnh HD, không phải pixel art
+    },
+    resolution: window.devicePixelRatio || 1,
     scale: {
         mode: Phaser.Scale.FIT,
         // TRÊN MOBILE: Chỉ căn giữa ngang (CENTER_HORIZONTALLY) 
@@ -71,7 +79,7 @@ const initialSetup = [
 
 function preload() {
     // Tải bàn cờ
-    this.load.svg('board', 'assets/ban-co-tuong.svg');
+    this.load.image('board', 'assets/board.png');
     this.load.svg('focus', 'assets/focus_8lines.svg');
     this.load.image('chieu_effect', 'assets/chieu_effect.png');
 
@@ -81,7 +89,7 @@ function preload() {
         'B_Xe', 'B_Ma', 'B_Tuong', 'B_Si', 'B_Tuong_G', 'B_Phao', 'B_Tot'
     ];
     pieceKeys.forEach(key => {
-        this.load.svg(key, `assets/${key}.svg`);
+        this.load.image(key, `assets/HD+/${key}.png`);
     });
 }
 
@@ -374,6 +382,7 @@ function create() {
         
         let piece = this.add.image(x, y, p.key).setDisplaySize(CELL_SIZE * 0.9, CELL_SIZE * 0.9);
         piece.setInteractive().setDepth(5);
+        // Giúp GPU xử lý texture lớn hiệu quả hơn khi thu nhỏ
         piece.side = p.key.startsWith('R') ? 'R' : 'B'; 
         piece.pieceData = { col: p.col, row: p.row }; // Vẫn giữ row logic để tính toán luật đi
         allPieces.add(piece);
@@ -387,8 +396,7 @@ function create() {
                 } else {
                     invalidMoveEffect(this, selectedPiece, moveResult.errorType);
                 }
-            } 
-            else if (piece.side === turn) {
+            } else if (piece.side === turn) {
                 selectedPiece = piece;
                 focusNew.setPosition(piece.x, piece.y).setVisible(true);
             }
@@ -770,13 +778,15 @@ function invalidMoveEffect(scene, piece, type) {
     });
 }
 
-// Hàm tìm quân cờ tại một vị trí (cột, hàng) cụ thể
 function getPieceAt(col, row) {
     if (!allPieces) return null;
+    const targetCol = parseInt(col);
+    const targetRow = parseInt(row);
+    
     return allPieces.getChildren().find(p => 
-        p.active && // Quân cờ còn tồn tại trên bàn
-        p.pieceData.col === col && 
-        p.pieceData.row === row
+        p.active && 
+        parseInt(p.pieceData.col) === targetCol && 
+        parseInt(p.pieceData.row) === targetRow
     );
 }
 
@@ -831,17 +841,17 @@ function showCheckEffect(scene) {
         targets: effect,
         scale: 0.3, // GIẢM TẠI ĐÂY: 0.5 là bằng một nửa ảnh gốc
         alpha: 1,
-        duration: 300,
+        duration: 100,
         ease: 'Back.out',
         onComplete: () => {
-            scene.cameras.main.shake(150, 0.005);
+            scene.cameras.main.shake(20, 0.005);
 
-            scene.time.delayedCall(1000, () => {
+            scene.time.delayedCall(200, () => {
                 scene.tweens.add({
                     targets: effect,
                     alpha: 0,
                     scale: 0.6, // Phóng to nhẹ khi biến mất cho đẹp
-                    duration: 200,
+                    duration: 100,
                     onComplete: () => effect.destroy()
                 });
             });
@@ -1029,58 +1039,12 @@ function getAllValidMoves(scene, side) {
     return validMoves;
 }
 
-async function startAIOrder(scene) {
-    const aiSide = (playerSide === 'R') ? 'B' : 'R';
-    if (turn !== aiSide) return;
-
-    const currentBoard = serializeBoard();
-
-    try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        
-        // Gửi yêu cầu lấy nước đi từ AI (Laravel sẽ tự check Books -> Stats)
-        const response = await fetch('/api/ai-move', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({ 
-                board: currentBoard, // Chuỗi 189 ký tự
-                turn: turn           // 'R' hoặc 'B'
-            })
-        });
-
-        const data = await response.json();
-
-        if (data.status === "success" && data.move) {
-            const { fromCol, fromRow, toCol, toRow } = data.move;
-
-            // Tìm quân cờ tại vị trí xuất phát
-            const piece = allPieces.getChildren().find(p => 
-                p.active && 
-                p.pieceData.col === fromCol && 
-                p.pieceData.row === fromRow
-            );
-            
-            if (piece) {
-                // Nếu tìm thấy quân cờ, thực hiện di chuyển ngay
-                executeMove(scene, piece, toCol, toRow);
-                return; // Kết thúc hàm startAIOrder thành công
-            } else {
-                console.warn("Dữ liệu move hợp lệ nhưng không tìm thấy quân cờ tại vị trí:", fromCol, fromRow);
-            }
-        }
-    } catch (error) {
-        console.error("Lỗi gọi AI từ Server:", error);
-    }
-
-    // 2. Nếu không có dữ liệu trong DB, dùng logic ngẫu nhiên cũ
-    const possibleMoves = getAllValidMoves(scene, aiSide);
-    if (possibleMoves.length > 0) {
-        const randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-        executeMove(scene, randomMove.piece, randomMove.toCol, randomMove.toRow);
-    }
+function getValidMovesForPiece(scene, piece) {
+    // Lấy tất cả nước đi hợp lệ của phe hiện tại (side của quân cờ đó)
+    const allMoves = getAllValidMoves(scene, piece.side);
+    
+    // Lọc ra những nước đi mà đối tượng quân cờ trùng với quân cờ đang xét
+    return allMoves.filter(move => move.piece === piece);
 }
 
 function saveGameState() {
@@ -1137,42 +1101,6 @@ function sendFinalStats(finalResult) {
 }
 
 function serializeBoard() {
-    // 1. Tạo mảng 10x9, mặc định là "."
-    let grid = Array.from({ length: 10 }, () => Array(9).fill("."));
-
-    // Bảng tra cứu linh hoạt: Chấp nhận cả tiếng Việt/Viết tắt bạn đã dùng
-    const pieceMap = {
-        'XE': 'R', 'JU': 'R',
-        'MA': 'N',
-        'TU': 'B', '象': 'B', 'TƯỢNG': 'B',
-        'SI': 'A', '士': 'A', 'SĨ': 'A',
-        'TG': 'K', ' tướng': 'K', 'TƯỚNG': 'K',
-        'PA': 'C', 'PHAO': 'C', 'PHÁO': 'C',
-        'TO': 'P', 'TOT': 'P', 'TỐT': 'P', '兵': 'P', '卒': 'P'
-    };
-
-    allPieces.getChildren().forEach(p => {
-        if (p.active) {
-            let key = p.texture.key.toUpperCase(); // Chuyển về HOA để dễ so sánh (Vd: "R_XE")
-            let parts = key.split('_');
-            
-            let side = parts[0]; // "R" hoặc "B"
-            let type = parts[1]; // "XE", "PHAO", "TO"...
-
-            let char = pieceMap[type] || '?';
-
-            // Đỏ HOA, Đen thường
-            let finalChar = (side === 'R') ? char.toUpperCase() : char.toLowerCase();
-            
-            if (grid[p.pieceData.row] && grid[p.pieceData.row][p.pieceData.col] !== undefined) {
-                grid[p.pieceData.row][p.pieceData.col] = finalChar;
-            }
-        }
-    });
-
-    // Nếu kết quả vẫn bị ngược Đen/Đỏ thì bạn thêm .reverse() vào trước .map nhé
-    return grid.map(row => row.join('')).join('');
-}function serializeBoard() {
     // Tạo lưới 10x9 trắng (.)
     let grid = Array.from({ length: 10 }, () => Array(9).fill("."));
 
@@ -1206,8 +1134,178 @@ function serializeBoard() {
         }
     });
 
-    // Theo ảnh DB của bạn: ID 1 bắt đầu bằng RNBAKABNR (Đỏ)
-    // Mà trong setup của bạn, Đỏ (R) nằm ở hàng 9 (cuối grid).
-    // Vậy phải ĐẢO NGƯỢC grid để hàng 9 lên đầu chuỗi.
     return grid.reverse().map(row => row.join('')).join('');
+}
+
+async function startAIOrder(scene) {
+    const aiSide = (playerSide === 'R') ? 'B' : 'R';
+    if (turn !== aiSide) return;
+
+    const currentBoard = serializeBoard();
+    let moveExecuted = false;
+
+    try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const response = await fetch('/api/ai-move', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ board: currentBoard, turn: turn })
+        });
+
+        const data = await response.json();
+
+        if (data.status === "success") {
+            let chosen = null;
+            // 1. Ưu tiên Book
+            if (data.source === 'book' && data.move) {
+                chosen = data.move;
+            } else if (data.source === 'stats' && data.moves) {
+                const goodMoves = data.moves.filter(m => m.score >= 0);
+                if (goodMoves.length > 0) {
+                    chosen = goodMoves[Math.floor(Math.random() * goodMoves.length)];
+                } else {
+                    // 3. Toàn nước xấu: Loại trừ khỏi danh sách allMoves
+                    const pickMoves = pickBestMove(scene, aiSide);
+                    console.log(pickMoves);
+
+                    const badKeys = data.moves.map(m => `${m.fromCol},${m.fromRow} to ${m.toCol},${m.toRow}`);
+                    const filtered = pickMoves.filter(m => {
+                        const key = `${m.piece.pieceData.col},${m.piece.pieceData.row} to ${m.toCol},${m.toRow}`;
+                        return !badKeys.includes(key);
+                    });
+
+                    if (filtered.length > 0) {
+                        const pick = filtered[Math.floor(Math.random() * filtered.length)];
+                        chosen = { fromCol: pick.piece.pieceData.col, fromRow: pick.piece.pieceData.row, toCol: pick.toCol, toRow: pick.toRow };
+                    }
+                }
+            }
+
+            if (chosen) {
+                const piece = getPieceAt(chosen.fromCol, chosen.fromRow);
+                if (piece) {
+                    executeMove(scene, piece, chosen.toCol, chosen.toRow);
+                    moveExecuted = true;
+                }
+            }
+        }
+    } catch (error) {
+        console.error("AI Error:", error);
+    }
+
+    // 4. FALLBACK: Nếu nãy giờ chưa đi được nước nào (No data hoặc lỗi)
+    if (!moveExecuted) {
+        const fallbackMoves = getAllValidMoves(scene, aiSide);
+        if (fallbackMoves.length > 0) {
+            const pick = fallbackMoves[Math.floor(Math.random() * fallbackMoves.length)];
+            executeMove(scene, pick.piece, pick.toCol, pick.toRow);
+        }
+    }
+}
+
+function pickBestMove(scene, side) {
+    const allMoves = getAllValidMoves(scene, side);
+    if (allMoves.length === 0) return [];
+
+    const checkmateMoves = [];
+    const captureMoves = [];
+    const threateningMoves = [];
+    const safeMoves = [];
+    const otherMoves = [];
+
+    allMoves.forEach(move => {
+        const targetPiece = getPieceAt(move.toCol, move.toRow);
+        const originalCol = move.piece.pieceData.col;
+        const originalRow = move.piece.pieceData.row;
+        
+        // --- GIẢ LẬP ---
+        move.piece.pieceData.col = move.toCol;
+        move.piece.pieceData.row = move.toRow;
+        if (targetPiece) targetPiece.active = false;
+
+        const opponentSide = (side === 'R') ? 'B' : 'R';
+
+        // 1. Check Chiếu bí
+        if (isCheckmate(scene, opponentSide)) {
+            checkmateMoves.push(move);
+        } 
+        // 2. Check Ăn quân hoặc Chiếu tướng
+        else if ((targetPiece && targetPiece.side !== side) || isOpponentKingUnderCheck(scene, side)) {
+            move.priorityValue = targetPiece ? (getPieceValue(targetPiece.type) + 100) : 50; 
+            captureMoves.push(move);
+        } 
+        else {
+            // 3. Check Hăm bắt
+            const potentialMoves = getValidMovesForPiece(scene, move.piece);
+            let maxThreatValue = 0;
+
+            potentialMoves.forEach(pMove => {
+                const threatTarget = getPieceAt(pMove.toCol, pMove.toRow);
+                if (threatTarget && threatTarget.side !== side) {
+                    maxThreatValue = Math.max(maxThreatValue, getPieceValue(threatTarget.type));
+                }
+            });
+
+            if (maxThreatValue > 0) {
+                move.priorityValue = maxThreatValue;
+                threateningMoves.push(move);
+            } 
+            // 4. Check An toàn
+            else if (isCellSafe(scene, move.toCol, move.toRow, side)) {
+                safeMoves.push(move);
+            } 
+            // 5. Nước đi bình thường (rủi ro cao)
+            else {
+                otherMoves.push(move);
+            }
+        }
+
+        // --- HOÀN TRẢ ---
+        move.piece.pieceData.col = originalCol;
+        move.piece.pieceData.row = originalRow;
+        if (targetPiece) targetPiece.active = true;
+    });
+
+    // Sắp xếp các nhóm có điểm số
+    captureMoves.sort((a, b) => b.priorityValue - a.priorityValue);
+    threateningMoves.sort((a, b) => b.priorityValue - a.priorityValue);
+
+    // Gộp tất cả nước đi "có ích" vào một mảng theo đúng thứ tự ưu tiên
+    // Chúng ta trả về mảng này để hàm startAIOrder lọc bỏ badKeys từ DB
+    console.log(captureMoves);
+    return [
+        ...checkmateMoves,
+        ...captureMoves,
+        ...threateningMoves,
+        // ...safeMoves,
+    ];
+}
+// Hàm phụ trợ định nghĩa giá trị quân cờ
+function getPieceValue(type) {
+    const values = {
+        'Tuong_G': 1000,
+        'Xe': 100,
+        'Phao': 50,
+        'Ma': 45,
+        'Tuong': 25,
+        'Si': 20,
+        'Tot': 10
+    };
+    return values[type] || 0;
+}
+
+function isCellSafe(scene, col, row, side) {
+    const opponentSide = (side === 'R') ? 'B' : 'R';
+    
+    // Lấy tất cả nước đi hợp lệ của đối thủ
+    const opponentMoves = getAllValidMoves(scene, opponentSide);
+    
+    // Kiểm tra xem có nước đi nào của đối thủ đích đến là ô (col, row) không
+    const threat = opponentMoves.find(m => m.toCol === col && m.toRow === row);
+    
+    // Nếu tìm thấy threat (mối đe dọa) thì ô này KHÔNG an toàn
+    return !threat;
 }
