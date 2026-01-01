@@ -61,16 +61,52 @@
             content: '←';
             font-size: 18px;
         }
+
+        #loading-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8); /* Nền tối */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Luôn nằm trên cùng */
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Vòng xoay Loading */
+        .loader {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #db3434; /* Màu đỏ cờ tướng */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div id="loading-screen">
+        <div class="loader"></div>
+        <p>Đang tải bàn cờ...</p>
+    </div>
 
     <a href="/" class="home-button">TRANG CHỦ</a>
 
     <div id="game-container"></div>
     
     <script src="{{ asset('games/co_tuong/game.js') }}?t=time()"></script>
+    <script src="{{ asset('games/co_tuong/move.js') }}?t=time()"></script>
+    <script src="{{ asset('games/co_tuong/ai.js') }}?t=time()"></script>
 </body>
 </html>

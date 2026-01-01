@@ -246,14 +246,10 @@ let timeLeft = 600;
 let aiThinkTime = 1000;
 let playerTimeTotal = 900;
 let aiTimeTotal = 900;
-
 function startTurnTimer(scene, isPlayerTurn) {
     // 1. Lấy phe người chơi từ biến toàn cục hoặc storage
     const pSide = localStorage.getItem('playerSide') || 'R';
     
-    // 2. Xác định màu của quân đang đến lượt (R hoặc B)
-    // Nếu là lượt người chơi thì quân đó có màu = pSide
-    // Nếu là lượt máy thì quân đó có màu = đối lập với pSide
     const currentTurnColor = isPlayerTurn ? pSide : (pSide === 'R' ? 'B' : 'R');
 
     // 3. Ẩn tất cả Timer để reset
@@ -261,7 +257,6 @@ function startTurnTimer(scene, isPlayerTurn) {
     if (scene.aiTimerText) scene.aiTimerText.setVisible(false);
 
     // 4. CHỐN HIỂN THỊ: isPlayerTurn luôn trỏ về khung của Người chơi, 
-    // không quan tâm người chơi đang cầm quân màu gì.
     const activeTimer = isPlayerTurn ? scene.playerTimerText : scene.aiTimerText;
     if (!activeTimer) return;
 
@@ -302,10 +297,10 @@ function startTurnTimer(scene, isPlayerTurn) {
                 activeTimer.setColor(themeColor); // Quay lại màu phe (Trắng hoặc Đỏ)
             }
 
-            if (currentTimeLeft <= 0) {
-                currentTurnTimer.remove();
-                handleTimeout(scene, isPlayerTurn);
-            }
+            // if (currentTimeLeft <= 0) {
+            //     currentTurnTimer.remove();
+            //     handleTimeout(scene, isPlayerTurn);
+            // }
         },
         callbackScope: scene,
         loop: true
@@ -450,238 +445,113 @@ function create() {
             });
         }
     });
+
+
+    // Tìm div loading bằng ID
+    const loadingScreen = document.getElementById('loading-screen');
+    
+    if (loadingScreen) {
+        // Cách 1: Ẩn ngay lập tức
+        loadingScreen.style.display = 'none';
+    }
 }
 
 function executeMove(scene, piece, col, row) {
     const moveString = `${piece.pieceData.col},${piece.pieceData.row} to ${col},${row}`;
     
-    // Lưu lại trạng thái TRƯỚC khi đổi lượt
+    // 1. Lưu lịch sử (Sử dụng serializeBoard hiện tại)
     gameHistory.push({
-        board: serializeBoard(), // Hàm biến bàn cờ thành chuỗi (xem bên dưới)
+        board: serializeBoard(),
         turn: turn,
         move: moveString
     });
 
-    // 1. Tìm xem tại ô đích có quân địch không
+    // 2. Xác định quân bị ăn tại ô đích
     const targetPiece = getPieceAt(col, row);
 
-    const targetDisplayRow = getDisplayRow(row); // Chuyển row logic thành row hiển thị
-
-    // 2. Cập nhật tọa độ logic cho quân đang đi
+    // 3. Cập nhật tọa độ logic cho Phaser Piece
     piece.pieceData.col = col;
     piece.pieceData.row = row;
 
+    // Tính toán tọa độ hiển thị (pixel)
+    const targetDisplayRow = getDisplayRow(row); 
     const newX = BOARD_OFFSET_X + PADDING + col * CELL_SIZE;
-    //const newY = PADDING + row * CELL_SIZE;
     const newY = BOARD_OFFSET_Y + PADDING + (targetDisplayRow * CELL_SIZE);
 
-    // 3. Thực hiện di chuyển
+    // Hiển thị vòng tròn đánh dấu vị trí cũ (Tùy chọn UX)
+    focusOld.setPosition(piece.x, piece.y).setVisible(true);
+
+    // 4. Thực hiện Tween di chuyển
     scene.tweens.add({
         targets: piece,
         x: newX,
         y: newY,
         duration: 200,
+        ease: 'Power2',
         onStart: () => {
-            // Nếu có quân địch, thực hiện hiệu ứng bị ăn
             if (targetPiece) {
+                // Hiệu ứng quân địch bị ăn
                 scene.tweens.add({
                     targets: targetPiece,
                     alpha: 0,
                     scale: 0.5,
                     duration: 150,
                     onComplete: () => {
-                        targetPiece.active = false; // Đánh dấu là đã chết để getPieceAt không tìm thấy nữa
-                        targetPiece.destroy();      // Xóa hoàn toàn khỏi bộ nhớ
+                        targetPiece.active = false;
+                        targetPiece.destroy(); // Xóa khỏi Scene và Group
                     }
                 });
             }
         },
         onComplete: () => {
+            // Đánh dấu vị trí mới
             focusNew.setPosition(newX, newY).setVisible(true);
 
-            // 1. Xác định phe đối thủ (phe chuẩn bị đến lượt đi)
+            // Lấy danh sách quân cờ "sạch" hiện tại để tính toán logic tiếp theo
+            const currentPieces = allPieces.getChildren().map(p => ({
+                side: p.side,
+                type: p.texture.key,
+                col: p.pieceData.col,
+                row: p.pieceData.row,
+                active: true
+            }));
+
             const nextTurn = (piece.side === 'R') ? 'B' : 'R';
 
-            if (isCheckmate(scene, nextTurn)) {
-                // 1. Xác định ai là người vừa thực hiện nước đi khiến đối phương hết cờ
+            // 5. KIỂM TRA KẾT THÚC (Dùng mảng sạch đã lấy ở trên)
+            if (isCheckmate(currentPieces, nextTurn)) {
                 const winnerSide = piece.side; 
-                
-                // 2. Lấy phe của người chơi từ localStorage
-                const pSide = localStorage.getItem('playerSide') || 'R';
-
-                // 3. So sánh: Nếu phe thắng trùng với phe người chơi -> 'win'
-                // Nếu không trùng (tức là Máy thắng) -> 'lose'
+                const pSide = playerSide || 'R';
                 const finalResult = (winnerSide === pSide) ? 'win' : 'lose';
 
-                // 4. Kiểm tra trạng thái để in thông báo phụ (Tùy chọn)
-                const isCheck = isKingInDanger(nextTurn);
-
-                // 5. Hiển thị thông báo kết thúc
                 showGameOver(scene, finalResult);
-                
-                // Dừng timer ngay lập tức
                 if (currentTurnTimer) currentTurnTimer.remove();
-                
-                return; // Kết thúc, không đổi lượt nữa
+                return; 
             }
 
-            // Kiểm tra chiếu tướng
-            if (isOpponentKingUnderCheck(scene, piece.side)) {
+            // 6. KIỂM TRA CHIẾU TƯỚNG (Cảnh báo âm thanh/hình ảnh)
+            if (isKingInDanger(nextTurn, currentPieces)) {
                 showCheckEffect(scene);
             }
 
-            // Đổi lượt
-
-            turn = (turn === 'R') ? 'B' : 'R';
-
-            saveGameState();
-            // Trong executeMove sau khi kết thúc lượt của Người chơi
-            if (turn !== playerSide) {
-                // Gọi AI bắt đầu suy nghĩ
-                startAIOrder(scene);
-            }
-            // 3. XÁC ĐỊNH: Lượt mới có phải của người chơi không?
+            // 7. ĐỔI LƯỢT VÀ QUẢN LÝ TIMER
+            turn = nextTurn;
             const isNowPlayerTurn = (turn === playerSide);
-
-            // 4. CHUYỂN TIMER QUA ĐỐI PHƯƠNG
+            
             startTurnTimer(scene, isNowPlayerTurn);
+            saveGameState();
+            
             selectedPiece = null;
+
+            // 8. KÍCH HOẠT AI NẾU ĐẾN LƯỢT MÁY
+            if (turn !== playerSide) {
+                // Delay một chút để người chơi kịp nhìn nước đi vừa thực hiện
+                scene.time.delayedCall(500, () => {
+                    startAIOrder(scene);
+                });
+            }
         }
     });
-}
-
-function isCheckmate(scene, sideToBottom) {
-    // 1. Lấy tất cả quân cờ còn sống của phe đang đến lượt (sideToBottom)
-    const myPieces = allPieces.getChildren().filter(p => p.active && p.side === sideToBottom);
-
-    // 2. Duyệt qua từng quân cờ
-    for (let piece of myPieces) {
-        // 3. Thử giả lập di chuyển quân cờ này đến mọi ô trên bàn cờ (9x10)
-        for (let r = 0; r <= 9; r++) {
-            for (let c = 0; c <= 8; c++) {
-                // Kiểm tra xem nước đi này có hợp lệ không
-                const result = isValidMove(piece, c, r);
-                
-                if (result.valid) {
-                    // Chỉ cần tìm thấy DUY NHẤT 1 nước đi hợp lệ -> Chưa thua
-                    return false; 
-                }
-            }
-        }
-    }
-    // Không tìm thấy nước đi nào cứu vãn được -> Chiếu bí!
-    return true;
-}
-
-function checkBasicMove(piece, newCol, newRow) {
-    const oldCol = piece.pieceData.col;
-    const oldRow = piece.pieceData.row;
-    const dCol = Math.abs(newCol - oldCol);
-    const dRow = Math.abs(newRow - oldRow);
-    const target = getPieceAt(newCol, newRow);
-
-    // 1. KHÔNG ĂN QUÂN MÌNH
-    if (target && target.side === piece.side) return false;
-
-    const key = piece.texture.key;
-
-    // 2. LUẬT PHÁO
-    if (key.includes('Phao')) {
-        if (oldCol !== newCol && oldRow !== newRow) return false;
-        const count = countPiecesBetween(oldCol, oldRow, newCol, newRow);
-        if (!target) return count === 0; // Đi trống: không vật cản
-        return count === 1; // Ăn quân: phải có 1 ngòi
-    }
-
-    // 3. LUẬT TỐT
-    if (key.includes('Tot')) {
-        const isRed = (piece.side === 'R');
-        // Không đi lùi
-        if (isRed && newRow > oldRow) return false;
-        if (!isRed && newRow < oldRow) return false;
-
-        const hasCrossedRiver = isRed ? (oldRow <= 4) : (oldRow >= 5);
-        if (!hasCrossedRiver) {
-            return dRow === 1 && dCol === 0; // Chưa qua sông: chỉ đi thẳng
-        } else {
-            return (dRow === 1 && dCol === 0) || (dRow === 0 && dCol === 1); // Qua sông: thẳng hoặc ngang
-        }
-    }
-
-    // 4. LUẬT XE
-    if (key.includes('Xe')) {
-        if (oldCol !== newCol && oldRow !== newRow) return false;
-        return countPiecesBetween(oldCol, oldRow, newCol, newRow) === 0;
-    }
-
-    // 5. LUẬT MÃ
-    if (key.includes('Ma')) {
-        if (!((dCol === 1 && dRow === 2) || (dCol === 2 && dRow === 1))) return false;
-        let bCol = oldCol, bRow = oldRow;
-        if (dRow === 2) bRow = (oldRow + newRow) / 2;
-        else bCol = (oldCol + newCol) / 2;
-        return !getPieceAt(bCol, bRow); // Kiểm tra chân mã
-    }
-
-    // 6. LUẬT TƯỢNG
-    if (key.includes('Tuong') && !key.includes('Tuong_G')) {
-        if (dCol !== 2 || dRow !== 2) return false;
-        const overRiver = piece.side === 'R' ? newRow < 5 : newRow > 4;
-        if (overRiver) return false;
-        return !getPieceAt((oldCol + newCol) / 2, (oldRow + newRow) / 2); // Mắt tượng
-    }
-
-    // 7. LUẬT SĨ
-    if (key.includes('Si')) {
-        if (dCol !== 1 || dRow !== 1) return false;
-        const inPalace = newCol >= 3 && newCol <= 5 && (piece.side === 'R' ? newRow >= 7 : newRow <= 2);
-        return inPalace;
-    }
-
-    // 8. LUẬT TƯỚNG
-    if (key.includes('Tuong_G')) {
-        if (dCol + dRow !== 1) return false;
-        const inPalace = newCol >= 3 && newCol <= 5 && (piece.side === 'R' ? newRow >= 7 : newRow <= 2);
-        return inPalace;
-    }
-
-    return false;
-}
-
-function isValidMove(piece, newCol, newRow) {
-    // 1. Check luật đi cơ bản
-    if (!checkBasicMove(piece, newCol, newRow)) {
-        return { valid: false, errorType: 'normal' };
-    }
-
-    // 2. Giả lập nước đi
-    const oldCol = piece.pieceData.col;
-    const oldRow = piece.pieceData.row;
-    const targetPiece = getPieceAt(newCol, newRow);
-
-    piece.pieceData.col = newCol;
-    piece.pieceData.row = newRow;
-    if (targetPiece) targetPiece.active = false;
-
-    // 3. KIỂM TRA LỖI RIÊNG BIỆT
-    let error = null;
-    
-    if (isKingFaceToFace()) {
-        error = 'face'; // Lỗi lộ mặt tướng
-    } else if (isKingInDanger(piece.side)) {
-        error = 'check'; // Lỗi đang bị chiếu hoặc đi vào thế bí
-    }
-
-    // 4. Hoàn tác giả lập
-    piece.pieceData.col = oldCol;
-    piece.pieceData.row = oldRow;
-    if (targetPiece) targetPiece.active = true;
-
-    // 5. Trả về kết quả
-    if (error) {
-        return { valid: false, errorType: error };
-    }
-    return { valid: true };
 }
 
 function invalidMoveEffect(scene, piece, type) {
@@ -778,68 +648,6 @@ function invalidMoveEffect(scene, piece, type) {
     });
 }
 
-function getPieceAt(col, row) {
-    if (!allPieces) return null;
-    
-    const searchCol = Number(col);
-    const searchRow = Number(row);
-    
-    const pieces = allPieces.getChildren();
-    
-    for (let p of pieces) {
-        // Chỉ xét quân đang hoạt động
-        if (!p.active) continue;
-
-        // Ép kiểu toàn bộ về Number để so sánh tuyệt đối
-        const pCol = Number(p.pieceData.col);
-        const pRow = Number(p.pieceData.row);
-
-        if (pCol === searchCol && pRow === searchRow) {
-            return p;
-        }
-    }
-    return null;
-}
-
-// Hàm đếm số quân cờ nằm giữa hai điểm (theo đường thẳng dọc hoặc ngang)
-function countPiecesBetween(c1, r1, c2, r2) {
-    let count = 0;
-    if (c1 === c2) { // Đi dọc
-        const min = Math.min(r1, r2);
-        const max = Math.max(r1, r2);
-        for (let r = min + 1; r < max; r++) {
-            if (getPieceAt(c1, r)) count++;
-        }
-    } else if (r1 === r2) { // Đi ngang
-        const min = Math.min(c1, c2);
-        const max = Math.max(c1, c2);
-        for (let c = min + 1; c < max; c++) {
-            if (getPieceAt(c, r1)) count++;
-        }
-    }
-    return count;
-}
-
-function isKingFaceToFace() {
-    const redKing = allPieces.getChildren().find(p => p.active && p.texture.key === 'R_Tuong_G');
-    const blackKing = allPieces.getChildren().find(p => p.active && p.texture.key === 'B_Tuong_G');
-
-    if (!redKing || !blackKing) return false;
-
-    // Hai tướng phải cùng cột
-    if (redKing.pieceData.col === blackKing.pieceData.col) {
-        const count = countPiecesBetween(
-            redKing.pieceData.col, 
-            redKing.pieceData.row, 
-            blackKing.pieceData.col, 
-            blackKing.pieceData.row
-        );
-        // Nếu không có quân cản ở giữa
-        if (count === 0) return true;
-    }
-    return false;
-}
-
 function showCheckEffect(scene) {
     const centerX = scene.cameras.main.width / 2;
     const centerY = scene.cameras.main.height / 2;
@@ -869,6 +677,7 @@ function showCheckEffect(scene) {
         }
     });
 }
+
 function isOpponentKingUnderCheck(scene, currentTurn) {
     const opponentSide = (currentTurn === 'R') ? 'B' : 'R';
     
@@ -888,30 +697,6 @@ function isOpponentKingUnderCheck(scene, currentTurn) {
     for (let p of myPieces) {
         // Sử dụng chính hàm isValidMove đã viết để kiểm tra tầm tấn công
         if (isValidMove(p, kingCol, kingRow).valid) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function isKingInDanger(side) {
-    // 1. Tìm vị trí Tướng của phe cần kiểm tra
-    const king = allPieces.getChildren().find(p => 
-        p.active && p.texture.key === (side + '_Tuong_G')
-    );
-    if (!king) return false;
-
-    const kingCol = king.pieceData.col;
-    const kingRow = king.pieceData.row;
-
-    // 2. Tìm tất cả quân của đối phương
-    const opponentSide = (side === 'R') ? 'B' : 'R';
-    const opponents = allPieces.getChildren().filter(p => p.active && p.side === opponentSide);
-
-    // 3. Nếu bất kỳ quân đối phương nào có thể "ăn" Tướng -> Tướng đang gặp nguy hiểm
-    for (let p of opponents) {
-        // Lưu ý: Sử dụng isValidMove nhưng phải tránh đệ quy vô tận
-        if (checkBasicMove(p, kingCol, kingRow)) {
             return true;
         }
     }
@@ -1023,43 +808,6 @@ function showGameOver(scene, result) {
     container.add(restartBtn);
 }
 
-function getAllValidMoves(scene, side) {
-    let validMoves = [];
-    
-    // SỬA TẠI ĐÂY: Thêm obj.active vào điều kiện lọc
-    const pieces = scene.children.list.filter(obj => 
-        obj.active &&           // QUAN TRỌNG: Chỉ lấy quân đang sống
-        obj.side === side && 
-        obj.pieceData
-    );
-
-    pieces.forEach(piece => {
-        for (let r = 0; r < 10; r++) {
-            for (let c = 0; c < 9; c++) {
-                const moveResult = isValidMove(piece, c, r);
-                
-                if (moveResult.valid) {
-                    validMoves.push({
-                        piece: piece,
-                        toCol: c,
-                        toRow: r
-                    });
-                }
-            }
-        }
-    });
-
-    return validMoves;
-}
-
-function getValidMovesForPiece(scene, piece) {
-    // Lấy tất cả nước đi hợp lệ của phe hiện tại (side của quân cờ đó)
-    const allMoves = getAllValidMoves(scene, piece.side);
-    
-    // Lọc ra những nước đi mà đối tượng quân cờ trùng với quân cờ đang xét
-    return allMoves.filter(move => move.piece === piece);
-}
-
 function saveGameState() {
     const piecesData = [];
     allPieces.getChildren().forEach(piece => {
@@ -1150,212 +898,6 @@ function serializeBoard() {
     return grid.reverse().map(row => row.join('')).join('');
 }
 
-async function startAIOrder(scene) {
-    const aiSide = (playerSide === 'R') ? 'B' : 'R';
-    if (turn !== aiSide) return;
-
-    const currentBoard = serializeBoard();
-    let moveExecuted = false;
-
-    try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        const response = await fetch('/api/ai-move', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({ board: currentBoard, turn: turn })
-        });
-
-        const data = await response.json();
-
-        if (data.status === "success") {
-            let chosen = null;
-            // 1. Ưu tiên Book
-            if (data.source === 'book' && data.move) {
-                console.log(data.move);
-                chosen = data.move;
-            } else if (data.source === 'stats' && data.moves) {
-                const goodMoves = data.moves.filter(m => m.score >= 0);
-                if (goodMoves.length > 0) {
-                    chosen = goodMoves[Math.floor(Math.random() * goodMoves.length)];
-                    console.log(chosen);
-                } else {
-                    // 3. Toàn nước xấu: Loại trừ khỏi danh sách allMoves
-                    const badKeys = data.moves.map(m => `${m.fromCol},${m.fromRow} to ${m.toCol},${m.toRow}`);
-                    
-                    const filtered = pickBestMove(scene, aiSide, badKeys);
-
-                    if (filtered.length > 0) {
-                        const pick = filtered[Math.floor(Math.random() * filtered.length)];
-                        chosen = { fromCol: pick.piece.pieceData.col, fromRow: pick.piece.pieceData.row, toCol: pick.toCol, toRow: pick.toRow };
-                    }
-                }
-            }
-
-            if (chosen) {
-                const piece = getPieceAt(chosen.fromCol, chosen.fromRow);
-                if (piece) {
-                    executeMove(scene, piece, chosen.toCol, chosen.toRow);
-                    moveExecuted = true;
-                }
-            }
-        }
-    } catch (error) {
-        console.error("AI Error:", error);
-    }
-
-    // 4. FALLBACK: Nếu nãy giờ chưa đi được nước nào (No data hoặc lỗi)
-    if (!moveExecuted) {
-        const fallbackMoves = getAllValidMoves(scene, aiSide);
-        if (fallbackMoves.length > 0) {
-            const pick = fallbackMoves[Math.floor(Math.random() * fallbackMoves.length)];
-            executeMove(scene, pick.piece, pick.toCol, pick.toRow);
-        }
-    }
-}
-
-function pickBestMove(scene, side, badKeys = []) {
-    let allMoves = getAllValidMoves(scene, side);
-
-    allMoves = allMoves.filter(move => {
-        // Không nằm trong danh sách nước đi tệ đã được xác định trước đó
-        const isBadKey = badKeys.some(bk => bk.piece === move.piece && bk.toCol === move.toCol && bk.toRow === move.toRow);
-        console.log(isBadKeyMove(scene, move, side));
-        // Và không dẫn đến mất Tướng
-        return !isBadKey && !isBadKeyMove(scene, move, side);
-    });
-
-    if (allMoves.length === 0) return [];
-
-    const opponentSide = (side === 'R') ? 'B' : 'R';
-
-    // 1. Check thắng ngay (Checkmate) - Ưu tiên tối thượng
-    for (let move of allMoves) {
-        if (simulateAndCheckWin(scene, move, opponentSide)) {
-            console.log("%c CHIẾU BÍ ĐẾN NƠI! ", "background: red; color: white;");
-            return [move];
-        }
-    }
-
-    // 2. Chấm điểm tất cả các nước đi hợp lệ
-    allMoves.forEach(move => {
-        move.scoreDetail = getMoveScore(scene, move, side);
-        move.totalScore = move.scoreDetail.total;
-    });
-
-    // 3. Lọc bỏ badKeys
-    let filteredMoves = filterBadMoves(allMoves, badKeys);
-
-    // 4. Sắp xếp theo điểm tổng giảm dần
-    filteredMoves.sort((a, b) => b.totalScore - a.totalScore);
-
-    // --- DEBUG TABLE ---
-    console.log(`--- AI ANALYSIS (${side}) ---`);
-    const debugData = filteredMoves.slice(0, 5).map(m => ({
-        Piece: m.piece.texture.key,
-        To: `${m.toCol},${m.toRow}`,
-        Total: m.totalScore,
-        Cap: m.scoreDetail.capture,
-        Eva: m.scoreDetail.evasion,
-        Thr: m.scoreDetail.threat,
-        Tac: m.scoreDetail.tactics,
-        Pen: m.scoreDetail.penalty,
-        Impact: m.scoreDetail.boardImpact
-    }));
-    console.table(debugData);
-
-    // 5. Trả về các nước đi tốt nhất
-    if (filteredMoves.length > 0) {
-        const bestScore = filteredMoves[0].totalScore;
-        const bestMoves = filteredMoves.filter(m => m.totalScore === bestScore);
-        
-        console.log(`AI chọn nước: ${bestMoves[0].piece.texture.key} với ${bestScore} điểm.`);
-        return bestMoves;
-    }
-
-    return [];
-}
-
-// Hàm phụ trợ định nghĩa giá trị quân cờ
-function getPieceValue(type) {
-    const values = {
-        'Xe': 100,
-        'Phao': 50,
-        'Ma': 45,
-        'Si': 20,
-        'Tuong_T': 20, // Tượng tịnh
-        'Tot': 10,
-        'Tuong_G': 1000 // Tướng soái
-    };
-
-    // Tìm kiếm trong chuỗi type (ví dụ type là 'R_Xe' thì lấy được 'Xe')
-    for (let key in values) {
-        if (type.includes(key)) {
-            return values[key];
-        }
-    }
-    return 0;
-}
-
-function isCellSafe(scene, col, row, side, movingPiece = null) {
-    const opponentSide = (side === 'R') ? 'B' : 'R';
-    let originalCol, originalRow, targetPiece;
-
-    // --- 1. GIẢ LẬP ---
-    if (movingPiece) {
-        originalCol = movingPiece.pieceData.col;
-        originalRow = movingPiece.pieceData.row;
-        
-        // Tìm quân tại ô đích (ô sắp bị ăn)
-        targetPiece = getPieceAt(col, row);
-        
-        // Nhảy vào tọa độ mới
-        movingPiece.pieceData.col = col;
-        movingPiece.pieceData.row = row;
-
-        // Tạm ẩn quân bị ăn để không tính nó làm "ngòi" hay "vật cản"
-        if (targetPiece) targetPiece.active = false;
-    }
-
-    // --- 2. LẤY DANH SÁCH QUÂN ĐỐI PHƯƠNG (Cái bạn đang thiếu) ---
-    const opponentPieces = scene.children.list.filter(obj => 
-        obj.active && 
-        obj.side === opponentSide && 
-        obj.pieceData
-    );
-
-    // --- 3. KIỂM TRA NGUY HIỂM ---
-    const isDangerous = opponentPieces.some(p => {
-        // Kiểm tra riêng cho Pháo vì nó cần mục tiêu tại (col, row)
-        if (p.texture.key.includes('Phao')) {
-            const isSameLine = (p.pieceData.col === col || p.pieceData.row === row);
-            if (!isSameLine) return false;
-
-            // Đếm ngòi nằm GIỮA Pháo địch và ô (col, row)
-            const count = countPlatformsForPhao(scene, p.pieceData.col, p.pieceData.row, col, row);
-            
-            // Nếu có đúng 1 ngòi, Pháo sẽ bắn trúng quân mình đang giả lập ở đó
-            return count === 1;
-        }
-
-        // Các quân khác dùng isValidMove bình thường
-        // Lúc này isValidMove sẽ thấy movingPiece đang đứng ở (col, row)
-        const check = isValidMove(p, col, row);
-        return check.valid;
-    });
-
-    // --- 4. HOÀN TRẢ ---
-    if (movingPiece) {
-        movingPiece.pieceData.col = originalCol;
-        movingPiece.pieceData.row = originalRow;
-        if (targetPiece) targetPiece.active = true;
-    }
-
-    return !isDangerous;
-}
-
 /**
  * Hàm đếm ngòi Pháo: Không tính quân nằm tại chính ô mục tiêu (targetCol, targetRow)
  */
@@ -1387,275 +929,4 @@ function filterBadMoves(moves, badKeys) {
         const key = `${m.piece.pieceData.col},${m.piece.pieceData.row} to ${m.toCol},${m.toRow}`;
         return !badKeys.includes(key);
     });
-}
-
-// Hàm giả lập nhanh để check thắng/thua
-function simulateAndCheckWin(scene, move, opponentSide) {
-    const originalCol = move.piece.pieceData.col;
-    const originalRow = move.piece.pieceData.row;
-    const targetPiece = getPieceAt(move.toCol, move.toRow);
-
-    move.piece.pieceData.col = move.toCol;
-    move.piece.pieceData.row = move.toRow;
-    if (targetPiece) targetPiece.active = false;
-
-    const win = isCheckmate(scene, opponentSide);
-
-    move.piece.pieceData.col = originalCol;
-    move.piece.pieceData.row = originalRow;
-    if (targetPiece) targetPiece.active = true;
-    
-    return win;
-}
-
-function getEvasionMoves(scene, side, allMoves, badKeys) {
-    const opponentSide = (side === 'R') ? 'B' : 'R';
-    let evasionMoves = [];
-
-    // 1. Lấy danh sách quân đang nằm trong tầm ngắm của đối thủ
-    const piecesAtRisk = allPieces.getChildren().filter(p => 
-        p.active && 
-        p.side === side && 
-        getPieceValue(p.texture.key) > 0 // Chỉ xét Xe, Pháo, Mã
-    ).filter(p => {
-        const col = p.pieceData.col;
-        const row = p.pieceData.row;
-        const myVal = getPieceValue(p.texture.key);
-
-        // Kiểm tra an toàn hiện tại
-        if (isCellSafe(scene, col, row, side)) return false;
-
-        // Nếu KHÔNG an toàn, kiểm tra xem có được bảo vệ không
-        const protected = isProtected(scene, col, row, side);
-        
-        if (protected) {
-            const opponentMoves = getAllValidMoves(scene, opponentSide);
-            const threats = opponentMoves.filter(m => m.toCol === col && m.toRow === row);
-            
-            // Tìm quân hăm dọa có giá trị thấp nhất của đối thủ
-            const minThreatValue = Math.min(...threats.map(t => getPieceValue(t.piece.texture.key)));
-            console.log(minThreatValue, myValue);
-            // 1. Nếu quân hăm dọa rẻ tiền hơn quân mình (ví dụ Tốt hăm Mã) -> CHẠY
-            if (minThreatValue < myVal) {
-                console.log(`Bỏ chạy: ${p.texture.key} bị quân yếu hơn (${minThreatValue}) hăm dọa`);
-                return true;
-            }
-
-            // 2. Nếu số quân hăm dọa nhiều hơn số quân bảo vệ (Áp đảo) -> CHẠY
-            const allyMoves = getAllValidMoves(scene, side);
-            const protectors = allyMoves.filter(m => m.toCol === col && m.toRow === row);
-            
-            if (threats.length > protectors.length) {
-                console.log(`Bỏ chạy: ${p.texture.key} bị áp đảo số lượng (Hăm: ${threats.length}, Vệ: ${protectors.length})`);
-                return true;
-            }
-
-            // 3. Nếu đối phương dùng quân to hăm quân nhỏ (Xe hăm Pháo) và mình có bảo vệ
-            // -> KHÔNG CHẠY (Vì đối phương sẽ lỗ nếu ăn)
-            return false; 
-        }
-
-        return true; // Không có bảo vệ -> Chắc chắn phải chạy
-    });
-
-    if (piecesAtRisk.length === 0) return [];
-
-    // Ưu tiên quân quý nhất chạy trước
-    piecesAtRisk.sort((a, b) => getPieceValue(b.texture.key) - getPieceValue(a.texture.key));
-
-    for (let atRiskPiece of piecesAtRisk) {
-        const movesForThisPiece = allMoves.filter(m => m.piece === atRiskPiece);
-        
-        for (let move of movesForThisPiece) {
-            const originalCol = move.piece.pieceData.col;
-            const originalRow = move.piece.pieceData.row;
-            
-            move.piece.pieceData.col = move.toCol;
-            move.piece.pieceData.row = move.toRow;
-            
-            // Ô mới phải an toàn tuyệt đối
-            const isSafeNewPlace = isCellSafe(scene, move.toCol, move.toRow, side);
-            
-            move.piece.pieceData.col = originalCol;
-            move.piece.pieceData.row = originalRow;
-
-            if (isSafeNewPlace) {
-                move.isEvasion = true;
-                evasionMoves.push(move);
-            }
-        }
-        
-        let filtered = filterBadMoves(evasionMoves, badKeys);
-        if (filtered.length > 0) return filtered;
-    }
-
-    return [];
-}
-
-function isProtected(scene, col, row, side) {
-    const pieceAtCell = getPieceAt(col, row);
-    if (!pieceAtCell) return false;
-
-    // Tạm thời vô hiệu hóa quân cờ tại ô đó để check xem đồng đội có bảo vệ được ô này không
-    const originalActive = pieceAtCell.active;
-    pieceAtCell.active = false; 
-
-    // Lấy tất cả nước đi của đồng đội khi ô đó đang "trống"
-    const allyMoves = getAllValidMoves(scene, side);
-    
-    // Kiểm tra xem có quân nào có thể đi tới ô này không
-    const canProtect = allyMoves.some(m => m.toCol === col && m.toRow === row);
-
-    // Hoàn trả trạng thái
-    pieceAtCell.active = originalActive;
-
-    return canProtect;
-}
-
-function getMoveScore(scene, move, side) {
-    const opponentSide = (side === 'R') ? 'B' : 'R';
-    const myValue = getPieceValue(move.piece.texture.key);
-    const targetPiece = getPieceAt(move.toCol, move.toRow);
-    
-    let detail = {
-        capture: 0,
-        evasion: 0,
-        threat: 0,    // <-- Thêm mới: Điểm hăm dọa
-        tactics: 0,
-        penalty: 0,
-        total: 0
-    };
-
-    // --- GIẢ LẬP TRẠNG THÁI ---
-    const originalCol = move.piece.pieceData.col;
-    const originalRow = move.piece.pieceData.row;
-    
-    move.piece.pieceData.col = move.toCol;
-    move.piece.pieceData.row = move.toRow;
-    if (targetPiece) targetPiece.active = false;
-
-   // Phải truyền move.piece vào để hàm biết quân nào đang giả lập di chuyển
-    const isSafeAfter = isCellSafe(scene, move.toCol, move.toRow, side, move.piece);
-
-    // 1. ĂN QUÂN (Capture)
-    if (targetPiece) {
-        const opponentValue = getPieceValue(targetPiece.texture.key);
-        detail.capture = isSafeAfter ? (opponentValue * 10) : ((opponentValue - myValue) * 10);
-    }
-
-    // 2. BỎ CHẠY (Evasion)
-    const isCurrentlySafe = isCellSafe(scene, originalCol, originalRow, side);
-    const isProtectedNow = isProtected(scene, originalCol, originalRow, side);
-    if (!isCurrentlySafe) {
-        if (!isProtectedNow && isSafeAfter) detail.evasion = myValue * 3;
-        else if (isSafeAfter) {
-            // Check nếu bị quân nhỏ hăm
-            const threats = getAllValidMoves(scene, opponentSide).filter(m => m.toCol === originalCol && m.toRow === originalRow);
-            if (threats.some(t => getPieceValue(t.piece.texture.key) < myValue)) detail.evasion = myValue * 5;
-        }
-    }
-
-    let boardImpact = 0;
-
-    // --- BƯỚC MỚI: KIỂM TRA HỆ LỤY CHO QUÂN ĐỒNG ĐỘI ---
-    // 1. Lấy danh sách đồng đội (không tính quân đang di chuyển)
-    const teammates = scene.children.list.filter(p => 
-        p.active && p.side === side && p !== move.piece
-    );
-
-    teammates.forEach(tm => {
-        // Kiểm tra xem trước khi đi, quân này có an toàn không
-        // (Lưu ý: Bạn có thể tối ưu bằng cách chỉ kiểm tra những quân đang bị hăm)
-        const wasSafe = isCellSafe(scene, tm.pieceData.col, tm.pieceData.row, side);
-        
-        // Sau khi giả lập nước đi của move.piece, kiểm tra lại an toàn cho đồng đội tm
-        const isStillSafe = isCellSafe(scene, tm.pieceData.col, tm.pieceData.row, side);
-
-        if (wasSafe && !isStillSafe) {
-            // Nếu nước đi làm đồng đội mất an toàn (vỡ căn hoặc làm lộ mặt)
-            const tmValue = getPieceValue(tm.texture.key);
-            boardImpact -= tmValue * 5; // Phạt điểm nặng
-        }
-    });
-
-    detail.boardImpact = boardImpact;
-
-    // Trong hàm tính điểm cho mỗi nước đi (getMoveScore)
-    if (move.piece.texture.key.includes('Tuong')) {
-        // Nếu Tướng di chuyển lên trên (giảm Row đối với quân Đen, tăng Row đối với quân Đỏ)
-        // Mà không phải là nước đi để thoát chiếu (isKingInDanger === false)
-        if (!isKingInDanger(side)) {
-            detail.evasion -= 50; // Phạt nặng nếu tự nhiên đòi lên Tướng
-        }
-    }
-
-    // 3. HĂM DỌA (Threatening) - CHỈ TÍNH KHI Ô ĐẾN AN TOÀN
-    if (isSafeAfter) {
-        // Lấy các nước đi hợp lệ của quân này tại vị trí mới
-        const nextMoves = getValidMovesForPiece(scene, move.piece);
-        let bestThreatValue = 0;
-
-        for (let nM of nextMoves) {
-            const potentialTarget = getPieceAt(nM.toCol, nM.toRow);
-            if (potentialTarget && potentialTarget.side !== side) {
-                const val = getPieceValue(potentialTarget.texture.key);
-                if (val > bestThreatValue) bestThreatValue = val;
-            }
-        }
-        
-        // Điểm hăm dọa = 10% giá trị quân định bắt (khích lệ nhẹ)
-        // Nếu hăm Xe (100) thì được +10 điểm, hăm Mã (45) được +4.5 điểm
-        detail.threat = bestThreatValue * 2; 
-    }
-
-    // 4. CHIẾN THUẬT & HÌNH PHẠT
-    if (isOpponentKingUnderCheck(scene, side)) detail.tactics = (isSafeAfter ? 50 : 10);
-    if (!targetPiece && !isSafeAfter) detail.penalty = -(myValue * 10);
-
-    // --- TỔNG KẾT ---
-    detail.total = detail.capture + detail.evasion + detail.threat + detail.tactics + detail.penalty + detail.boardImpact;
-
-    // --- HOÀN TRẢ ---
-    move.piece.pieceData.col = originalCol;
-    move.piece.pieceData.row = originalRow;
-    if (targetPiece) targetPiece.active = true;
-
-    return detail;
-}
-
-function isBadKeyMove(scene, move, side) {
-    const opponentSide = (side === 'R') ? 'B' : 'R';
-    let isBad = false;
-
-    // --- 1. GIẢ LẬP NƯỚC ĐI CỦA MÌNH ---
-    const originalCol = move.piece.pieceData.col;
-    const originalRow = move.piece.pieceData.row;
-    const targetPiece = getPieceAt(move.toCol, move.toRow);
-
-    move.piece.pieceData.col = move.toCol;
-    move.piece.pieceData.row = move.toRow;
-    if (targetPiece) targetPiece.active = false;
-
-    // --- 2. KIỂM TRA XEM ĐỐI PHƯƠNG CÓ ĂN ĐƯỢC TƯỚNG KHÔNG ---
-    // Tìm quân Tướng của mình
-    const myKing = scene.children.list.find(p => 
-        p.active && p.side === side && p.texture.key.includes('Tuong')
-    );
-
-    if (myKing) {
-        // Lấy tất cả nước đi của đối thủ sau khi mình đã đi
-        const opponentMoves = getAllValidMoves(scene, opponentSide);
-        
-        // Nếu có bất kỳ nước nào của đối thủ ăn được Tướng
-        isBad = opponentMoves.some(m => 
-            m.toCol === myKing.pieceData.col && m.toRow === myKing.pieceData.row
-        );
-    }
-
-    // --- 3. HOÀN TRẢ TRẠNG THÁI ---
-    move.piece.pieceData.col = originalCol;
-    move.piece.pieceData.row = originalRow;
-    if (targetPiece) targetPiece.active = true;
-
-    return isBad;
 }
