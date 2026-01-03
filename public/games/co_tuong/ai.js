@@ -208,10 +208,10 @@ function pickBestMove(scene, side, badKeys = []) {
         }
     }
 
-    for (let i = 0; i <= allMoves.length; i++) {
-        if (i <= 3)
-        console.table(allMoves[i].type, allMoves[i].scoreDetail);
-    }   
+    // for (let i = 0; i <= allMoves.length; i++) {
+    //     if (i <= 3)
+    //     console.table(allMoves[i].type, allMoves[i].scoreDetail);
+    // }   
 
     // Trả về danh sách các nước đi tốt nhất (có cùng điểm cao nhất)
     if (allMoves.length > 0) {
