@@ -123,7 +123,7 @@
 
     <div id="game-container"></div>
 
-    <div class="controls">
+    <div class="controls" style="display:none;">
         <button id="toggle-auto-ai" class="btn-auto-off">Auto AI: OFF</button>
     </div>
 
