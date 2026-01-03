@@ -20,6 +20,8 @@ let turn = 'R';
 let playerSide = localStorage.getItem('playerSide') || 'R';
 let gameHistory = []; // Lưu các đối tượng {board, turn, move}
 
+let isAutoAI = false; // Mặc định là tắt
+
 // Tính toán kích thước logic của game
 const isMobileDevice = window.innerWidth < window.innerHeight; // Kiểm tra nhanh mobile
 const GAME_WIDTH = isMobileDevice ? BOARD_WIDTH : (BOARD_WIDTH + 450);
@@ -380,6 +382,7 @@ function create() {
         // Giúp GPU xử lý texture lớn hiệu quả hơn khi thu nhỏ
         piece.side = p.key.startsWith('R') ? 'R' : 'B'; 
         piece.pieceData = { col: p.col, row: p.row }; // Vẫn giữ row logic để tính toán luật đi
+        piece.id = p.id || `${p.key}_${p.col}_${p.row}`;
         allPieces.add(piece);
 
         piece.on('pointerdown', (pointer, localX, localY, event) => {
@@ -398,8 +401,6 @@ function create() {
         });
     });
 
-    // 5. Sự kiện Click bàn cờ (Tính toán dựa trên BOARD_OFFSET_X)
-    // Tìm đến đoạn boardImg.on('pointerdown', ...) trong hàm create()
     boardImg.on('pointerdown', (pointer) => {
         if (selectedPiece) {
             const col = Math.round((pointer.x - BOARD_OFFSET_X - PADDING) / CELL_SIZE);
@@ -428,12 +429,16 @@ function create() {
         showProfile(this, user.user_name, playerSide, true);
         showProfile(this, "MÁY PRO", opponentSide, false);
 
-        // FIX TẠI ĐÂY:
-        if (playerSide === 'R' && turn === 'R') {
+        if ((playerSide === 'R' && turn === 'R') 
+            || (playerSide === 'B' && turn === 'B')) {
             // Nếu người chơi là Đỏ -> Chạy Timer Người chơi
-            startTurnTimer(this, true); 
-        } else if (playerSide === 'B' && turn === 'B') {
             startTurnTimer(this, true);
+            if (isAutoAI) {
+                // Gọi AI đi nước đầu tiên
+                this.time.delayedCall(800, () => {
+                    startAIOrder(this);
+                });
+            }
         } else {
             // Nếu Máy là Đỏ -> Chạy Timer Máy
             // Phải truyền false vì lượt này KHÔNG PHẢI của người chơi
@@ -458,13 +463,6 @@ function create() {
 
 function executeMove(scene, piece, col, row) {
     const moveString = `${piece.pieceData.col},${piece.pieceData.row} to ${col},${row}`;
-    
-    // 1. Lưu lịch sử (Sử dụng serializeBoard hiện tại)
-    gameHistory.push({
-        board: serializeBoard(),
-        turn: turn,
-        move: moveString
-    });
 
     // 2. Xác định quân bị ăn tại ô đích
     const targetPiece = getPieceAt(col, row);
@@ -472,6 +470,14 @@ function executeMove(scene, piece, col, row) {
     // 3. Cập nhật tọa độ logic cho Phaser Piece
     piece.pieceData.col = col;
     piece.pieceData.row = row;
+
+    // 1. Lưu lịch sử (Sử dụng serializeBoard hiện tại)
+    gameHistory.push({
+        board: serializeBoard(),
+        turn: turn,
+        move: moveString,
+        threatedPiece: getThreatenedPieceIds(allPieces.getChildren(), piece, turn)
+    });
 
     // Tính toán tọa độ hiển thị (pixel)
     const targetDisplayRow = getDisplayRow(row); 
@@ -544,7 +550,7 @@ function executeMove(scene, piece, col, row) {
             selectedPiece = null;
 
             // 8. KÍCH HOẠT AI NẾU ĐẾN LƯỢT MÁY
-            if (turn !== playerSide) {
+            if (turn !== playerSide || isAutoAI) {
                 // Delay một chút để người chơi kịp nhìn nước đi vừa thực hiện
                 scene.time.delayedCall(500, () => {
                     startAIOrder(scene);
@@ -580,9 +586,9 @@ function invalidMoveEffect(scene, piece, type) {
             mainMsg = "LỘ MẶT TƯỚNG!";
             subMsg = "Hai tướng không được nhìn nhau";
             break;
-        case 'limit':
-            mainMsg = "PHẠM LUẬT!";
-            subMsg = "Không được chiếu quá 10 lần";
+        case 'persistent_chase':
+            mainMsg = "BẤT BIẾN!";
+            subMsg = "Không được đuổi 1 quân liên tiếp nhiều lần";
             break;
     }
 
@@ -706,6 +712,8 @@ function isOpponentKingUnderCheck(scene, currentTurn) {
 function showGameOver(scene, result) {
     localStorage.removeItem('xiangqi_save_game');
     sendFinalStats(result);
+
+    selectedPiece = null;
 
     // result: 'win' (Đỏ thắng), 'lose' (Đen thắng), hoặc 'draw' (Hòa/Cờ trắng)
     const centerX = scene.cameras.main.width / 2;
@@ -861,29 +869,47 @@ function sendFinalStats(finalResult) {
     .catch(error => console.error("Error:", error));
 }
 
-function serializeBoard() {
-    // Tạo lưới 10x9 trắng (.)
+function serializeBoard(piecesSource = null) {
+    // 1. Lấy nguồn dữ liệu: Nếu có tham số thì dùng, không thì lấy allPieces của Phaser
+    const source = piecesSource || (typeof allPieces !== 'undefined' ? allPieces.getChildren() : []);
+
+    // Tạo lưới 10x9 trống (.)
     let grid = Array.from({ length: 10 }, () => Array(9).fill("."));
 
-    // Bảng ánh xạ khớp chính xác với Key của bạn
     const pieceMap = {
         'XE': 'R',
         'MA': 'N',
-        'TUONG': 'B',   // Tượng (Voi)
-        'SI': 'A',      // Sĩ
-        'TUONG_G': 'K', // Tướng (Vua) - Xử lý trường hợp có hậu tố _G
+        'TUONG': 'B',
+        'SI': 'A',
+        'TUONG_G': 'K',
         'PHAO': 'C',
         'TOT': 'P'
     };
 
-    allPieces.getChildren().forEach(p => {
-        if (p.active) {
-            let key = p.texture.key.toUpperCase(); // Ví dụ: "R_TUONG_G"
-            let parts = key.split('_'); // ["R", "TUONG", "G"] hoặc ["R", "XE"]
-            
+    source.forEach(p => {
+        // Kiểm tra quân cờ còn sống (Active)
+        // Lưu ý: Đối với quân clone, ta mặc định là true hoặc p.active
+        const isActive = (p.active !== undefined) ? p.active : true;
+
+        if (isActive) {
+            // Lấy Tọa độ: Linh hoạt giữa pieceData (Phaser) và object phẳng (Clone)
+            const r = (p.pieceData ? p.pieceData.row : p.row);
+            const c = (p.pieceData ? p.pieceData.col : p.col);
+
+            // Lấy Key: Linh hoạt giữa texture.key (Phaser) và type (Clone)
+            let key = "";
+            if (p.texture && p.texture.key) {
+                key = p.texture.key.toUpperCase();
+            } else if (p.type) {
+                key = p.type.toUpperCase();
+            }
+
+            if (!key) return;
+
+            let parts = key.split('_');
             let side = parts[0]; // "R" hoặc "B"
             
-            // Lấy phần loại quân: nếu là TUONG_G thì nối lại, nếu không thì lấy parts[1]
+            // Xử lý loại quân (TUONG_G hoặc XE, MA...)
             let type = (parts[1] === 'TUONG' && parts[2] === 'G') ? 'TUONG_G' : parts[1];
 
             let char = pieceMap[type] || '?';
@@ -891,11 +917,15 @@ function serializeBoard() {
             // Đỏ (R) viết HOA, Đen (B) viết thường
             let finalChar = (side === 'R') ? char.toUpperCase() : char.toLowerCase();
             
-            grid[p.pieceData.row][p.pieceData.col] = finalChar;
+            // Điền vào lưới (Bảo vệ tránh lỗi tọa độ ngoài phạm vi)
+            if (grid[r] && grid[r][c] !== undefined) {
+                grid[r][c] = finalChar;
+            }
         }
     });
 
-    return grid.reverse().map(row => row.join('')).join('');
+    // Trả về chuỗi kết quả (Đảo ngược grid nếu bạn cần gốc tọa độ từ phía trên)
+    return grid.slice().reverse().map(row => row.join('')).join('');
 }
 
 /**
@@ -930,3 +960,18 @@ function filterBadMoves(moves, badKeys) {
         return !badKeys.includes(key);
     });
 }
+
+// TRONG HÀM CREATE HOẶC KHỞI TẠO
+const btnAuto = document.getElementById('toggle-auto-ai');
+btnAuto.addEventListener('click', () => {
+    isAutoAI = !isAutoAI;
+    
+    if (isAutoAI) {
+        btnAuto.innerText = "Auto AI: ON";
+        btnAuto.className = "btn-auto-on";
+        startAIOrder(game.scene.scenes[0]);
+    } else {
+        btnAuto.innerText = "Auto AI: OFF";
+        btnAuto.className = "btn-auto-off";
+    }
+});

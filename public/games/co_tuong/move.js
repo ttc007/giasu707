@@ -74,28 +74,35 @@ function isValidMove(piece, newCol, newRow, piecesSource = null) {
     // 3. TẠO GIẢ LẬP SẠCH (Không sửa đổi piece gốc)
     const side = piece.side;
     const pieceId = piece.id || (piece.pieceData ? piece.pieceData.id : null);
-    
+
     // Tạo mảng mới mô phỏng sau khi đi nước này
     const afterPieces = currentPieces
         .filter(p => {
-            // Loại bỏ quân địch bị ăn tại ô đích
-            const pCol = p.col !== undefined ? p.col : p.pieceData.col;
-            const pRow = p.row !== undefined ? p.row : p.pieceData.row;
-            const isAtTarget = Number(pCol) === Number(newCol) && Number(pRow) === Number(newRow);
+            const pCol = Number(p.pieceData ? p.pieceData.col : p.col);
+            const pRow = Number(p.pieceData ? p.pieceData.row : p.row);
+            const isAtTarget = pCol === Number(newCol) && pRow === Number(newRow);
+            // Loại bỏ quân địch tại ô đích
             return !(isAtTarget && p.side !== side);
         })
         .map(p => {
-            // Clone và cập nhật vị trí cho quân đang di chuyển
-            const isMovingPiece = (p === piece || (pieceId && (p.id === pieceId || (p.pieceData && p.pieceData.id === pieceId))));
+            const pId = p.id || (p.pieceData ? p.pieceData.id : null);
+            const isMovingPiece = (p === piece || (pieceId && pId === pieceId));
+
             if (isMovingPiece) {
+                // Clone sâu pieceData để không dính líu đến quân gốc
                 return { 
                     ...p, 
-                    col: newCol, 
-                    row: newRow, 
-                    pieceData: p.pieceData ? { ...p.pieceData, col: newCol, row: newRow } : undefined 
+                    col: Number(newCol), 
+                    row: Number(newRow),
+                    pieceData: p.pieceData ? { ...p.pieceData, col: Number(newCol), row: Number(newRow) } : undefined 
                 };
             }
-            return { ...p };
+            
+            // Cực kỳ quan trọng: Phải clone cả pieceData của những quân đứng yên
+            return { 
+                ...p, 
+                pieceData: p.pieceData ? { ...p.pieceData } : undefined 
+            };
         });
 
     // 4. KIỂM TRA LỖI CHIẾU TƯỚNG / LỘ MẶT TƯỚNG TRÊN MẢNG GIẢ LẬP
@@ -112,17 +119,29 @@ function isValidMove(piece, newCol, newRow, piecesSource = null) {
 
     // 2. Kiểm tra trong gameHistory
     // Chúng ta cần kiểm tra các mốc: cách 4 nước (index - 4) và index - 8
+    // TRONG isValidMove (khi giả lập nước đi cho quân 'piece')
     const len = gameHistory.length;
 
-    // và hình cờ cách đây 8 nước (chu kỳ 2) không.
-    const isRepeatCycle1 = len >= 4 && gameHistory[len - 4].board === futureHash;
+    if (!piecesSource && len >= 4) {
+        const futureHash = serializeBoard(afterPieces);
+        // Lấy danh sách ID quân địch mà nước đi này sẽ hăm dọa
+       // const futureThreats = getThreatenedPieceIds(afterPieces, piece, side); 
 
-    if (isRepeatCycle1) {
-        console.log("Vi phạm lỗi lặp hình cờ chu kỳ 3 lần!");
-        return { valid: false, errorType: 'repeat' };
+        // Tìm quân cờ bị đuổi chung (giao điểm của các tập hợp hăm dọa)
+        const secondLastMove = gameHistory[len - 2].threatedPiece; // Lượt trước của chính phe đang đi
+        const fourthLastMove = gameHistory[len - 4].threatedPiece; // Lượt trước nữa của chính phe đang đi
+
+        // Kiểm tra xem có quân nào bị hăm dọa LIÊN TỤC trong cả 3 lượt của phe này không
+        const persistentTarget = secondLastMove.find(id => 
+            fourthLastMove.includes(id)
+        );
+
+        if (persistentTarget && gameHistory[len - 3].board === futureHash) {
+            console.warn(`Vi phạm: Quân ${piece} đang trường tầm quân ${persistentTarget}`);
+            return { valid: false, errorType: 'persistent_chase' };
+        }
     }
 
-    // 5. TRẢ KẾT QUẢ (Không cần hoàn tác vì chúng ta không sửa piece gốc)
     return { valid: true };
 }
 
@@ -319,16 +338,17 @@ function getValidMovesForPiece(piecesSource, piece) {
     // 2. Lấy tất cả nước đi hợp lệ của phe đó trên nguồn dữ liệu tương ứng
     // Truyền piecesSource vào để getAllValidMoves tính toán trên đúng tập dữ liệu đó
     const allMoves = getAllValidMoves(piecesSource, side);
-    
     // 3. Lọc ra những nước đi dành riêng cho quân cờ này
     // Lưu ý: Nếu là quân cờ clone, ta so sánh qua ID hoặc vị trí (Col, Row)
-    return allMoves.filter(move => {
+    const data = allMoves.filter(move => {
         if (move.piece.id && piece.id) {
             return move.piece.id === piece.id;
         }
         // Dự phòng nếu không có ID thì so sánh tham chiếu object
         return move.piece === piece;
     });
+
+    return data;
 }
 
 function isCheckmate(pieces, side) {
@@ -347,27 +367,18 @@ function isCheckmate(pieces, side) {
     return true; // Duyệt hết không có nước nào -> Thua
 }
 
-function serializeSimulatedBoard(pieces) {
-    let grid = Array.from({ length: 10 }, () => Array(9).fill("."));
-    const pieceMap = { 'XE': 'R', 'MA': 'N', 'TUONG': 'B', 'SI': 'A', 'TUONG_G': 'K', 'PHAO': 'C', 'TOT': 'P' };
+function getThreatenedPieceIds(boardState, movingPiece, side) {
+    const threats = [];
+    const opponents = boardState.filter(p => p.side !== side && p.active !== false);
 
-    pieces.forEach(p => {
-        // p ở đây là object từ afterPieces (có col, row hoặc pieceData.col, pieceData.row)
-        let r = p.pieceData ? p.pieceData.row : p.row;
-        let c = p.pieceData ? p.pieceData.col : p.col;
+    for (let target of opponents) {
+        const tCol = target.pieceData ? target.pieceData.col : target.col;
+        const tRow = target.pieceData ? target.pieceData.row : target.row;
         
-        // Lấy type từ texture.key hoặc p.type tùy vào cách bạn clone
-        let key = p.texture ? p.texture.key.toUpperCase() : (p.type || "");
-        let parts = key.split('_');
-        let side = parts[0];
-        let type = (parts[1] === 'TUONG' && parts[2] === 'G') ? 'TUONG_G' : parts[1];
-
-        let char = pieceMap[type] || '?';
-        let finalChar = (side === 'R') ? char.toUpperCase() : char.toLowerCase();
-        
-        grid[r][c] = finalChar;
-    });
-
-    // Quan trọng: .reverse() phải đồng bộ với hàm serializeBoard gốc của bạn
-    return grid.slice().reverse().map(row => row.join('')).join('');
+        // CHỈ dùng checkBasicMove ở đây, tuyệt đối không dùng isValidMove
+        if (checkBasicMove(movingPiece, tCol, tRow, boardState) && target) {
+            threats.push(target.id || target.pieceData.id);
+        }
+    }
+    return threats;
 }

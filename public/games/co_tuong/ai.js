@@ -1,4 +1,4 @@
-function getPieceValue(type) {
+function getPieceValue(type, col = null, row = null, side = null) {
     const values = {
         'Xe': 100,
         'Phao': 50,
@@ -10,17 +10,37 @@ function getPieceValue(type) {
     };
 
     // Tìm kiếm trong chuỗi type (ví dụ type là 'R_Xe' thì lấy được 'Xe')
+    let baseValue = 0;
+    if (type.includes('Tot') && row !== null) {
+        // Giả định: Phe Đỏ (R) nằm dưới (row 5-9), Phe Đen (B) nằm trên (row 0-4)
+        // Nếu không truyền side, ta có thể đoán side từ type (ví dụ 'R_Tot')
+        const pieceSide = side || (type.startsWith('R') ? 'R' : 'B');
+        
+        const hasCrossedRiver = (pieceSide === 'R') ? (row <= 4) : (row >= 5);
+        
+        if (hasCrossedRiver) {
+            baseValue += 16; //
+        }
+    }
+
     for (let key in values) {
         if (type.includes(key)) {
-            return values[key];
+            return values[key] + baseValue;
         }
     }
     return 0;
 }
 
 async function startAIOrder(scene) {
-    const aiSide = (playerSide === 'R') ? 'B' : 'R';
-    if (turn !== aiSide) return;
+    let aiSide = (playerSide === 'R') ? 'B' : 'R';
+
+    // Nếu không phải Auto và không phải lượt của AI thiết lập sẵn thì dừng
+    // (Giữ lại logic này nếu bạn chỉ muốn AI đánh hộ người chơi khi bật Auto)
+    if (!isAutoAI && turn !== aiSide) return;
+
+    if (isAutoAI) {
+        aiSide = turn;
+    }
 
     // Lấy dữ liệu quân cờ hiện tại để truyền vào các hàm logic
     const currentPieces = allPieces.getChildren();
@@ -65,7 +85,7 @@ async function startAIOrder(scene) {
                         toCol: m.toCol,
                         toRow: m.toRow
                     }));
-                    console.log(badKeys);
+                    // console.log(badKeys);
                     
                     const filtered = pickBestMove(scene, aiSide, badKeys);
 
@@ -116,10 +136,6 @@ async function startAIOrder(scene) {
             executeMove(scene, piece, chosen.toCol, chosen.toRow);
 
             console.log("AI không tìm được nước đi tốt, thực hiện đánh random từ allValid.");
-        } else {
-            // Trường hợp này nghĩa là AI đã bị bí cờ hoàn toàn (không còn nước nào đi được)
-            console.log("AI không còn nước đi hợp lệ nào để thực hiện.");
-            chosen = null; 
         }
     }
 }
@@ -181,26 +197,21 @@ function pickBestMove(scene, side, badKeys = []) {
     // --- DEBUG TABLE ĐẦY ĐỦ ---
     console.log(`--- AI ANALYSIS (${side}) ---`);
 
-    const debugData = allMoves.slice(0, 5).map(m => {
-        // Đảm bảo m.type có tên quân dễ đọc
-        const pieceName = m.type ? m.type.replace(`${side}_`, '') : '??';
-        
-        return {
-            'Quân': pieceName,
-            'Từ': `${m.fromCol},${m.fromRow}`,
-            'Đến': `${m.toCol},${m.toRow}`,
-            'TỔNG': m.totalScore,
-            'Ăn': m.scoreDetail.capture || 0,
-            'Chạy': m.scoreDetail.evasion || 0,
-            'Cứu': m.scoreDetail.protection || 0,   // Cột mới: Điểm bảo vệ đồng đội
-            'Hăm': m.scoreDetail.threat || 0,
-            'HệLụy': m.scoreDetail.boardImpact || 0, // Cột mới: Điểm làm hở sườn đồng đội
-            'Phạt': m.scoreDetail.penalty || 0,
-            'ChiếnThuật': m.scoreDetail.tactics || 0
-        };
-    });
+    if (allMoves.length > 1) {
+        let len = gameHistory.length;
+        if (len >= 11) {
+            if (gameHistory[len -1].board === gameHistory[len - 9].board 
+                && gameHistory[len - 2].board === gameHistory[len - 10].board
+                && gameHistory[len - 3].board === gameHistory[len - 11].board) {
+                allMoves.shift();
+            }
+        }
+    }
 
-    console.table(debugData);
+    for (let i = 0; i <= allMoves.length; i++) {
+        if (i <= 3)
+        console.table(allMoves[i].type, allMoves[i].scoreDetail);
+    }   
 
     // Trả về danh sách các nước đi tốt nhất (có cùng điểm cao nhất)
     if (allMoves.length > 0) {
@@ -275,7 +286,7 @@ function getMoveScore(currentPieces, move, side) {
     const isSafeAfter = isActuallySafe(move.toCol, move.toRow, side, afterPieces);
     // --- 2. TÍNH ĐIỂM ĂN QUÂN (CAPTURE) ---
     if (targetPiece) {
-        const opponentValue = getPieceValue(targetPiece.type);
+        const opponentValue = getPieceValue(targetPiece.type, targetPiece.col, targetPiece.row, targetPiece.side);
         // Nếu an toàn: ăn trọn. Nếu không an toàn: tính điểm trao đổi (Lời/Lỗ)
         detail.capture = isSafeAfter ? (opponentValue * 1) : ((opponentValue - myValue) * 1);
     }
@@ -328,11 +339,29 @@ function getMoveScore(currentPieces, move, side) {
                     if (enemyValue > myValue) {
                         // Chỉ có giá trị nếu quân địch to hơn quân mình (ví dụ: Pháo hăm Xe)
                         // Điểm = phần lãi nếu đổi quân
-                        totalThreatScore = Math.max(totalThreatScore, (enemyValue - myValue) * 1);
+                        totalThreatScore = Math.max(totalThreatScore, (enemyValue - myValue) * 0.2);
                     } else {
-                        // Nếu quân địch rẻ hơn hoặc bằng mình (Xe hăm Mã có bảo vệ)
-                        // Điểm hăm dọa rất thấp hoặc bằng 0 vì đối phương không sợ
-                        totalThreatScore = Math.max(totalThreatScore, 10); 
+                        // TH2: Hăm quân CÓ bảo vệ -> ĐỔI QUÂN HOẶC TẬP TRUNG HỎA LỰC
+                        
+                        // Đếm số lượng quân mình đang cùng "ngắm" vào mục tiêu này
+                        const myAttackers = countAttackers(m.toCol, m.toRow, side, afterPieces);
+                        // Đếm số lượng quân địch đang bảo vệ mục tiêu này
+                        const enemyDefenders = countAttackers(m.toCol, m.toRow, enemy.side, afterPieces);
+
+                        if (myAttackers > enemyDefenders) {
+                            // THÊM: Nếu phe mình áp đảo số lượng (ví dụ 2 Xe soi 1 Sĩ có 1 Tượng bảo vệ)
+                            // Đây là tư duy tấn công vũ bão: Sẵn sàng phá vỡ hàng phòng thủ
+                            const overloadBonus = (enemyValue * 0.5); 
+                            totalThreatScore = Math.max(totalThreatScore, overloadBonus);
+                        } else if (enemyValue > myValue) {
+                            // Chỉ có giá trị nếu quân địch to hơn quân mình (ví dụ: Pháo hăm Xe)
+                            totalThreatScore = Math.max(totalThreatScore, (enemyValue - myValue) * 1);
+                        } else {
+                            // Nếu quân mình tiếp sức cho đồng đội (áp lực tăng lên dù chưa áp đảo)
+                            // Thay vì chỉ cho 10 điểm, ta cộng thêm điểm "áp lực"
+                            const pressureBonus = (myAttackers >= 2) ? 50 : 10;
+                            totalThreatScore = Math.max(totalThreatScore, pressureBonus); 
+                        }
                     }
                 }
             }
@@ -466,6 +495,29 @@ function isBadKeyMove(piecesSource, move, side) {
         }
     }
 
+    const len = gameHistory.length;
+    if (len >= 4) {
+        const futureHash = serializeBoard(afterMyMove);
+       // const futureThreats = getThreatenedPieceIds(afterPieces, piece, side); 
+
+        // Tìm quân cờ bị đuổi chung (giao điểm của các tập hợp hăm dọa)
+        const secondLastMove = gameHistory[len - 2].threatedPiece; // Lượt trước của chính phe đang đi
+        const fourthLastMove = gameHistory[len - 4].threatedPiece; // Lượt trước nữa của chính phe đang đi
+
+        // Kiểm tra xem có quân nào bị hăm dọa LIÊN TỤC trong cả 3 lượt của phe này không
+        const persistentTarget = secondLastMove.find(id => 
+            fourthLastMove.includes(id)
+        );
+
+        if (gameHistory[len - 4].board === futureHash) {
+            if (persistentTarget) {
+                console.warn(`Vi phạm: Quân ${move.type} trường tầm quân ${persistentTarget}`);
+                return true;
+            }
+        }
+        
+    }
+
     return false; // Vượt qua được mọi phản công của địch
 }
 
@@ -484,4 +536,17 @@ function simulateMove(source, m) {
         moving.row = m.toRow;
     }
     return virtual;
+}
+
+function countAttackers(col, row, side, boardState) {
+    let count = 0;
+    const pieces = boardState.filter(p => p.side === side && p.active !== false);
+    
+    pieces.forEach(p => {
+        // Sử dụng checkBasicMove để tránh đệ quy
+        if (checkBasicMove(p, col, row, boardState)) {
+            count++;
+        }
+    });
+    return count;
 }

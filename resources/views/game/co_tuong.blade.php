@@ -91,6 +91,24 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        #toggle-auto-ai {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+        .btn-auto-off { background-color: #666; color: white; }
+        .btn-auto-on { background-color: #2ecc71; color: white; box-shadow: 0 0 10px #2ecc71; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
@@ -104,7 +122,11 @@
     <a href="/" class="home-button">TRANG CHỦ</a>
 
     <div id="game-container"></div>
-    
+
+    <div class="controls">
+        <button id="toggle-auto-ai" class="btn-auto-off">Auto AI: OFF</button>
+    </div>
+
     <script src="{{ asset('games/co_tuong/game.js') }}?t=time()"></script>
     <script src="{{ asset('games/co_tuong/move.js') }}?t=time()"></script>
     <script src="{{ asset('games/co_tuong/ai.js') }}?t=time()"></script>
