@@ -166,9 +166,9 @@
         <div class="board-wrapper">
           <canvas id="chessboard" width="355" height="420"></canvas>
         </div>
-        <div id="result" style="min-height:100px; text-align: left;" class="card p-2 mb-3 mt-2 mx-3"></div>
+        <div id="result" style="min-height:100px; text-align: left;display: none;" class="card p-2 mb-3 mt-2 mx-3"></div>
 
-        <div class="my-3 text-center">
+        <div class="my-3 text-center" style="display:none;">
             <textarea id="comment" class="form-control" rows="3" style="max-width: 400px; margin: 0 auto;"></textarea>
         </div>
 
