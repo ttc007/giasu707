@@ -109,6 +109,30 @@
         }
         .btn-auto-off { background-color: #666; color: white; }
         .btn-auto-on { background-color: #2ecc71; color: white; box-shadow: 0 0 10px #2ecc71; }
+
+        .btn-icon {
+            background-color: #f39c12; /* Màu cam nổi bật cho Restart */
+            color: white;
+            border: none;
+            border-radius: 50%; /* Làm nút hình tròn */
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            font-size: 20px;
+            display: inline;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .btn-icon:hover {
+            background-color: #e67e22;
+            transform: rotate(-45deg); /* Hiệu ứng xoay nhẹ khi hover */
+        }
+
+        .btn-icon:active {
+            transform: scale(0.9); /* Hiệu ứng nhấn nút */
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
@@ -123,8 +147,11 @@
 
     <div id="game-container"></div>
 
-    <div class="controls" style="display:none;">
+    <div class="controls">
         <button id="toggle-auto-ai" class="btn-auto-off">Auto AI: OFF</button>
+        <button id="btn-restart" class="btn-icon" title="Restart Game">
+            &#8635;
+        </button>
     </div>
 
     <script src="{{ asset('games/co_tuong/game.js') }}?t=time()"></script>

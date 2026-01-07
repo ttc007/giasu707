@@ -90,7 +90,12 @@ async function startAIOrder(scene) {
                     const filtered = pickBestMove(scene, aiSide, badKeys);
 
                     if (filtered && filtered.length > 0) {
-                        const pick = filtered[0]; // pickBestMove thường đã sort nước ngon nhất lên đầu
+                        // 1. Tạo một chỉ số ngẫu nhiên từ 0 đến filtered.length - 1
+                        const randomIndex = Math.floor(Math.random() * filtered.length);
+                        
+                        // 2. Lấy nước đi tại vị trí ngẫu nhiên đó
+                        const pick = filtered[randomIndex];
+
                         chosen = { 
                             fromCol: pick.fromCol, 
                             fromRow: pick.fromRow, 
@@ -193,10 +198,6 @@ function pickBestMove(scene, side, badKeys = []) {
     // Sắp xếp giảm dần theo điểm tổng
     allMoves.sort((a, b) => b.totalScore - a.totalScore);
 
-    // --- DEBUG LOG ---
-    // --- DEBUG TABLE ĐẦY ĐỦ ---
-    console.log(`--- AI ANALYSIS (${side}) ---`);
-
     if (allMoves.length > 1) {
         let len = gameHistory.length;
         if (len >= 11) {
@@ -208,15 +209,10 @@ function pickBestMove(scene, side, badKeys = []) {
         }
     }
 
-    // for (let i = 0; i <= allMoves.length; i++) {
-    //     if (i <= 3)
-    //     console.table(allMoves[i].type, allMoves[i].scoreDetail);
-    // }   
-
-    // Trả về danh sách các nước đi tốt nhất (có cùng điểm cao nhất)
+    // Trả về danh sách tối đa 2 nước đi tốt nhất
     if (allMoves.length > 0) {
-        const topScore = allMoves[0].totalScore;
-        return allMoves.filter(m => m.totalScore === topScore);
+        console.log(allMoves.slice(0, 2));
+        return allMoves.slice(0, 2);
     }
 
     return [];
@@ -251,7 +247,8 @@ function getMoveScore(currentPieces, move, side) {
     const opponentSide = (side === 'R') ? 'B' : 'R';
     const myValue = getPieceValue(move.type);
     
-    let detail = { capture: 0, evasion: 0, protection: 0, threat: 0, tactics: 0, penalty: 0, boardImpact: 0, total: 0 };
+    let detail = { capture: 0, evasion: 0, protection: 0, threat: 0, tactics: 0,
+     penalty: 0, boardImpact: 0, mobility:0, total: 0 };
 
     // --- 1. TẠO TRẠNG THÁI GIẢ LẬP (Mảng sạch) ---
     // Trước khi đi
@@ -385,8 +382,26 @@ function getMoveScore(currentPieces, move, side) {
         detail.penalty -= 60;
     }
 
+    // --- 7. TÍNH ĐIỂM CƠ ĐỘNG (MOBILITY) ---
+
+    // Lấy tất cả nước đi hợp lệ của ta và địch ở trạng thái TRƯỚC
+    const myMovesBefore = getAllValidMoves(beforePieces, side).length;
+    const oppMovesBefore = getAllValidMoves(beforePieces, opponentSide).length;
+
+    // Lấy tất cả nước đi hợp lệ của ta và địch ở trạng thái SAU
+    const myMovesAfter = getAllValidMoves(afterPieces, side).length;
+    const oppMovesAfter = getAllValidMoves(afterPieces, opponentSide).length;
+
+    // Tính toán độ tăng trưởng
+    const myGrowth = myMovesAfter - myMovesBefore;
+    const oppGrowth = oppMovesAfter - oppMovesBefore;
+
+    // Điểm mobility = Ta tăng bao nhiêu - Địch tăng bấy nhiêu
+    detail.mobility = (myGrowth - oppGrowth);
+
     // --- TỔNG KẾT ---
-    detail.total = detail.capture + detail.evasion + detail.protection + detail.threat + detail.tactics + detail.penalty + detail.boardImpact;
+    detail.total = detail.capture + detail.evasion + detail.protection
+     + detail.threat + detail.tactics + detail.penalty + detail.boardImpact + detail.mobility;
 
     return detail;
 }

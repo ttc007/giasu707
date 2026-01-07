@@ -975,3 +975,13 @@ btnAuto.addEventListener('click', () => {
         btnAuto.className = "btn-auto-off";
     }
 });
+
+document.getElementById('btn-restart').addEventListener('click', function() {
+    if (confirm("Bạn có chắc chắn muốn làm mới ván cờ không?")) {
+        localStorage.removeItem('xiangqi_save_game');
+        // sendFinalStats(result);
+
+        selectedPiece = null;
+        game.scene.scenes[0].scene.restart(); 
+    }
+});

@@ -70,11 +70,11 @@ class GameScoreController extends Controller
     }
 
     public function getAiMove(Request $request) {
-        $boardStats = $request->input('board'); // Chuỗi 189 ký tự
-        $turn = $request->input('turn'); // 'R' hoặc 'B'
+        $boardStats = $request->input('board'); // Chuỗi 90 ký tự
+        $turn = $request->input('turn');
+        $colorForBook = ($turn === 'R') ? 'red' : 'green';
 
-        // --- BƯỚC 1: TRUY VẤN BẢNG BOOKS (Giữ nguyên logic ưu tiên) ---
-        $colorForBook = ($turn === 'R') ? 'red' : 'green'; 
+        // --- LẦN 1: TÌM TRỰC TIẾP ---
         $bookMove = DB::table('books')
             ->where('image_chess', $boardStats)
             ->where('color', $colorForBook)
@@ -82,18 +82,19 @@ class GameScoreController extends Controller
             ->first();
 
         if ($bookMove) {
-            $moveData = json_decode($bookMove->move);
-            return response()->json([
-                'status' => 'success',
-                'source' => 'book',
-                'move' => [ // Trả về nước đơn lẻ vì Book là chuẩn nhất
-                    'fromCol' => -1 + (int)$moveData->fromX,
-                    'fromRow' => 10 - (int)$moveData->fromY,
-                    'toCol' => -1 + (int)$moveData->toX,
-                    'toRow' => 10 - (int)$moveData->toY
-                ],
-                'comment' => $bookMove->comment
-            ]);
+            return $this->formatBookResponse($bookMove, false);
+        }
+
+        // --- LẦN 2: TÌM ĐỐI XỨNG ---
+        $mirroredBoard = $this->mirrorBoard($boardStats);
+        $mirrorBookMove = DB::table('books')
+            ->where('image_chess', $mirroredBoard)
+            ->where('color', $colorForBook)
+            ->where('is_hidden', 0)
+            ->first();
+
+        if ($mirrorBookMove) {
+            return $this->formatBookResponse($mirrorBookMove, true);
         }
 
         // --- BƯỚC 2: TRUY VẤN TẤT CẢ MOVE_STATS ---
@@ -133,29 +134,41 @@ class GameScoreController extends Controller
             ]);
     }
 
-    private function convertToBookFormat($boardStats) {
-        // 1. Tách các hàng
-        $rows = explode('|', $boardStats);
+    private function mirrorBoard($boardStats) {
+        // 1. Chia chuỗi 90 ký tự thành mảng, mỗi phần tử là 1 hàng (9 ô)
+        $rows = str_split($boardStats, 9); 
         
-        // 2. ĐẢO NGƯỢC THỨ TỰ HÀNG: Đưa hàng 9 (Đỏ) lên vị trí đầu tiên của chuỗi
-        $rows = array_reverse($rows);
+        $mirroredRows = array_map(function($row) {
+            // 2. Đảo ngược ký tự trong từng hàng (Trái sang Phải)
+            return strrev($row);
+        }, $rows);
+        
+        // 3. Nối lại thành chuỗi 90 ký tự đã được đối xứng
+        return implode('', $mirroredRows);
+    }
 
-        $bookBoard = "";
+    private function formatBookResponse($bookMove, $isMirrored = false) {
+        $moveData = json_decode($bookMove->move);
+        
+        $fromX = (int)$moveData->fromX;
+        $toX = (int)$moveData->toX;
 
-        // 3. MAP CHUẨN: R (Xe), N (Mã), B (Tượng), A (Sĩ), K (Tướng), C (Pháo), P (Tốt)
-        // Đỏ HOA, Đen thường
-        $map = [
-            'RX' => 'R', 'RM' => 'N', 'RT' => 'B', 'RS' => 'A', 'RG' => 'K', 'RP' => 'C', 'RO' => 'P', // Đỏ
-            'BX' => 'r', 'BM' => 'n', 'BT' => 'b', 'BS' => 'a', 'BG' => 'k', 'BP' => 'c', 'BO' => 'p'  // Đen
-        ];
-
-        foreach ($rows as $row) {
-            for ($i = 0; $i < strlen($row); $i += 2) {
-                $piece = substr($row, $i, 2);
-                $bookBoard .= $map[$piece] ?? ".";
-            }
+        // Nếu là bàn cờ đối xứng, phải đảo ngược tọa độ X (cột)
+        if ($isMirrored) {
+            $fromX = 10 - $fromX;
+            $toX = 10 - $toX;
         }
-        
-        return $bookBoard;
+
+        return response()->json([
+            'status' => 'success',
+            'source' => 'book',
+            'move' => [
+                'fromCol' => -1 + $fromX,
+                'fromRow' => 10 - (int)$moveData->fromY,
+                'toCol' => -1 + $toX,
+                'toRow' => 10 - (int)$moveData->toY
+            ],
+            'comment' => ($isMirrored ? "[Đối xứng] " : "") . $bookMove->comment
+        ]);
     }
 }
